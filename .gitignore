@@ -25,3 +25,4 @@ hs_err_pid*
 workspace.xml
 modules.xml
 .idea/libraries/*
+*.iml
