@@ -1,5 +1,6 @@
 package com.nunoneto;
 
+import com.nunoneto.databases.UserDatabase;
 import com.nunoneto.loggers.Logger;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
@@ -18,6 +19,12 @@ public class App {
 
     public static ExecutorService getAsync() {
         return executors;
+    }
+
+    private static UserDatabase userDatabase;
+
+    public static UserDatabase getUserDatabase() {
+        return userDatabase;
     }
 
     private static File dataFolder;
@@ -93,7 +100,6 @@ public class App {
         server.join();
 
     }
-
 
 
 }

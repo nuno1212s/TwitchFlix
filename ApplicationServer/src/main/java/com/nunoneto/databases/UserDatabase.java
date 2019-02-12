@@ -1,5 +1,6 @@
 package com.nunoneto.databases;
 
+import com.nunoneto.authentication.accounts.OwnUser;
 import com.nunoneto.authentication.User;
 
 import java.util.UUID;
@@ -38,5 +39,14 @@ public interface UserDatabase {
      * @return
      */
     User getAccountInformation(UUID userID);
+
+    /**
+     * Get th
+     * @param email
+     * @return
+     */
+    OwnUser getAccountInformationOwnAccount(String email);
+
+    OwnUser getAccountInformationOwnAccount(UUID ID);
 
 }

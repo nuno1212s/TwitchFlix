@@ -44,6 +44,12 @@
             <artifactId>jersey-media-moxy</artifactId>
             <version>2.28</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.28.0</version>
+        </dependency>
     </dependencies>
 
     <build>

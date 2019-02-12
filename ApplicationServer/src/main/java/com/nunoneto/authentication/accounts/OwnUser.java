@@ -1,4 +1,6 @@
-package com.nunoneto.authentication;
+package com.nunoneto.authentication.accounts;
+
+import com.nunoneto.authentication.User;
 
 public class OwnUser extends User {
 

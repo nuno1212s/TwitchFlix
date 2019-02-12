@@ -2,6 +2,13 @@ package com.nunoneto.authentication;
 
 import java.util.UUID;
 
+/**
+ * Base user storage class.
+ *
+ * Does not store the password of the user
+ *
+ * This class is meant to be used as OAuth2 google
+ */
 public abstract class User {
 
     //An unique universal identifier for each user
