@@ -1,11 +1,15 @@
 package com.nunoneto;
 
+import com.nunoneto.authentication.accounts.AuthenticationHandler;
 import com.nunoneto.databases.UserDatabase;
 import com.nunoneto.loggers.Logger;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.glassfish.jersey.servlet.ServletContainer;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -15,7 +19,7 @@ import java.util.logging.Level;
 
 public class App {
 
-    private static ExecutorService executors = Executors.newFixedThreadPool(50);
+    private static ExecutorService executors = Executors.newFixedThreadPool(15);
 
     public static ExecutorService getAsync() {
         return executors;
@@ -94,6 +98,12 @@ public class App {
         https.setHost("localhost");
         https.setIdleTimeout(500000);
 
+        ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
+        servletContextHandler.setContextPath("/");
+        server.setHandler(servletContextHandler);
+
+        registerServlets(servletContextHandler);
+
         server.addConnector(https);
 
         server.start();
@@ -101,5 +111,13 @@ public class App {
 
     }
 
+    private static void registerServlets(ServletContextHandler ctx) {
+
+        ServletHolder serHol = ctx.addServlet(ServletContainer.class, "/rest/*");
+        serHol.setInitOrder(1);
+        serHol.setInitParameter("jersey.config.server.provider.classnames",
+                AuthenticationHandler.class.getCanonicalName());
+
+    }
 
 }

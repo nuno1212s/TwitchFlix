@@ -5,8 +5,10 @@ package com.nunoneto.authentication.oauth2;
  */
 public class OAuth2Handler {
 
-    private static String clientID;
+    private static final String CLIENT_ID = "";
 
-    private static String clientSecret;
+    private static final String CLIENT_SECRET = "";
+
+    private static final String REDIRECT_URL = "";
 
 }

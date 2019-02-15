@@ -19,4 +19,15 @@ public class OwnUser extends User {
         this.confirmed = false;
     }
 
+    public byte[] getPassword() {
+        return password;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public boolean isConfirmed() {
+        return confirmed;
+    }
 }
