@@ -8,6 +8,7 @@ import javax.ws.rs.core.MediaType;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -16,7 +17,7 @@ public class AuthenticationHandler {
 
     /**
      * Each key is valid for 60 minutes without activity. (A new key is generated on every request to maintain security)
-     *
+     * <p>
      * After those 60 minutes have passed, a new key must be generated for the user, requiring re authentication
      */
     private static final long DEFAULT_VALID_TIME = 3600L * 1000;
@@ -29,7 +30,8 @@ public class AuthenticationHandler {
 
     /**
      * Attempts to authenticate the user
-     * @param email The user's email
+     *
+     * @param email    The user's email
      * @param password The salted + hashed password
      */
     @POST
@@ -55,23 +57,23 @@ public class AuthenticationHandler {
 
     @POST
     @Path("logout")
+    @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
-    public void logOut(String email, String accessToken) {
+    public boolean logOut(String email, String accessToken) {
 
         User user = App.getUserDatabase().getAccountInformation(email);
 
-        ActiveConnection session = connections.get(user.getUserID());
+        if (isValid(user.getUserID(), Base64.getDecoder().decode(accessToken))) {
 
-        if (session != null) {
+            connections.remove(user.getUserID());
 
-            if (Arrays.equals(session.getAccessToken(), accessToken.getBytes())) {
-                connections.remove(user.getUserID());
-            } else {
-                throw new WebApplicationException("Wrong access token, operation not permitted", 403);
-            }
+            return true;
+
+        } else {
+
+            throw new WebApplicationException("Wrong access token.", 403);
 
         }
-
     }
 
     @POST
@@ -93,13 +95,19 @@ public class AuthenticationHandler {
 
     /**
      * Check if an access token is valid for a user
+     *
      * @return
      */
     public boolean isValid(UUID userID, byte[] accessToken) {
         if (this.connections.containsKey(userID)) {
 
-            return Arrays.equals(this.connections.get(userID).getAccessToken(), accessToken);
+            ActiveConnection activeConnection = this.connections.get(userID);
 
+            if (!activeConnection.isValid()) {
+                return false;
+            }
+
+            return Arrays.equals(activeConnection.getAccessTokenBytes(), accessToken);
         }
 
         return false;
@@ -113,11 +121,11 @@ public class AuthenticationHandler {
 
 class ActiveConnection {
 
-    UUID owner;
+    private UUID owner;
 
-    long createdTime, validFor;
+    private long createdTime, validFor;
 
-    byte[] accessToken;
+    private byte[] accessToken;
 
     public ActiveConnection(UUID owner, long validFor) {
         this.owner = owner;
@@ -128,12 +136,13 @@ class ActiveConnection {
         this.accessToken = new BigInteger(256, new SecureRandom()).toByteArray();
     }
 
-    public void refreshToken() {
+    public ActiveConnection refreshToken() {
 
         this.accessToken = new BigInteger(256, new SecureRandom()).toByteArray();
 
         this.createdTime = System.currentTimeMillis();
 
+        return this;
     }
 
     public UUID getOwner() {
@@ -144,11 +153,19 @@ class ActiveConnection {
         return createdTime;
     }
 
+    public boolean isValid() {
+        return getCreatedTime() + getValidFor() <= System.currentTimeMillis();
+    }
+
     public long getValidFor() {
         return validFor;
     }
 
-    public byte[] getAccessToken() {
+    public byte[] getAccessTokenBytes() {
         return accessToken;
+    }
+
+    public String getAccessToken() {
+        return Base64.getEncoder().encodeToString(accessToken);
     }
 }

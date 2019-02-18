@@ -3,6 +3,8 @@ package com.nunoneto;
 import com.nunoneto.authentication.accounts.AuthenticationHandler;
 import com.nunoneto.databases.UserDatabase;
 import com.nunoneto.loggers.Logger;
+import com.nunoneto.videohandler.SearchEngine;
+import com.nunoneto.videohandler.VideoRestHandler;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -29,6 +31,12 @@ public class App {
 
     public static UserDatabase getUserDatabase() {
         return userDatabase;
+    }
+
+    private static SearchEngine videoSearchEngine;
+
+    public static SearchEngine getVideoSearchEngine() {
+        return videoSearchEngine;
     }
 
     private static File dataFolder;
@@ -113,10 +121,15 @@ public class App {
 
     private static void registerServlets(ServletContextHandler ctx) {
 
-        ServletHolder serHol = ctx.addServlet(ServletContainer.class, "/rest/*");
-        serHol.setInitOrder(1);
-        serHol.setInitParameter("jersey.config.server.provider.classnames",
+        ServletHolder authentication = ctx.addServlet(ServletContainer.class, "/*");
+        authentication.setInitOrder(1);
+        authentication.setInitParameter("jersey.config.server.provider.classnames",
                 AuthenticationHandler.class.getCanonicalName());
+
+        ServletHolder mainRest = ctx.addServlet(ServletContainer.class, "/*");
+        mainRest.setInitOrder(2);
+        mainRest.setInitParameter("jersey.config.server.provider.classnames",
+                VideoRestHandler.class.getCanonicalName());
 
     }
 
