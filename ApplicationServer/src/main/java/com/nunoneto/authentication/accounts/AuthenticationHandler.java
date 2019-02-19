@@ -5,8 +5,6 @@ import com.nunoneto.authentication.User;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.UUID;
@@ -88,9 +86,18 @@ public class AuthenticationHandler {
 
         OwnUser ownUser = new OwnUser(firstName, lastName, email, password, salt);
 
+        App.getAsync().submit(() -> App.getUserDatabase().createAccount(ownUser));
+
         App.getUserDatabase().createAccount(ownUser);
 
         return generateActiveConnection(ownUser.getUserID());
+    }
+
+    /**
+     * Creates an OAuth Google session
+     */
+    public ActiveConnection createOAuthConnection(UUID userID) {
+        return generateActiveConnection(userID);
     }
 
     /**
@@ -113,59 +120,13 @@ public class AuthenticationHandler {
         return false;
     }
 
+    public ActiveConnection getActiveConnection(UUID userID) {
+        return this.connections.getOrDefault(userID, null);
+    }
+
     private ActiveConnection generateActiveConnection(UUID owner) {
         return new ActiveConnection(owner, DEFAULT_VALID_TIME);
     }
 
 }
 
-class ActiveConnection {
-
-    private UUID owner;
-
-    private long createdTime, validFor;
-
-    private byte[] accessToken;
-
-    public ActiveConnection(UUID owner, long validFor) {
-        this.owner = owner;
-        this.validFor = validFor;
-
-        this.createdTime = System.currentTimeMillis();
-
-        this.accessToken = new BigInteger(256, new SecureRandom()).toByteArray();
-    }
-
-    public ActiveConnection refreshToken() {
-
-        this.accessToken = new BigInteger(256, new SecureRandom()).toByteArray();
-
-        this.createdTime = System.currentTimeMillis();
-
-        return this;
-    }
-
-    public UUID getOwner() {
-        return owner;
-    }
-
-    public long getCreatedTime() {
-        return createdTime;
-    }
-
-    public boolean isValid() {
-        return getCreatedTime() + getValidFor() <= System.currentTimeMillis();
-    }
-
-    public long getValidFor() {
-        return validFor;
-    }
-
-    public byte[] getAccessTokenBytes() {
-        return accessToken;
-    }
-
-    public String getAccessToken() {
-        return Base64.getEncoder().encodeToString(accessToken);
-    }
-}

@@ -39,6 +39,12 @@ public class App {
         return videoSearchEngine;
     }
 
+    private static AuthenticationHandler authenticationHandler;
+
+    public static AuthenticationHandler getAuthenticationHandler() {
+        return authenticationHandler;
+    }
+
     private static File dataFolder;
 
     static {
