@@ -2,6 +2,7 @@ package com.nunoneto;
 
 import com.nunoneto.authentication.accounts.AuthenticationHandler;
 import com.nunoneto.databases.UserDatabase;
+import com.nunoneto.databases.VideoDatabase;
 import com.nunoneto.loggers.Logger;
 import com.nunoneto.videohandler.SearchEngine;
 import com.nunoneto.videohandler.VideoRestHandler;
@@ -13,7 +14,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import java.io.File;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -37,6 +38,12 @@ public class App {
 
     public static SearchEngine getVideoSearchEngine() {
         return videoSearchEngine;
+    }
+
+    private static VideoDatabase videoDatabase;
+
+    public static VideoDatabase getVideoDatabase() {
+        return videoDatabase;
     }
 
     private static AuthenticationHandler authenticationHandler;
@@ -70,6 +77,8 @@ public class App {
 
         new Logger(dataFolder);
 
+        authenticationHandler = new AuthenticationHandler();
+
         //Setup http multithreading to stop blocking I/O requests
         QueuedThreadPool httpThreadPool = new QueuedThreadPool();
 
@@ -77,10 +86,13 @@ public class App {
 
         Server server = new Server(httpThreadPool);
 
-        File f = new File(App.class.getResource("keystore2.jks").toURI());
+        File f = new File(dataFolder + File.separator + "SSL" + File.separator, "keystore2.jks");
 
         if (!f.exists()) {
-            Logger.getIns().log(Level.SEVERE, "The keystore file does not exist. Cannot establish secure server.");
+
+            exportKeyStore(f);
+
+            Logger.log(Level.SEVERE, "The keystore file does not exist. Cannot establish secure server.");
 
             return;
         }
@@ -122,6 +134,31 @@ public class App {
 
         server.start();
         server.join();
+
+    }
+
+    private static void exportKeyStore(File destination) {
+
+        Logger.log(Level.INFO, "Exporting keystore file.");
+
+        try (InputStream resourceAsStream = App.class.getResourceAsStream("keystore2.jks");
+             OutputStream outputStream = new FileOutputStream(destination)) {
+
+            destination.createNewFile();
+
+            int length;
+
+            byte[] buffer = new byte[1024];
+
+            while ((length = resourceAsStream.read(buffer)) != 0) {
+
+                outputStream.write(buffer, 0, length);
+
+            }
+
+        } catch (IOException e) {
+            Logger.logException(e);
+        }
 
     }
 

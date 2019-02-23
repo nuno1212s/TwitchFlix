@@ -8,23 +8,15 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 public class Logger {
 
-    private static Logger ins;
+    private static File outputFile;
 
-    public static Logger getIns() {
-        return ins;
-    }
-
-    private File outputFile;
-
-    private PrintStream systemOut, logOut;
+    private static PrintStream systemOut, logOut;
 
     public Logger(File dataFolder) {
-        ins = this;
 
         outputFile = new File(dataFolder, "log.txt");
 
@@ -77,11 +69,11 @@ public class Logger {
 
     }
 
-    public void log(Object object) {
+    public static void log(Object object) {
         log(Level.INFO, object);
     }
 
-    public void log(Level level, Object string) {
+    public static void log(Level level, Object string) {
 
 
         String logMessage = "[" + getDate() + "] " + "[" + level.getName() + "] " + string.toString();
@@ -94,7 +86,16 @@ public class Logger {
 
     }
 
-    private String getDate() {
+    public static void logException(Throwable throwable) {
+
+        throwable.printStackTrace(logOut);
+
+        throwable.printStackTrace(systemOut);
+
+        App.getAsync().submit(() -> logOut.flush());
+    }
+
+    private static String getDate() {
         Calendar d = Calendar.getInstance();
 
         Date time = d.getTime();

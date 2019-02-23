@@ -15,5 +15,7 @@ public interface VideoDatabase {
 
     List<Video> getVideosSortedByUploadDate();
 
+    void incrementVideoViews(UUID videoID);
+
 
 }

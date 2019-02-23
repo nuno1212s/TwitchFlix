@@ -1,5 +1,7 @@
 package com.nunoneto.videohandler;
 
+import com.nunoneto.App;
+
 import java.util.UUID;
 
 public class Video {
@@ -89,5 +91,11 @@ public class Video {
 
     public int getViews() {
         return views;
+    }
+
+    public void addView() {
+        this.views++;
+
+        App.getVideoDatabase().incrementVideoViews(this.getVideoID());
     }
 }

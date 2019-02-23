@@ -2,9 +2,9 @@ package com.nunoneto.util;
 
 public class Pair<K, T> {
 
-    K key;
+    private K key;
 
-    T value;
+    private T value;
 
     public Pair(K key, T value) {
         this.key = key;
