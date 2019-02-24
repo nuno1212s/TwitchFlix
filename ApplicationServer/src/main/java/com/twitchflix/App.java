@@ -1,11 +1,11 @@
-package com.nunoneto;
+package com.twitchflix;
 
-import com.nunoneto.authentication.accounts.AuthenticationHandler;
-import com.nunoneto.databases.UserDatabase;
-import com.nunoneto.databases.VideoDatabase;
-import com.nunoneto.loggers.Logger;
-import com.nunoneto.videohandler.SearchEngine;
-import com.nunoneto.videohandler.VideoRestHandler;
+import com.twitchflix.authentication.accounts.AuthenticationHandler;
+import com.twitchflix.databases.UserDatabase;
+import com.twitchflix.databases.VideoDatabase;
+import com.twitchflix.loggers.Logger;
+import com.twitchflix.videohandler.SearchEngine;
+import com.twitchflix.videohandler.VideoRestHandler;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;

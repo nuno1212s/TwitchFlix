@@ -1,4 +1,4 @@
-package com.nunoneto.util;
+package com.twitchflix.util;
 
 public class Pair<K, T> {
 

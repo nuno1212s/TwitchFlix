@@ -1,6 +1,6 @@
-package com.nunoneto.loggers;
+package com.twitchflix.loggers;
 
-import com.nunoneto.App;
+import com.twitchflix.App;
 
 import java.io.*;
 import java.text.SimpleDateFormat;

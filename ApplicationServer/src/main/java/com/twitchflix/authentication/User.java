@@ -1,4 +1,4 @@
-package com.nunoneto.authentication;
+package com.twitchflix.authentication;
 
 import java.util.ArrayList;
 import java.util.Collections;

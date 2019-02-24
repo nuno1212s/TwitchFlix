@@ -1,7 +1,7 @@
-package com.nunoneto.databases;
+package com.twitchflix.databases;
 
-import com.nunoneto.authentication.accounts.OwnUser;
-import com.nunoneto.authentication.User;
+import com.twitchflix.authentication.accounts.OwnUser;
+import com.twitchflix.authentication.User;
 
 import java.util.UUID;
 

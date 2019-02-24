@@ -1,4 +1,4 @@
-package com.nunoneto.authentication.accounts;
+package com.twitchflix.authentication.accounts;
 
 import java.math.BigInteger;
 import java.security.SecureRandom;

@@ -1,4 +1,4 @@
-package com.nunoneto.videohandler;
+package com.twitchflix.videohandler;
 
 import java.util.List;
 

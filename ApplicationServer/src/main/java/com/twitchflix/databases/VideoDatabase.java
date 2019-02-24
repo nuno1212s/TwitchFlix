@@ -1,6 +1,6 @@
-package com.nunoneto.databases;
+package com.twitchflix.databases;
 
-import com.nunoneto.videohandler.Video;
+import com.twitchflix.videohandler.Video;
 
 import java.util.List;
 import java.util.UUID;

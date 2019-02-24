@@ -1,7 +1,7 @@
-package com.nunoneto.rest.models;
+package com.twitchflix.rest.models;
 
-import com.nunoneto.authentication.User;
-import com.nunoneto.videohandler.Video;
+import com.twitchflix.authentication.User;
+import com.twitchflix.videohandler.Video;
 
 import java.util.UUID;
 

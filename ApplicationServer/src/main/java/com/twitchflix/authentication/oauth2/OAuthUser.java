@@ -1,6 +1,6 @@
-package com.nunoneto.authentication.oauth2;
+package com.twitchflix.authentication.oauth2;
 
-import com.nunoneto.authentication.User;
+import com.twitchflix.authentication.User;
 
 public class OAuthUser extends User {
 

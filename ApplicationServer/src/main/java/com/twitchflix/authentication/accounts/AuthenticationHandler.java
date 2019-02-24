@@ -1,7 +1,7 @@
-package com.nunoneto.authentication.accounts;
+package com.twitchflix.authentication.accounts;
 
-import com.nunoneto.App;
-import com.nunoneto.authentication.User;
+import com.twitchflix.App;
+import com.twitchflix.authentication.User;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

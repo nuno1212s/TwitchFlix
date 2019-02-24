@@ -1,6 +1,6 @@
-package com.nunoneto.videohandler;
+package com.twitchflix.videohandler;
 
-import com.nunoneto.App;
+import com.twitchflix.App;
 
 import java.util.UUID;
 

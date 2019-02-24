@@ -1,6 +1,6 @@
-package com.nunoneto.authentication.accounts;
+package com.twitchflix.authentication.accounts;
 
-import com.nunoneto.authentication.User;
+import com.twitchflix.authentication.User;
 
 public class OwnUser extends User {
 

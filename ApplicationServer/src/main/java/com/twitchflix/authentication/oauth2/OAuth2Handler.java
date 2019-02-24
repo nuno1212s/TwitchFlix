@@ -1,4 +1,4 @@
-package com.nunoneto.authentication.oauth2;
+package com.twitchflix.authentication.oauth2;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -6,9 +6,9 @@ import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import com.nunoneto.App;
-import com.nunoneto.authentication.User;
-import com.nunoneto.authentication.accounts.ActiveConnection;
+import com.twitchflix.App;
+import com.twitchflix.authentication.User;
+import com.twitchflix.authentication.accounts.ActiveConnection;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;

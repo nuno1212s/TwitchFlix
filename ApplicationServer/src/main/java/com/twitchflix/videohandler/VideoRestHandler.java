@@ -1,10 +1,10 @@
-package com.nunoneto.videohandler;
+package com.twitchflix.videohandler;
 
-import com.nunoneto.App;
-import com.nunoneto.authentication.User;
-import com.nunoneto.authentication.accounts.ActiveConnection;
-import com.nunoneto.rest.models.UserVideo;
-import com.nunoneto.util.Pair;
+import com.twitchflix.App;
+import com.twitchflix.authentication.User;
+import com.twitchflix.authentication.accounts.ActiveConnection;
+import com.twitchflix.rest.models.UserVideo;
+import com.twitchflix.util.Pair;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
