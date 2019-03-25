@@ -1,11 +1,10 @@
-package com.twitchflix;
+package com.nunoneto;
 
-import com.twitchflix.authentication.accounts.AuthenticationHandler;
-import com.twitchflix.databases.UserDatabase;
-import com.twitchflix.databases.VideoDatabase;
-import com.twitchflix.loggers.Logger;
-import com.twitchflix.videohandler.SearchEngine;
-import com.twitchflix.videohandler.VideoRestHandler;
+import com.nunoneto.authentication.accounts.AuthenticationHandler;
+import com.nunoneto.databases.UserDatabase;
+import com.nunoneto.loggers.Logger;
+import com.nunoneto.videohandler.SearchEngine;
+import com.nunoneto.videohandler.VideoRestHandler;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -14,7 +13,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import java.io.*;
+import java.io.File;
 import java.net.URISyntaxException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -173,6 +172,11 @@ public class App {
         mainRest.setInitOrder(2);
         mainRest.setInitParameter("jersey.config.server.provider.classnames",
                 VideoRestHandler.class.getCanonicalName());
+
+        ServletHolder oAuthRest = ctx.addServlet(ServletContainer.class, "/*");
+        oAuthRest.setInitOrder(3);
+        oAuthRest.setInitParameter("jersey.config.server.provider.classnames",
+                OAuth2Handler.class.getCanonicalName());
 
     }
 

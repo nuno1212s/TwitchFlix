@@ -1,5 +1,7 @@
 package com.twitchflix.authentication;
 
+import org.bson.Document;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
