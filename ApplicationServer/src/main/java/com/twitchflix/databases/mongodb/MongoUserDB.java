@@ -1,4 +1,4 @@
-package com.nunoneto.databases.mongodb;
+package com.twitchflix.databases.mongodb;
 
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
@@ -8,9 +8,9 @@ import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
-import com.nunoneto.authentication.User;
-import com.nunoneto.authentication.accounts.OwnUser;
-import com.nunoneto.databases.UserDatabase;
+import com.twitchflix.authentication.User;
+import com.twitchflix.authentication.accounts.OwnUser;
+import com.twitchflix.databases.UserDatabase;
 import org.bson.Document;
 import org.reactivestreams.Publisher;
 

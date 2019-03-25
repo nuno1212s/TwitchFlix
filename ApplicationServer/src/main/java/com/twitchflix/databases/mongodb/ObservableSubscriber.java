@@ -1,4 +1,4 @@
-package com.nunoneto.databases.mongodb;
+package com.twitchflix.databases.mongodb;
 
 import com.mongodb.MongoTimeoutException;
 import org.reactivestreams.Subscriber;
