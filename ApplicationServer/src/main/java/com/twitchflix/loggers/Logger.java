@@ -16,43 +16,40 @@ public class Logger {
 
     private static PrintStream systemOut, logOut;
 
-    public Logger(File dataFolder) {
+    public Logger() {
 
-        outputFile = new File(dataFolder, "log.txt");
+        outputFile = App.getFileManager().getFile("log.txt");
 
-        if (outputFile.exists()) {
-            //Output file already exists, zip the old log file and create a new one
+        //Output file already exists, zip the old log file and create a new one
 
-            File storageFile = new File(dataFolder, "log- " + getDate() + ".zip");
+        File storageFile = App.getFileManager().getFileAndCreate("log-" + getDate() + ".zip");
 
-            try (ZipOutputStream writeStream = new ZipOutputStream(new FileOutputStream(storageFile));
-                 //Read the old log file
-                    InputStream readStream = new FileInputStream(outputFile)) {
+        try (ZipOutputStream writeStream = new ZipOutputStream(new FileOutputStream(storageFile));
+             //Read the old log file
+             InputStream readStream = new FileInputStream(outputFile)) {
 
-                storageFile.createNewFile();
+            ZipEntry e = new ZipEntry("log.txt");
 
-                ZipEntry e = new ZipEntry("log.txt");
+            writeStream.putNextEntry(e);
 
-                writeStream.putNextEntry(e);
+            int length;
 
-                int length;
+            //1KB read buffer
+            byte[] buffer = new byte[1024];
 
-                //1KB read buffer
-                byte[] buffer = new byte[1024];
+            while ((length = readStream.read(buffer)) != 0) {
 
-                while ((length = readStream.read(buffer)) != 0) {
+                writeStream.write(buffer, 0, length);
 
-                    writeStream.write(buffer, 0, length);
-
-                }
-
-                //Delete the contents of the output file
-                outputFile.delete();
-                outputFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
             }
+
+            //Delete the contents of the output file
+            outputFile.delete();
+            outputFile.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
 
         systemOut = System.out;
 

@@ -1,10 +1,16 @@
-package com.nunoneto;
+package com.twitchflix;
 
-import com.nunoneto.authentication.accounts.AuthenticationHandler;
-import com.nunoneto.databases.UserDatabase;
-import com.nunoneto.loggers.Logger;
-import com.nunoneto.videohandler.SearchEngine;
-import com.nunoneto.videohandler.VideoRestHandler;
+import com.twitchflix.authentication.accounts.AuthenticationHandler;
+import com.twitchflix.authentication.oauth2.OAuth2Handler;
+import com.twitchflix.databases.UserDatabase;
+import com.twitchflix.databases.VideoDatabase;
+import com.twitchflix.databases.mongodb.MongoUserDB;
+import com.twitchflix.databases.mysql.MySqlVideoDB;
+import com.twitchflix.filesystem.DefaultFileManager;
+import com.twitchflix.filesystem.FileManager;
+import com.twitchflix.loggers.Logger;
+import com.twitchflix.videohandler.SearchEngine;
+import com.twitchflix.videohandler.VideoRestHandler;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
 import org.eclipse.jetty.servlet.ServletContextHandler;
@@ -13,8 +19,7 @@ import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import java.io.File;
-import java.net.URISyntaxException;
+import java.io.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -23,58 +28,48 @@ public class App {
 
     private static ExecutorService executors = Executors.newFixedThreadPool(15);
 
-    public static ExecutorService getAsync() {
-        return executors;
-    }
-
     private static UserDatabase userDatabase;
-
-    public static UserDatabase getUserDatabase() {
-        return userDatabase;
-    }
 
     private static SearchEngine videoSearchEngine;
 
-    public static SearchEngine getVideoSearchEngine() {
-        return videoSearchEngine;
-    }
-
     private static VideoDatabase videoDatabase;
 
-    public static VideoDatabase getVideoDatabase() {
-        return videoDatabase;
-    }
-
     private static AuthenticationHandler authenticationHandler;
+
+    private static FileManager fileManager;
 
     public static AuthenticationHandler getAuthenticationHandler() {
         return authenticationHandler;
     }
 
-    private static File dataFolder;
-
-    static {
-
-        try {
-            dataFolder = new File(App.class.getProtectionDomain().getCodeSource().getLocation()
-                    .toURI());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        String parentPath = dataFolder.toString();
-        dataFolder = new File(parentPath.substring(0, parentPath.lastIndexOf(File.separator)) + File.separator + "App");
-
-        if (!dataFolder.exists()) {
-            dataFolder.mkdir();
-        }
+    public static VideoDatabase getVideoDatabase() {
+        return videoDatabase;
     }
+
+    public static SearchEngine getVideoSearchEngine() {
+        return videoSearchEngine;
+    }
+
+    public static UserDatabase getUserDatabase() {
+        return userDatabase;
+    }
+
+    public static ExecutorService getAsync() {
+        return executors;
+    }
+
+    public static FileManager getFileManager() {
+        return fileManager;
+    }
+
 
     public static void main(String[] args) throws Exception {
 
         //Initialize the logger
 
-        new Logger(dataFolder);
+        initFileManager();
+        initLoggers();
+        initDatabases();
 
         authenticationHandler = new AuthenticationHandler();
 
@@ -85,7 +80,7 @@ public class App {
 
         Server server = new Server(httpThreadPool);
 
-        File f = new File(dataFolder + File.separator + "SSL" + File.separator, "keystore2.jks");
+        File f = getFileManager().getFile("SSL" + File.separator + "keystore2.jks");
 
         if (!f.exists()) {
 
@@ -136,6 +131,9 @@ public class App {
 
     }
 
+    /**
+     * Saves the key store (SHA 256 SSH certificate) to the application folder
+     */
     private static void exportKeyStore(File destination) {
 
         Logger.log(Level.INFO, "Exporting keystore file.");
@@ -178,6 +176,23 @@ public class App {
         oAuthRest.setInitParameter("jersey.config.server.provider.classnames",
                 OAuth2Handler.class.getCanonicalName());
 
+    }
+
+    private static void initDatabases() {
+
+        userDatabase = new MongoUserDB();
+        videoDatabase = new MySqlVideoDB();
+
+    }
+
+    private static void initFileManager() {
+
+        fileManager = new DefaultFileManager();
+
+    }
+
+    private static void initLoggers() {
+        new Logger();
     }
 
 }

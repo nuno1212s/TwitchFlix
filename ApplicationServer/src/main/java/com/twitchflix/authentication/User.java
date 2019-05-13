@@ -1,11 +1,17 @@
 package com.twitchflix.authentication;
 
+import com.twitchflix.authentication.accounts.OwnUser;
+import com.twitchflix.authentication.oauth2.OAuthUser;
 import org.bson.Document;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 /**
  * Base user storage class.
@@ -85,6 +91,37 @@ public abstract class User {
 
     public boolean hasUploadedVideo(UUID video) {
         return this.uploadedVideos.contains(video);
+    }
+
+    public Document toMongoDB() {
+
+        return new Document("userID", this.getUserID().toString())
+                .append("FirstName", this.getFirstName())
+                .append("LastName", this.getLastName())
+                .append("Email", this.getEmail())
+                .append("LikedVideos", this.likedVideos)
+                .append("WatchedVideos", this.watchedVideos)
+                .append("UploadedVideos", this.uploadedVideos);
+
+    }
+
+    public static User fromMongoDB(Document d) {
+
+        Class<? extends User> users = d.containsKey("Password") ? OwnUser.class : OAuthUser.class;
+
+        User u;
+
+        try {
+            Method fromMongoDB = users.getDeclaredMethod("fromMongoDB", Document.class);
+
+             u = (User) fromMongoDB.invoke(null, d);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+
+            return null;
+        }
+
+        return u;
     }
 
 }
