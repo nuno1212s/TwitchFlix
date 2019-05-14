@@ -59,7 +59,7 @@ public class VideoRestHandler {
 
             User user = App.getUserDatabase().getAccountInformation(userID2);
 
-            List<Video> videos = engine.getLatestVideos();
+            List<Video> videos = engine.getFeed();
 
             List<UserVideo> instantiatedVideos = instantiateVideos(videos, user);
 
