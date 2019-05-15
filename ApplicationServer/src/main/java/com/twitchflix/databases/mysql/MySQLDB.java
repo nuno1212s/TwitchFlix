@@ -6,6 +6,9 @@ import com.twitchflix.filesystem.FileManager;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+
 public abstract class MySQLDB {
 
     protected static HikariDataSource dataSource;
@@ -36,7 +39,12 @@ public abstract class MySQLDB {
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         config.addDataSourceProperty("cachePrepStmts", "true");
 
-        dataSource = new HikariDataSource(config);
+        MySQLDB.dataSource = new HikariDataSource(config);
     }
+
+    protected Connection getConnection() throws SQLException {
+        return dataSource.getConnection();
+    }
+
 
 }

@@ -1,6 +1,7 @@
-package com.twitchflix.videohandler;
+package com.twitchflix.searchengine;
 
 import com.twitchflix.authentication.User;
+import com.twitchflix.videohandler.Video;
 
 import java.util.List;
 

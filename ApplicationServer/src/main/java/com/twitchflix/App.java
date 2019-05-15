@@ -9,7 +9,7 @@ import com.twitchflix.databases.mysql.MySqlVideoDB;
 import com.twitchflix.filesystem.DefaultFileManager;
 import com.twitchflix.filesystem.FileManager;
 import com.twitchflix.loggers.Logger;
-import com.twitchflix.videohandler.SearchEngine;
+import com.twitchflix.searchengine.SearchEngine;
 import com.twitchflix.videohandler.VideoRestHandler;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
@@ -182,6 +182,12 @@ public class App {
 
         userDatabase = new MongoUserDB();
         videoDatabase = new MySqlVideoDB();
+
+    }
+
+    private static void initSearchEngine() {
+
+
 
     }
 

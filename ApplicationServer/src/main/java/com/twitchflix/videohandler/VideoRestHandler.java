@@ -4,6 +4,7 @@ import com.twitchflix.App;
 import com.twitchflix.authentication.User;
 import com.twitchflix.authentication.accounts.ActiveConnection;
 import com.twitchflix.rest.models.UserVideo;
+import com.twitchflix.searchengine.SearchEngine;
 import com.twitchflix.util.Pair;
 
 import javax.ws.rs.*;
@@ -31,7 +32,7 @@ public class VideoRestHandler {
 
             User user = App.getUserDatabase().getAccountInformation(userUUID);
 
-            List<Video> videos = videoSearchEngine.searchVideoByTitle(videoName);
+            List<Video> videos = videoSearchEngine.searchVideoByTitle(videoName, user);
 
             List<UserVideo> userVideos = instantiateVideos(videos, user);
 
@@ -59,7 +60,7 @@ public class VideoRestHandler {
 
             User user = App.getUserDatabase().getAccountInformation(userID2);
 
-            List<Video> videos = engine.getFeed();
+            List<Video> videos = engine.getFeed(user);
 
             List<UserVideo> instantiatedVideos = instantiateVideos(videos, user);
 

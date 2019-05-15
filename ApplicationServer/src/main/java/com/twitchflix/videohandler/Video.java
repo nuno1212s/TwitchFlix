@@ -21,8 +21,8 @@ public class Video {
 
     private String link, thumbnailLink;
 
-    public Video(UUID uploader, String title, String description, boolean live,
-                 String link, String thumbnailLink) {
+    Video(UUID uploader, String title, String description, boolean live,
+          String link, String thumbnailLink) {
 
         this.videoID = UUID.randomUUID();
         this.uploader = uploader;
@@ -37,8 +37,8 @@ public class Video {
 
     }
 
-    public Video(UUID videoID, UUID uploader, String title, String description, long uploadDate,
-                 int likes, int views, boolean live, String link, String thumbnailLink) {
+    protected Video(UUID videoID, UUID uploader, String title, String description, long uploadDate,
+                    int likes, int views, boolean live, String link, String thumbnailLink) {
 
         this.videoID = videoID;
         this.uploader = uploader;
@@ -96,6 +96,8 @@ public class Video {
     public void addView() {
         this.views++;
 
-        App.getVideoDatabase().incrementVideoViews(this.getVideoID());
+        App.getAsync().submit(() ->
+                App.getVideoDatabase().incrementVideoViews(this.getVideoID()));
     }
+
 }
