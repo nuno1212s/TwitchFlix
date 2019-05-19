@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ApplicationClient</string>
+    <string name="landing_page_string">Welcome to Twitch Flix</string>
+    <string name="input_user_name">Username</string>
+    <string name="input_password">Password</string>
+    <string name="attempt_login">Login</string>
+</resources>
