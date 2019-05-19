@@ -20,7 +20,8 @@ public class FileStorage implements InformationStorage {
     @Override
     public boolean isUserLoggedIn() {
 
-        return this.cacheFile.exists();
+        return false;
+//        return this.cacheFile.exists();
 
     }
 

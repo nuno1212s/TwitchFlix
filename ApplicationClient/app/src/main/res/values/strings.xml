@@ -1,7 +1,16 @@
 <resources>
     <string name="app_name">ApplicationClient</string>
     <string name="landing_page_string">Welcome to Twitch Flix</string>
-    <string name="input_user_name">Username</string>
+    <string name="input_user_name">Email</string>
     <string name="input_password">Password</string>
     <string name="attempt_login">Login</string>
+    <string name="server_client_id">793164474933-kems2c08ooo47da8jpn8ak15s1u3tf5h.apps.googleusercontent.com</string>
+    <string name="register">Register</string>
+    <string name="register_form">Register form</string>
+    <string name="input_user_email">Email</string>
+    <string name="input_first_name">First Name</string>
+    <string name="input_last_name">Last Name</string>
+    <string name="register_button">Register</string>
+    <string name="email_not_valid">The email you have provided is not valid</string>
+    <string name="account_already_exists">Account with that email already exists</string>
 </resources>

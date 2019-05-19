@@ -8,6 +8,9 @@
         <item name="colorAccent">@color/colorAccent</item>
 
         <item name="android:windowContentTransitions">true</item>
+
+        <item name="windowNoTitle">true</item>
+        <item name="android:windowNoTitle">true</item>
     </style>
 
 </resources>
