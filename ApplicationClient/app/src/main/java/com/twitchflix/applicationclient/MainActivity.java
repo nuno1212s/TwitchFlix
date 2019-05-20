@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import com.twitchflix.applicationclient.activities.LandingPage;
 import com.twitchflix.applicationclient.activities.LoginActivity;
 import com.twitchflix.applicationclient.datastorage.FileStorage;
 import com.twitchflix.applicationclient.datastorage.InformationStorage;
@@ -20,11 +21,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        setTitle("1");
+        ServerApp.getIns().setInformationStorage(new FileStorage(this));
 
-        Intent intent = new Intent(this, LoginActivity.class);
+        if (!ServerApp.getIns().getInformationStorage().isUserLoggedIn()) {
+            Intent intent = new Intent(this, LoginActivity.class);
 
-        startActivity(intent);
+            startActivity(intent);
+        } else {
+
+            Intent intent = new Intent(this, LandingPage.class);
+
+
+        }
+
 
     }
 }

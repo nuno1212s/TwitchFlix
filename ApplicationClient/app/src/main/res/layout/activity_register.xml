@@ -57,7 +57,7 @@
         android:hint="@string/input_password"/>
 
     <Button
-        android:id="@+id/attempregister"
+        android:id="@+id/attemptregister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -5,18 +5,19 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.ServerApp;
+import com.twitchflix.applicationclient.authentication.PasswordHandler;
+import com.twitchflix.applicationclient.utils.Utils;
 
+import java.lang.ref.WeakReference;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -25,10 +26,6 @@ import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private static final char[] charSet = "123456789abcdefghijklmnopqrstuvyxwzABCDEFGHIJKLMNOPQRSTUVYXWZ".toCharArray();
-
-    private static final Random random = new Random();
-
     private static final Pattern emailPattern = Pattern.compile("^.+@.+\\..+");
 
     @Override
@@ -36,25 +33,14 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        findViewById(R.id.attempregister).setOnClickListener(this::onClickRegister);
-
-
+        findViewById(R.id.attemptregister).setOnClickListener(this::onClickRegister);
     }
 
     public void onClickRegister(View view) {
 
         LinearLayout layout = findViewById(R.id.register_screen);
 
-        View account_already_exists = findViewById(R.id.account_already_exists),
-            wrong_email = findViewById(R.id.email_not_valid);
-
-        if (account_already_exists != null) {
-            layout.removeView(account_already_exists);
-        }
-
-        if (wrong_email != null) {
-            layout.removeView(wrong_email);
-        }
+        Utils.removeViewsFrom(layout, R.id.email_not_valid, R.id.account_already_exists);
 
         EditText firstName = findViewById(R.id.inputfirstname),
                 lastName = findViewById(R.id.inputlastname),
@@ -62,15 +48,15 @@ public class RegisterActivity extends AppCompatActivity {
                 password = findViewById(R.id.inputpassword);
 
         if (!emailPattern.matcher(email.getText()).find()) {
-            addTextElementToEnd(layout, R.string.email_not_valid);
+            Utils.addErrorText(this, layout, R.id.email_not_valid, R.string.email_not_valid);
             return;
         }
 
-        String salt = getRandomString(15);
+        String salt = PasswordHandler.getSalt(10);
 
-        String hashedPassword = hashPassword(password.getText().toString(), salt);
+        String hashedPassword = PasswordHandler.hashPassword(password.getText().toString(), salt);
 
-        new AttemptRegisterAccount().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+        new AttemptRegisterAccount(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                 firstName.getText().toString(),
                 lastName.getText().toString(),
                 email.getText().toString(),
@@ -79,76 +65,40 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    private void addTextElementToEnd(ViewGroup l, int resId) {
+    private static class AttemptRegisterAccount extends AsyncTask<String, Void, Boolean> {
 
-        TextView emailNotValid = new TextView(this);
+        private WeakReference<RegisterActivity> context;
 
-        emailNotValid.setId(R.id.email_not_valid);
+        private WeakReference<LinearLayout> layout;
 
-        emailNotValid.setPadding(0, 10, 0 ,0);
+        private WeakReference<ProgressBar> bar;
 
-        emailNotValid.setGravity(Gravity.CENTER);
+        public AttemptRegisterAccount(RegisterActivity activity) {
 
-        emailNotValid.setText(resId);
+            this.context = new WeakReference<>(activity);
 
-        emailNotValid.setTextColor(Color.RED);
+            this.layout = new WeakReference<>(activity.findViewById(R.id.register_screen));
 
-        l.addView(emailNotValid);
-    }
-
-    private String getRandomString(int size) {
-
-        StringBuilder builder = new StringBuilder("");
-
-        for (int i = 0; i < size; i++) {
-
-            builder.append(charSet[random.nextInt(charSet.length)]);
+            this.bar = new WeakReference<>(new ProgressBar(activity));
 
         }
-
-        return builder.toString();
-    }
-
-    private String hashPassword(String password, String salt) {
-
-        try {
-            MessageDigest instance = MessageDigest.getInstance("SHA-256");
-
-            return new String(instance.digest((password + salt).getBytes(StandardCharsets.UTF_8)), StandardCharsets.UTF_8);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private class AttemptRegisterAccount extends AsyncTask<String, Void, Boolean> {
-
-        private LinearLayout layout;
-
-        private ProgressBar bar;
 
         @Override
         protected void onPreExecute() {
+            LinearLayout layout = this.layout.get();
 
-            this.layout = findViewById(R.id.register_screen);
+            ProgressBar progressBar = this.bar.get();
 
-            this.bar = new ProgressBar(RegisterActivity.this);
+            if (progressBar != null && layout != null) {
+                progressBar.setPadding(0, 50, 0, 0);
 
-            this.bar.setPadding(0, 50, 0, 0);
-
-            layout.addView(this.bar);
+                layout.addView(progressBar);
+            }
 
         }
 
         @Override
         protected Boolean doInBackground(String... strings) {
-
-            try {
-                Thread.sleep(100000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
 
             String firstName = strings[0],
                     lastName = strings[1],
@@ -168,16 +118,23 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean successfull) {
 
-            layout.removeView(bar);
+            LinearLayout layout = this.layout.get();
 
-            if (successfull) {
+            RegisterActivity activity = this.context.get();
+            ProgressBar bar = this.bar.get();
 
-                Intent intent = new Intent(RegisterActivity.this, LandingPage.class);
+            if (layout != null && activity != null && bar != null) {
+                layout.removeView(bar);
 
-                startActivity(intent);
+                if (successfull) {
 
-            } else {
-                addTextElementToEnd(layout, R.string.account_already_exists);
+                    Intent intent = new Intent(activity, LandingPage.class);
+
+                    activity.startActivity(intent);
+
+                } else {
+                    Utils.addErrorText(activity, layout, R.id.account_already_exists, R.string.account_already_exists);
+                }
             }
         }
     }
