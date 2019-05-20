@@ -1,27 +1,19 @@
 package com.twitchflix.applicationclient.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import com.twitchflix.applicationclient.R;
-import com.twitchflix.applicationclient.ServerApp;
+import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.authentication.PasswordHandler;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Random;
 import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
@@ -106,17 +98,17 @@ public class RegisterActivity extends AppCompatActivity {
                     hashed_password = strings[3],
                     salt = strings[4];
 
-            if (ServerApp.getIns().getAuthRequests().accountExistsWithEmail(email)) {
+            if (ClientApp.getIns().getAuthRequests().accountExistsWithEmail(email)) {
                 return false;
             }
 
-            ServerApp.getIns().getAuthRequests().registerAccount(email, firstName, lastName, hashed_password, salt);
+            ClientApp.getIns().getAuthRequests().registerAccount(email, firstName, lastName, hashed_password, salt);
 
             return true;
         }
 
         @Override
-        protected void onPostExecute(Boolean successfull) {
+        protected void onPostExecute(Boolean successful) {
 
             LinearLayout layout = this.layout.get();
 
@@ -126,11 +118,13 @@ public class RegisterActivity extends AppCompatActivity {
             if (layout != null && activity != null && bar != null) {
                 layout.removeView(bar);
 
-                if (successfull) {
+                if (successful) {
 
                     Intent intent = new Intent(activity, LandingPage.class);
 
                     activity.startActivity(intent);
+
+                    activity.finish();
 
                 } else {
                     Utils.addErrorText(activity, layout, R.id.account_already_exists, R.string.account_already_exists);

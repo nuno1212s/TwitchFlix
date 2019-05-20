@@ -10,7 +10,6 @@ import com.twitchflix.util.Pair;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ public class VideoRestHandler {
 
         UUID userUUID = UUID.fromString(userID);
 
-        if (App.getAuthenticationHandler().isValid(userUUID, Base64.getDecoder().decode(accessToken))) {
+        if (App.getAuthenticationHandler().isValid(userUUID, accessToken)) {
 
             User user = App.getUserDatabase().getAccountInformation(userUUID);
 
@@ -56,7 +55,7 @@ public class VideoRestHandler {
 
         UUID userID2 = UUID.fromString(userID);
 
-        if (App.getAuthenticationHandler().isValid(userID2, Base64.getDecoder().decode(accessToken))) {
+        if (App.getAuthenticationHandler().isValid(userID2, accessToken)) {
 
             User user = App.getUserDatabase().getAccountInformation(userID2);
 
@@ -77,11 +76,11 @@ public class VideoRestHandler {
     @POST
     @Path("view")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void acceptView(String userID, String AccessToken, String videoID) {
+    public void acceptView(String userID, String accessToken, String videoID) {
 
         UUID userID2 = UUID.fromString(userID);
 
-        if (App.getAuthenticationHandler().isValid(userID2, Base64.getDecoder().decode(AccessToken))) {
+        if (App.getAuthenticationHandler().isValid(userID2, accessToken)) {
 
             User user = App.getUserDatabase().getAccountInformation(userID2);
 

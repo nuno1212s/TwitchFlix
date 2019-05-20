@@ -1,6 +1,6 @@
 package com.twitchflix.applicationclient.authentication;
 
-import com.twitchflix.applicationclient.ServerApp;
+import com.twitchflix.applicationclient.ClientApp;
 
 import java.util.UUID;
 
@@ -21,6 +21,10 @@ public class ActiveConnection {
 
     }
 
+    public UUID getOwner() {
+        return owner;
+    }
+
     public boolean hasExpired() {
 
         return createdTime + validFor < System.currentTimeMillis();
@@ -29,7 +33,11 @@ public class ActiveConnection {
 
     public void refreshConnection() {
 
-        ServerApp.getIns().getAuthRequests().refreshActiveConnection(this);
+        ActiveConnection activeConnection = ClientApp.getIns().getAuthRequests().refreshActiveConnection(this);
+
+        this.createdTime = activeConnection.createdTime;
+        this.validFor = activeConnection.validFor;
+        this.accessToken = activeConnection.accessToken;
 
     }
 

@@ -6,14 +6,14 @@ import com.twitchflix.applicationclient.datastorage.InformationStorage;
 import com.twitchflix.applicationclient.userdata.UserData;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
 
-public class ServerApp {
+public class ClientApp {
 
-    private static ServerApp ins;
+    private static ClientApp ins;
 
-    public synchronized static ServerApp getIns() {
+    public synchronized static ClientApp getIns() {
 
         if (ins == null) {
-            ins = new ServerApp();
+            ins = new ClientApp();
         }
 
         return ins;
@@ -29,7 +29,7 @@ public class ServerApp {
 
     private UserData userData;
 
-    private ServerApp() {
+    private ClientApp() {
 //        this.informationStorage = new FileStorage();
 
     }
@@ -41,6 +41,7 @@ public class ServerApp {
     public InformationStorage getInformationStorage() {
         return informationStorage;
     }
+
     public AuthRequests getAuthRequests() {
         return authRequests;
     }

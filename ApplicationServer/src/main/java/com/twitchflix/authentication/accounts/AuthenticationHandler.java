@@ -5,8 +5,8 @@ import com.twitchflix.authentication.User;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -44,7 +44,7 @@ public class AuthenticationHandler {
             throw new WebApplicationException("User not found", 404);
         }
 
-        if (Arrays.equals(password.getBytes(), accountInformation.getPassword())) {
+        if (Arrays.equals(password.getBytes(StandardCharsets.UTF_8), accountInformation.getPassword())) {
 
             return generateActiveConnection(accountInformation.getUserID());
 
@@ -61,7 +61,7 @@ public class AuthenticationHandler {
 
         User user = App.getUserDatabase().getAccountInformation(email);
 
-        if (isValid(user.getUserID(), Base64.getDecoder().decode(accessToken))) {
+        if (isValid(user.getUserID(), accessToken.getBytes(StandardCharsets.UTF_8))) {
 
             connections.remove(user.getUserID());
 
@@ -93,11 +93,47 @@ public class AuthenticationHandler {
         return generateActiveConnection(ownUser.getUserID());
     }
 
+    @POST
+    @Path("refresh")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public ActiveConnection refreshConnection(UUID userID, String password, String access_token) {
+
+        ActiveConnection activeConnection = App.getAuthenticationHandler().getActiveConnection(userID);
+
+        if (!Arrays.equals(activeConnection.getAccessTokenBytes(), access_token.getBytes(StandardCharsets.UTF_8))) {
+            throw new WebApplicationException("Wrong access token");
+        }
+
+        if (checkPassword(userID, password)) {
+
+            return activeConnection.refreshToken();
+
+        }
+
+        throw new WebApplicationException("Wrong authentication");
+    }
+
+    public boolean checkPassword(UUID userID, String hashed_password) {
+
+        OwnUser accountInformation = App.getUserDatabase().getAccountInformationOwnAccount(userID);
+
+        if (accountInformation == null) {
+            throw new NullPointerException("User not found");
+        }
+
+        return Arrays.equals(hashed_password.getBytes(StandardCharsets.UTF_8), accountInformation.getPassword());
+    }
+
     /**
      * Creates an OAuth Google session
      */
     public ActiveConnection createOAuthConnection(UUID userID) {
         return generateActiveConnection(userID);
+    }
+
+    public boolean isValid(UUID userID, String accessToken) {
+        return isValid(userID, accessToken.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

@@ -38,7 +38,7 @@ public class UserData {
         return salt;
     }
 
-    public UserData fromUser(User user) {
+    public static UserData fromUser(User user) {
 
         String salt = "";
 

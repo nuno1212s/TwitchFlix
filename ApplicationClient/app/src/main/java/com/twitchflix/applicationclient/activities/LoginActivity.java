@@ -1,17 +1,14 @@
 package com.twitchflix.applicationclient.activities;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -19,8 +16,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.twitchflix.applicationclient.R;
-import com.twitchflix.applicationclient.ServerApp;
+import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
+import com.twitchflix.applicationclient.authentication.PasswordHandler;
+import com.twitchflix.applicationclient.userdata.UserData;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;
@@ -64,15 +63,25 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    private void removeErrorText() {
+
+        Utils.removeViewsFrom(findViewById(R.id.login_activity), R.id.login_not_valid);
+
+    }
+
     public void onClickLogin(View view) {
+        removeErrorText();
+
         EditText email = findViewById(R.id.login_email),
                 password = findViewById(R.id.login_password);
 
-
+        new AttemptToLogin(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                email.getText().toString(), password.getText().toString());
 
     }
 
     public void onLoginGoogle(View view) {
+        removeErrorText();
 
         Intent signInIntent = signInClient.getSignInIntent();
 
@@ -80,8 +89,15 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Handle clicking the register button
+     * Redirects to the register screen
+     *
+     * @param view
+     */
     public void onClickRegister(View view) {
+        removeErrorText();
+
         Intent register = new Intent(this, RegisterActivity.class);
 
         startActivity(register);
@@ -126,11 +142,28 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    private class AttempToLogin extends AsyncTask<String, Void, Boolean> {
+    private void handleUserSignIn(boolean successful, ViewGroup layout) {
+        if (successful) {
+
+            Intent intent = new Intent(this, LandingPage.class);
+
+            startActivity(intent);
+
+            finish();
+
+        } else {
+
+            Utils.addErrorText(this, layout, R.id.login_not_valid, R.string.login_not_valid);
+
+        }
+
+    }
+
+    private static class AttemptToLogin extends AsyncTask<String, Void, Boolean> {
 
         private WeakReference<LoginActivity> loginActivity;
 
-        public AttempToLogin(LoginActivity activity) {
+        public AttemptToLogin(LoginActivity activity) {
             this.loginActivity = new WeakReference<>(activity);
         }
 
@@ -149,9 +182,37 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... strings) {
-            String email = strings[0];
+            String email = strings[0], password = strings[1];
 
-            return null;
+            UserData userData = ClientApp.getIns().getUserDataRequests().requestUserData(email);
+
+            String hashedPassword = PasswordHandler.hashPassword(password, userData.getSalt());
+
+            ActiveConnection activeConnection = ClientApp.getIns().getAuthRequests().requestConnection(email, hashedPassword);
+
+            if (activeConnection != null) {
+                ClientApp.getIns().setCurrentActiveAccount(activeConnection);
+                ClientApp.getIns().setUserData(userData);
+            }
+
+            return activeConnection != null;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean successful) {
+
+            LoginActivity activity = this.loginActivity.get();
+
+            if (activity != null) {
+
+                ViewGroup layout = activity.findViewById(R.id.login_activity);
+
+                Utils.removeViewsFrom(layout, R.id.login_progress_bar);
+
+                activity.handleUserSignIn(successful, layout);
+
+            }
+
         }
     }
 
@@ -181,19 +242,19 @@ public class LoginActivity extends AppCompatActivity {
 
             String idToken = strings[0];
 
-            ActiveConnection activeConnection = ServerApp.getIns().getAuthRequests().requestConnection(idToken);
+            ActiveConnection activeConnection = ClientApp.getIns().getAuthRequests().requestConnection(idToken);
 
             if (activeConnection != null) {
-                ServerApp.getIns().setCurrentActiveAccount(activeConnection);
+                ClientApp.getIns().setCurrentActiveAccount(activeConnection);
 
-                ServerApp.getIns().setUserData(ServerApp.getIns().getUserDataRequests().requestUserData(activeConnection));
+                ClientApp.getIns().setUserData(ClientApp.getIns().getUserDataRequests().requestUserData(activeConnection));
             }
 
             return activeConnection != null;
         }
 
         @Override
-        protected void onPostExecute(Boolean successfull) {
+        protected void onPostExecute(Boolean successful) {
 
             LoginActivity loginActivity = this.loginActivity.get();
 
@@ -203,17 +264,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 Utils.removeViewsFrom(layout, R.id.login_progress_bar);
 
-                if (successfull) {
-
-                    Intent intent = new Intent(loginActivity, LandingPageN.class);
-
-                    loginActivity.startActivity(intent);
-
-                } else {
-
-                    Utils.addErrorText(loginActivity, layout, R.id.login_not_valid, R.string.login_not_valid);
-
-                }
+                loginActivity.handleUserSignIn(successful, layout);
 
             }
 

@@ -6,7 +6,7 @@ public interface AuthRequests {
 
     ActiveConnection requestConnection(String google_token_id);
 
-    void refreshActiveConnection(ActiveConnection activeConnection);
+    ActiveConnection refreshActiveConnection(ActiveConnection activeConnection);
 
     void destroyConnection(ActiveConnection activeConnection);
 

@@ -41,7 +41,7 @@ public interface UserDatabase {
     User getAccountInformation(UUID userID);
 
     /**
-     * Get th
+     * Get the account information, knowing it is a own user type
      * @param email
      * @return
      */

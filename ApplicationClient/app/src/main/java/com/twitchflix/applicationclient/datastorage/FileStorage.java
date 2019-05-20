@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.*;
+import java.util.UUID;
 
 public class FileStorage implements InformationStorage {
 
@@ -32,9 +33,11 @@ public class FileStorage implements InformationStorage {
 
             JSONObject userData = new JSONObject();
 
-            userData.put("UserName", loginData.getUserName());
+            userData.put("UUID", loginData.getUserID().toString());
 
-            userData.put("Password", loginData.getHashedPassword());
+            userData.put("UserName", loginData.getEmail());
+
+            userData.put("Token", loginData.getToken());
 
             userData.put("AccessToken", loginData.getAccessToken());
 
@@ -59,9 +62,10 @@ public class FileStorage implements InformationStorage {
 
         try {
             return new UserLogin.UserLoginBuilder()
-                    .setUserName(jsonObject.getString("UserName"))
+                    .setUserID(UUID.fromString(jsonObject.getString("UUID")))
+                    .setEmail(jsonObject.getString("UserName"))
                     .setAccessToken(jsonObject.getString("AccessToken"))
-                    .setHashedPassword(jsonObject.getString("Password"))
+                    .setToken(jsonObject.getString("Token"))
                     .createUserLogin();
         } catch (JSONException e) {
             e.printStackTrace();
