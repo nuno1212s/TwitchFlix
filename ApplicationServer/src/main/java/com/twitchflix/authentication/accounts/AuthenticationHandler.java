@@ -5,6 +5,7 @@ import com.twitchflix.authentication.User;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.UUID;
@@ -36,28 +37,39 @@ public class AuthenticationHandler {
     @Path("login")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ActiveConnection handleAuthenticationRequest(String email, String password) {
+    public Response handleAuthenticationRequest(@FormParam("email") String email,
+                                                @FormParam("password") String password) {
 
         OwnUser accountInformation = App.getUserDatabase().getAccountInformationOwnAccount(email);
 
         if (accountInformation == null) {
-            throw new WebApplicationException("User not found", 404);
+            return Response
+                    .status(404)
+                    .entity("User not found")
+                    .build();
         }
 
         if (Arrays.equals(password.getBytes(StandardCharsets.UTF_8), accountInformation.getPassword())) {
 
-            return generateActiveConnection(accountInformation.getUserID());
+            return Response
+                    .ok()
+                    .entity(generateActiveConnection(accountInformation.getUserID()))
+                    .build();
 
         }
 
-        throw new WebApplicationException("Wrong password", 400);
+        return Response
+                .status(400)
+                .entity("Password is not correct")
+                .build();
     }
 
     @POST
     @Path("logout")
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
-    public boolean logOut(String email, String accessToken) {
+    public Response logOut(@FormParam("email") String email,
+                           @FormParam("accesstoken") String accessToken) {
 
         User user = App.getUserDatabase().getAccountInformation(email);
 
@@ -65,11 +77,16 @@ public class AuthenticationHandler {
 
             connections.remove(user.getUserID());
 
-            return true;
+            return Response.ok()
+                    .entity(true)
+                    .build();
 
         } else {
 
-            throw new WebApplicationException("Wrong access token.", 403);
+            return Response.status(403)
+                    .entity(false)
+                    .entity("User is not logged in")
+                    .build();
 
         }
     }
@@ -78,10 +95,16 @@ public class AuthenticationHandler {
     @Path("register")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ActiveConnection registerAccount(String email, String firstName, String lastName, String password, String salt) {
+    public Response registerAccount(@FormParam("email") String email,
+                                    @FormParam("firstname") String firstName,
+                                    @FormParam("lastName") String lastName,
+                                    @FormParam("password") String password,
+                                    @FormParam("salt") String salt) {
 
         if (App.getUserDatabase().existsAccountWithEmail(email)) {
-            throw new WebApplicationException("Account with that email already exists", 400);
+            Response.status(400)
+                    .entity("Account with that email already exists")
+                    .build();
         }
 
         OwnUser ownUser = new OwnUser(firstName, lastName, email, password, salt);
@@ -90,28 +113,38 @@ public class AuthenticationHandler {
 
         App.getUserDatabase().createAccount(ownUser);
 
-        return generateActiveConnection(ownUser.getUserID());
+        return Response.ok()
+                .entity(generateActiveConnection(ownUser.getUserID()))
+                .build();
     }
 
     @POST
     @Path("refresh")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ActiveConnection refreshConnection(UUID userID, String password, String access_token) {
+    public Response refreshConnection(@FormParam("userid") UUID userID,
+                                      @FormParam("password") String password,
+                                      @FormParam("accesstoken") String access_token) {
 
         ActiveConnection activeConnection = App.getAuthenticationHandler().getActiveConnection(userID);
 
         if (!Arrays.equals(activeConnection.getAccessTokenBytes(), access_token.getBytes(StandardCharsets.UTF_8))) {
-            throw new WebApplicationException("Wrong access token");
+            return Response.status(400)
+                    .entity("Wrong access token")
+                    .build();
         }
 
         if (checkPassword(userID, password)) {
 
-            return activeConnection.refreshToken();
+            return Response.ok()
+                    .entity(activeConnection.refreshToken())
+                    .build();
 
         }
 
-        throw new WebApplicationException("Wrong authentication");
+        return Response.status(400)
+                .entity("Wrong authentication")
+                .build();
     }
 
     public boolean checkPassword(UUID userID, String hashed_password) {

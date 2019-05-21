@@ -76,7 +76,9 @@ public class VideoRestHandler {
     @POST
     @Path("view")
     @Consumes(MediaType.APPLICATION_JSON)
-    public void acceptView(String userID, String accessToken, String videoID) {
+    public void acceptView(@FormParam("userid") String userID,
+                           @FormParam("accesstoken") String accessToken,
+                           @FormParam("videoid") String videoID) {
 
         UUID userID2 = UUID.fromString(userID);
 

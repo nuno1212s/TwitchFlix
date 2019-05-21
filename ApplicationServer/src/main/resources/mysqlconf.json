@@ -1,0 +1,6 @@
+{
+  "IP": "localhost:3306",
+  "UserName": "root",
+  "Password": "password",
+  "Database": "videos"
+}

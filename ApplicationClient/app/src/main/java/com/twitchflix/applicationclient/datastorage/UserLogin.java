@@ -48,6 +48,7 @@ public class UserLogin {
     }
 
     public static class UserLoginBuilder {
+
         private UUID userID;
         private String email;
         private String token;

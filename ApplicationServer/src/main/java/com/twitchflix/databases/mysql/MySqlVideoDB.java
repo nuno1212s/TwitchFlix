@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
     private static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS VIDEOS(VIDEOID BINARY(16) NOT NULL PRIMARY KEY," +
-            " UPLOADER BINARY(16) NOT NULL PRIMARY KEY, TITLE varchar(255) NOT NULL, DESCRIPTION SMALLTEXT NOT NULL DEFAULT ''," +
-            " UPLOADDATE BIGINT, LIKES BIGINTEGER, VIEWS BIGINTEGER, LIVE BOOLEAN, LINK varchar(2048), THUMBNAILLINK varchar(2048));";
+            " UPLOADER BINARY(16) NOT NULL, TITLE varchar(255) NOT NULL, DESCRIPTION TEXT NOT NULL," +
+            " UPLOADDATE BIGINT, LIKES BIGINT, VIEWS BIGINT, LIVE BOOLEAN, LINK varchar(2048), THUMBNAILLINK varchar(2048), UNIQUE(VIDEOID));";
 
     public MySqlVideoDB() {
         super();

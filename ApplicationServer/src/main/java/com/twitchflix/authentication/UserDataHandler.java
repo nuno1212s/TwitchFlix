@@ -2,11 +2,9 @@ package com.twitchflix.authentication;
 
 import com.twitchflix.App;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 @Path("userdata")
 public class UserDataHandler {
@@ -14,15 +12,27 @@ public class UserDataHandler {
     @GET
     @Path("rquserbyemail")
     @Produces(MediaType.APPLICATION_JSON)
-    public UserData requestUserData(String email) {
+    public Response requestUserData(@HeaderParam("email") String email) {
 
         User accountInformation = App.getUserDatabase().getAccountInformation(email);
 
         if (accountInformation == null) {
-            throw new WebApplicationException("User with that email has not been found");
+            return Response.status(400)
+                    .entity("User with that email has not been found")
+                    .build();
         }
 
-        return UserData.fromUser(accountInformation);
+        return Response.ok()
+                .entity(UserData.fromUser(accountInformation))
+                .build();
+    }
+
+    @GET
+    @Path("test")
+    public Response test() {
+
+        return Response.ok().entity("TESTE OK").build();
+
     }
 
 }

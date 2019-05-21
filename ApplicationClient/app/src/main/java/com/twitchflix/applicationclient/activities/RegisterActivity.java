@@ -51,7 +51,7 @@ public class RegisterActivity extends AppCompatActivity {
         new AttemptRegisterAccount(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
                 firstName.getText().toString(),
                 lastName.getText().toString(),
-                email.getText().toString(),
+                 email.getText().toString(),
                 hashedPassword,
                 salt);
 

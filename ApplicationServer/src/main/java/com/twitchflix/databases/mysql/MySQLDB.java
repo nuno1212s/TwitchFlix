@@ -16,13 +16,19 @@ public abstract class MySQLDB {
     protected static String userName, password, database, IP;
 
     public MySQLDB() {
-        if (dataSource == null) {
+        if (dataSource != null) {
             return;
+        }
+
+        try {
+            Class.forName("com.mysql.jdbc.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
 
         FileManager fileManager = App.getFileManager();
 
-        GenericJson parsedFile = fileManager.readFile(fileManager.getFileAndCreate("mysqlcfg.json"));
+        GenericJson parsedFile = fileManager.readFile(fileManager.getFileFromResource("mysqlcfg.json"));
 
         MySQLDB.userName = (String) parsedFile.get("UserName");
         MySQLDB.password = (String) parsedFile.get("Password");
@@ -38,6 +44,7 @@ public abstract class MySQLDB {
         config.addDataSourceProperty("prepStmtCacheSize", "350");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
         config.addDataSourceProperty("cachePrepStmts", "true");
+
 
         MySQLDB.dataSource = new HikariDataSource(config);
     }
