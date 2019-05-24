@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import com.twitchflix.applicationclient.activities.LandingPage;
+import com.twitchflix.applicationclient.landingpage.LandingPage;
 import com.twitchflix.applicationclient.activities.LoginActivity;
 import com.twitchflix.applicationclient.datastorage.FileStorage;
 import com.twitchflix.applicationclient.datastorage.UserLogin;

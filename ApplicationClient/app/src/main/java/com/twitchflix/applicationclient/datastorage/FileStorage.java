@@ -1,6 +1,6 @@
 package com.twitchflix.applicationclient.datastorage;
 
-import android.app.Activity;
+import android.content.Context;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -12,24 +12,25 @@ public class FileStorage implements InformationStorage {
 
     private static final String fileName = "datastorage.json";
 
-    private final File cacheFile;
+    private Context context;
 
-    public FileStorage(Activity a) {
-        this.cacheFile = new File(a.getCacheDir(), fileName);
+    public FileStorage(Context context) {
+        this.context = context;
     }
 
     @Override
     public boolean isUserLoggedIn() {
 
-        return false;
-//        return this.cacheFile.exists();
+        return new File(context.getFilesDir(), fileName).exists();
 
     }
 
     @Override
     public void setUserLogin(UserLogin loginData) {
 
-        try (BufferedWriter outputStream = new BufferedWriter(new FileWriter(getCacheFileOrCreate()))) {
+        try (FileOutputStream out = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+             OutputStreamWriter writer = new OutputStreamWriter(out);
+             BufferedWriter outputStream = new BufferedWriter(writer)) {
 
             JSONObject userData = new JSONObject();
 
@@ -76,25 +77,17 @@ public class FileStorage implements InformationStorage {
 
     @Override
     public void deleteUserLogin() {
-        this.cacheFile.delete();
+
+        context.deleteFile(fileName);
+
     }
 
-    private File getCacheFileOrCreate() throws IOException {
-
-        if (!this.cacheFile.exists()) {
-            this.cacheFile.createNewFile();
-        }
-
-        return cacheFile;
-    }
 
     private JSONObject readFileAndReturn() {
 
-        if (!this.cacheFile.exists()) {
-            return null;
-        }
-
-        try (BufferedReader inputStream = new BufferedReader(new FileReader(getCacheFileOrCreate()))) {
+        try (FileInputStream stream = context.openFileInput(fileName);
+             InputStreamReader reader = new InputStreamReader(stream);
+             BufferedReader inputStream = new BufferedReader(reader)) {
 
             StringBuilder builder = new StringBuilder();
 

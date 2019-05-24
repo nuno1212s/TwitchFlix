@@ -3,6 +3,7 @@ package com.twitchflix.applicationclient;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.authentication.AuthRequests;
 import com.twitchflix.applicationclient.datastorage.InformationStorage;
+import com.twitchflix.applicationclient.servercomunication.ServerRequests;
 import com.twitchflix.applicationclient.userdata.UserData;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
 
@@ -25,6 +26,8 @@ public class ClientApp {
 
     private UserDataRequests userDataRequests;
 
+    private ServerRequests serverRequests;
+
     private ActiveConnection currentActiveAccount;
 
     private UserData userData;
@@ -40,6 +43,10 @@ public class ClientApp {
 
     public InformationStorage getInformationStorage() {
         return informationStorage;
+    }
+
+    public ServerRequests getServerRequests() {
+        return serverRequests;
     }
 
     public AuthRequests getAuthRequests() {

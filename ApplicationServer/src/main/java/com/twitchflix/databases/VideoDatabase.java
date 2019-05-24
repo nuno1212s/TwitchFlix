@@ -18,5 +18,9 @@ public interface VideoDatabase {
 
     void incrementVideoViews(UUID videoID);
 
+    void registerVideoStream(Video video);
+
+    void updateVideo(Video video);
+
 
 }

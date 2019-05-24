@@ -64,9 +64,9 @@ public class OAuth2Handler {
     @Path("authenticate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response authenticate(@FormParam("idToken") String idToken) throws GeneralSecurityException, IOException {
+    public Response authenticate(com.twitchflix.rest.models.GoogleIdToken idToken) throws GeneralSecurityException, IOException {
 
-        GoogleIdToken token = verifier.verify(idToken);
+        GoogleIdToken token = verifier.verify(idToken.getIdToken());
 
         if (token != null) {
             GoogleIdToken.Payload userInformation = token.getPayload();

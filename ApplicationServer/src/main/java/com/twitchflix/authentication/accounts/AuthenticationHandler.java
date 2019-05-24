@@ -2,6 +2,10 @@ package com.twitchflix.authentication.accounts;
 
 import com.twitchflix.App;
 import com.twitchflix.authentication.User;
+import com.twitchflix.rest.models.EmailLoginModel;
+import com.twitchflix.rest.models.LogoutModel;
+import com.twitchflix.rest.models.RefreshConnectionModel;
+import com.twitchflix.rest.models.RegisterModel;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -30,17 +34,15 @@ public class AuthenticationHandler {
     /**
      * Attempts to authenticate the user
      *
-     * @param email    The user's email
-     * @param password The salted + hashed password
+     * @param login The login model
      */
     @POST
     @Path("login")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response handleAuthenticationRequest(@FormParam("email") String email,
-                                                @FormParam("password") String password) {
+    public Response handleAuthenticationRequest(EmailLoginModel login) {
 
-        OwnUser accountInformation = App.getUserDatabase().getAccountInformationOwnAccount(email);
+        OwnUser accountInformation = App.getUserDatabase().getAccountInformationOwnAccount(login.getEmail());
 
         if (accountInformation == null) {
             return Response
@@ -49,7 +51,7 @@ public class AuthenticationHandler {
                     .build();
         }
 
-        if (Arrays.equals(password.getBytes(StandardCharsets.UTF_8), accountInformation.getPassword())) {
+        if (Arrays.equals(login.getPassword().getBytes(StandardCharsets.UTF_8), accountInformation.getPassword())) {
 
             return Response
                     .ok()
@@ -64,16 +66,20 @@ public class AuthenticationHandler {
                 .build();
     }
 
+    /**
+     * Logout of the server
+     * @param logout the logout params
+     * @return
+     */
     @POST
     @Path("logout")
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response logOut(@FormParam("email") String email,
-                           @FormParam("accesstoken") String accessToken) {
+    public Response logOut(LogoutModel logout) {
 
-        User user = App.getUserDatabase().getAccountInformation(email);
+        User user = App.getUserDatabase().getAccountInformation(logout.getEmail());
 
-        if (isValid(user.getUserID(), accessToken.getBytes(StandardCharsets.UTF_8))) {
+        if (isValid(user.getUserID(), logout.getAccessToken().getBytes(StandardCharsets.UTF_8))) {
 
             connections.remove(user.getUserID());
 
@@ -91,23 +97,25 @@ public class AuthenticationHandler {
         }
     }
 
+    /**
+     * Registers the account
+     * @param register The register data
+     * @return
+     */
     @POST
     @Path("register")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerAccount(@FormParam("email") String email,
-                                    @FormParam("firstname") String firstName,
-                                    @FormParam("lastName") String lastName,
-                                    @FormParam("password") String password,
-                                    @FormParam("salt") String salt) {
+    public Response registerAccount(RegisterModel register) {
 
-        if (App.getUserDatabase().existsAccountWithEmail(email)) {
+        if (App.getUserDatabase().existsAccountWithEmail(register.getEmail())) {
             Response.status(400)
                     .entity("Account with that email already exists")
                     .build();
         }
 
-        OwnUser ownUser = new OwnUser(firstName, lastName, email, password, salt);
+        OwnUser ownUser = new OwnUser(register.getFirstName(), register.getLastName(),
+                register.getEmail(), register.getPassword(), register.getSalt());
 
         App.getAsync().submit(() -> App.getUserDatabase().createAccount(ownUser));
 
@@ -122,19 +130,17 @@ public class AuthenticationHandler {
     @Path("refresh")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response refreshConnection(@FormParam("userid") UUID userID,
-                                      @FormParam("password") String password,
-                                      @FormParam("accesstoken") String access_token) {
+    public Response refreshConnection(RefreshConnectionModel refresh) {
 
-        ActiveConnection activeConnection = App.getAuthenticationHandler().getActiveConnection(userID);
+        ActiveConnection activeConnection = App.getAuthenticationHandler().getActiveConnection(refresh.getUserID());
 
-        if (!Arrays.equals(activeConnection.getAccessTokenBytes(), access_token.getBytes(StandardCharsets.UTF_8))) {
+        if (!Arrays.equals(activeConnection.getAccessTokenBytes(), refresh.getAccessToken().getBytes(StandardCharsets.UTF_8))) {
             return Response.status(400)
                     .entity("Wrong access token")
                     .build();
         }
 
-        if (checkPassword(userID, password)) {
+        if (checkPassword(refresh.getUserID(), refresh.getPassword())) {
 
             return Response.ok()
                     .entity(activeConnection.refreshToken())

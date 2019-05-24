@@ -1,6 +1,7 @@
-package com.twitchflix.applicationclient.activities;
+package com.twitchflix.applicationclient.landingpage;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -63,6 +64,8 @@ public class LandingPage extends AppCompatActivity
         String userFullName = userData.getFirstName() + " " + userData.getLastName();
 
         userName.setText(userFullName);
+
+        new LandingPageDrawer(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override

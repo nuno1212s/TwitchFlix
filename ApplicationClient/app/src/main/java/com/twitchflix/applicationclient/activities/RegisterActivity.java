@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.authentication.PasswordHandler;
+import com.twitchflix.applicationclient.landingpage.LandingPage;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;

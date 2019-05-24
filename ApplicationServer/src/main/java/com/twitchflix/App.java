@@ -24,12 +24,15 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 
 import java.io.*;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 public class App {
+
+    public static String SERVER_IP;
 
     private static ExecutorService executors = Executors.newFixedThreadPool(15);
 
@@ -71,6 +74,7 @@ public class App {
     public static void main(String[] args) throws Exception {
 
         //Initialize the logger
+        SERVER_IP = retrieveIpAddress();
 
         initFileManager();
         initLoggers();
@@ -117,16 +121,12 @@ public class App {
         https.setHost("localhost");
         https.setIdleTimeout(500000);
 
-        ServerConnector connector = new ServerConnector(server);
-
-        connector.setPort(80);
-
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         servletContextHandler.setContextPath("/");
 
         server.setHandler(registerServlets(servletContextHandler));
 
-        server.setConnectors(new Connector[]{connector, https});
+        server.setConnectors(new Connector[]{https});
 
         server.start();
         server.join();
@@ -145,7 +145,8 @@ public class App {
                         AuthenticationHandler.class.getCanonicalName(),
                         VideoRestHandler.class.getCanonicalName(),
                         OAuth2Handler.class.getCanonicalName(),
-                        UserDataHandler.class.getCanonicalName()
+                        UserDataHandler.class.getCanonicalName(),
+                        DebugExceptionMapper.class.getCanonicalName()
                 )));
 
         handlers.setHandlers(new Handler[]{ctx, new DefaultHandler()});
@@ -174,6 +175,23 @@ public class App {
 
     private static void initLoggers() {
         new Logger();
+    }
+
+    private static String retrieveIpAddress() throws IOException {
+
+
+        URL whatismyip = new URL("http://checkip.amazonaws.com");
+
+        try (InputStream stream = whatismyip.openStream();
+             InputStreamReader reader1 = new InputStreamReader(stream);
+             BufferedReader reader = new BufferedReader(reader1)) {
+
+            return reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
 }

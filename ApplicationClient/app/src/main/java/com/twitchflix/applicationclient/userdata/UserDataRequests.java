@@ -2,7 +2,11 @@ package com.twitchflix.applicationclient.userdata;
 
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 
+import java.util.UUID;
+
 public interface UserDataRequests {
+
+    UserData requestUserData(UUID userID);
 
     UserData requestUserData(String email);
 

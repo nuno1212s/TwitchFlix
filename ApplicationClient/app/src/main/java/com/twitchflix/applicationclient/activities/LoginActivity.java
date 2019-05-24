@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -19,6 +20,7 @@ import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.authentication.PasswordHandler;
+import com.twitchflix.applicationclient.landingpage.LandingPage;
 import com.twitchflix.applicationclient.userdata.UserData;
 import com.twitchflix.applicationclient.utils.Utils;
 
@@ -44,11 +46,6 @@ public class LoginActivity extends AppCompatActivity {
         signInClient = GoogleSignIn.getClient(this, gso);
 
         findViewById(R.id.sign_in_button).setOnClickListener(this::onLoginGoogle);
-    }
-
-    @Override
-    public void onBackPressed() {
-        //Do nothing on back pressed
     }
 
     @Override
@@ -174,6 +171,8 @@ public class LoginActivity extends AppCompatActivity {
 
             if (loginActivity != null) {
 
+                loginActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                 Utils.addProgressBar(loginActivity, loginActivity.findViewById(R.id.login_activity), R.id.login_progress_bar);
 
             }
@@ -205,6 +204,8 @@ public class LoginActivity extends AppCompatActivity {
 
             if (activity != null) {
 
+                activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                 ViewGroup layout = activity.findViewById(R.id.login_activity);
 
                 Utils.removeViewsFrom(layout, R.id.login_progress_bar);
@@ -230,6 +231,9 @@ public class LoginActivity extends AppCompatActivity {
             LoginActivity loginActivity = this.loginActivity.get();
 
             if (loginActivity != null) {
+
+                loginActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
+
                 LinearLayout layout = loginActivity.findViewById(R.id.login_activity);
 
                 Utils.addProgressBar(loginActivity, layout, R.id.login_progress_bar);
@@ -259,6 +263,8 @@ public class LoginActivity extends AppCompatActivity {
             LoginActivity loginActivity = this.loginActivity.get();
 
             if (loginActivity != null) {
+
+                loginActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
                 LinearLayout layout = loginActivity.findViewById(R.id.login_activity);
 
