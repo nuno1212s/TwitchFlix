@@ -22,8 +22,8 @@ public class ObservableSubscriber<T> implements Subscriber<T> {
     private volatile boolean completed;
 
     ObservableSubscriber() {
-        this.received = new ArrayList<T>();
-        this.errors = new ArrayList<Throwable>();
+        this.received = new ArrayList<>();
+        this.errors = new ArrayList<>();
         this.latch = new CountDownLatch(1);
     }
 

@@ -3,7 +3,7 @@ package com.twitchflix.authentication.accounts;
 import com.twitchflix.authentication.User;
 import org.bson.Document;
 
-import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public class OwnUser extends User {
                    String hashed_password, String salt) {
         super(userID, firstName, lastName, email, uploadedVideos, likedVideos, watchedVideos);
 
-        this.password = Base64.getDecoder().decode(hashed_password);
+        this.password = hashed_password.getBytes(StandardCharsets.UTF_8);
         this.salt = salt;
 
     }
@@ -28,7 +28,7 @@ public class OwnUser extends User {
     public OwnUser(String name, String lastName, String email, String hashed_password, String salt) {
         super(name, lastName, email);
 
-        this.password = hashed_password.getBytes();
+        this.password = hashed_password.getBytes(StandardCharsets.UTF_8);
         this.salt = salt;
 
         this.confirmed = false;
@@ -50,7 +50,7 @@ public class OwnUser extends User {
     public Document toMongoDB() {
         Document document = super.toMongoDB();
 
-        document.append("Password", Base64.getEncoder().encode(password));
+        document.append("Password", new String(password, StandardCharsets.UTF_8));
         document.append("Salt", salt);
         document.append("Confirmed", confirmed);
 

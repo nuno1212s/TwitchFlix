@@ -77,6 +77,10 @@ public class Video {
         return live;
     }
 
+    public void setLive(boolean live) {
+        this.live = live;
+    }
+
     public String getLink() {
         return link;
     }
@@ -100,4 +104,7 @@ public class Video {
                 App.getVideoDatabase().incrementVideoViews(this.getVideoID()));
     }
 
+    public void setLink(String link) {
+        this.link = link;
+    }
 }

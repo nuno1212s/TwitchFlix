@@ -1,7 +1,11 @@
 package com.twitchflix.videohandler;
 
+import com.twitchflix.rest.models.VideoStream;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.UUID;
 
 public class VideoBuilder {
@@ -11,6 +15,7 @@ public class VideoBuilder {
     private boolean live;
     private String link;
     private String thumbnailLink;
+    private String streamLink;
     private UUID videoID;
     private long uploadDate;
     private int likes;
@@ -66,6 +71,11 @@ public class VideoBuilder {
         return this;
     }
 
+    public VideoBuilder setStreamLink(String streamLink) {
+        this.streamLink = streamLink;
+        return this;
+    }
+
     public VideoBuilder fromResultSet(ResultSet set) throws SQLException {
 
         setUploader(UUID.fromString(set.getString("UPLOADER")));
@@ -74,8 +84,8 @@ public class VideoBuilder {
         setDescription(set.getString("DESCRIPTION"));
         setLive(set.getBoolean("LIVE"));
         setLink(set.getString("LINK"));
-        setThumbnailLink(set.getString("THUMBLINK"));
-        setUploadDate(set.getDate("UPLOADDATE").toInstant().toEpochMilli());
+        setThumbnailLink(set.getString("THUMBNAILLINK"));
+//        setUploadDate(set.getDate("UPLOADDATE").toLocalDate().getLong(ChronoField.MILLI_OF_SECOND));
         setLikes(set.getInt("LIKES"));
         setViews(set.getInt("VIEWS"));
 
@@ -83,6 +93,15 @@ public class VideoBuilder {
     }
 
     public Video createVideo() {
-        return new Video(videoID, uploader, title, description, uploadDate, likes, views, live, link, thumbnailLink);
+        return new Video(videoID, uploader, title, description, uploadDate,
+                likes, views, live, link, thumbnailLink);
+    }
+
+    public VideoStream createVideoStream() {
+        VideoStream videoStream = new VideoStream(videoID, uploader, title, description, uploadDate, likes, views, live, link, thumbnailLink);
+
+        videoStream.setStreamLink(this.streamLink);
+
+        return videoStream;
     }
 }

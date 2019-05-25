@@ -6,32 +6,34 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
+import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.twitchflix.App;
 import com.twitchflix.filesystem.FileManager;
 
 public abstract class MongoDB {
 
-    protected static MongoClient client;
+    private static MongoClient client;
 
-    protected static String userName, database, password;
+    protected static String userName, database, password, IP;
 
     public MongoDB() {
 
-        if (client == null) {
+        if (client != null) {
             return;
         }
 
         FileManager fileManager = App.getFileManager();
 
-        GenericJson genericJson = fileManager.readFile(fileManager.getFileAndCreate("mongocfg.json"));
+        GenericJson genericJson = fileManager.readFile(fileManager.getFileFromResource("mongoconf.json"));
 
         MongoDB.userName = (String) genericJson.get("UserName");
         MongoDB.database = (String) genericJson.get("Database");
         MongoDB.password = (String) genericJson.get("Password");
+        MongoDB.IP = (String) genericJson.get("IP");
 
         MongoCredential credential = MongoCredential.createCredential(userName, database, password.toCharArray());
 
-        ConnectionString connectionString = new ConnectionString("mongodb://localhost");
+        ConnectionString connectionString = new ConnectionString("mongodb://" + MongoDB.IP);
 
         MongoClientSettings clientSettings = MongoClientSettings.builder()
                 .applyConnectionString(connectionString)
@@ -39,6 +41,14 @@ public abstract class MongoDB {
                 .build();
 
         MongoDB.client = MongoClients.create(clientSettings);
+    }
+
+    protected MongoClient getClient() {
+        return MongoDB.client;
+    }
+
+    protected MongoDatabase getDatabase() {
+        return getClient().getDatabase(MongoDB.database);
     }
 
 }

@@ -22,7 +22,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
     @Override
     public boolean existsAccountWithEmail(String email) {
 
-        MongoDatabase database = client.getDatabase(MongoDB.database);
+        MongoDatabase database = getDatabase();
 
         MongoCollection<Document> users = database.getCollection("users");
 
@@ -37,7 +37,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
     @Override
     public void createAccount(User user) {
 
-        MongoDatabase database = client.getDatabase(MongoDB.database);
+        MongoDatabase database = getDatabase();
 
         MongoCollection<Document> users = database.getCollection("users");
 
@@ -50,7 +50,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
     @Override
     public void deleteAccount(UUID userID) {
 
-        MongoDatabase database = client.getDatabase(MongoDB.database);
+        MongoDatabase database = getDatabase();
 
         MongoCollection<Document> users = database.getCollection("users");
 
@@ -65,7 +65,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
     @Override
     public User getAccountInformation(String email) {
 
-        MongoDatabase database = client.getDatabase(MongoDB.database);
+        MongoDatabase database = getDatabase();
 
         MongoCollection<Document> users = database.getCollection("users");
 
@@ -77,7 +77,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
     @Override
     public User getAccountInformation(UUID userID) {
 
-        MongoDatabase database = client.getDatabase(MongoDB.database);
+        MongoDatabase database = getDatabase();
 
         MongoCollection<Document> users = database.getCollection("users");
 
@@ -89,12 +89,26 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
     @Override
     public OwnUser getAccountInformationOwnAccount(String email) {
-        return null;
+
+        MongoDatabase database = getDatabase();
+
+        MongoCollection<Document> users = database.getCollection("users");
+
+        Publisher<Document> userData = users.find(new Document("email", email)).limit(1).first();
+
+        return (OwnUser) getUser(userData);
     }
 
     @Override
     public OwnUser getAccountInformationOwnAccount(UUID ID) {
-        return null;
+
+        MongoDatabase database = getDatabase();
+
+        MongoCollection<Document> users = database.getCollection("users");
+
+        Publisher<Document> userData = users.find(new Document("userID", ID)).limit(1).first();
+
+        return (OwnUser) getUser(userData);
     }
 
     private User getUser(Publisher<Document> userID1) {

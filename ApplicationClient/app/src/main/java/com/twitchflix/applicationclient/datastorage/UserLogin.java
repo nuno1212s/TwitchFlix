@@ -1,39 +1,72 @@
 package com.twitchflix.applicationclient.datastorage;
 
+import com.twitchflix.applicationclient.ClientApp;
+import com.twitchflix.applicationclient.authentication.ActiveConnection;
+
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
+
 public class UserLogin {
 
-    private String userName, hashedPassword, accessToken;
+    private UUID userID;
 
-    private UserLogin(String userName, String hashedPassword, String accessToken) {
-        this.userName = userName;
-        this.hashedPassword = hashedPassword;
+    /**
+     * The token is varied, can be either the google id token or the hashed user password
+     */
+    private String email, token, accessToken;
+
+    private UserLogin(UUID userID, String email, String token, String accessToken) {
+        this.userID = userID;
+        this.email = email;
+        this.token = token;
         this.accessToken = accessToken;
     }
 
-    public String getUserName() {
-        return userName;
+    public UUID getUserID() {
+        return userID;
     }
 
-    public String getHashedPassword() {
-        return hashedPassword;
+    public String getEmail() {
+        return email;
+    }
+
+    public String getToken() {
+        return token;
     }
 
     public String getAccessToken() {
         return accessToken;
     }
 
+    public ActiveConnection toActiveConnection() {
+
+        ActiveConnection a = new ActiveConnection(getUserID(), 0, 0, this.accessToken.getBytes(StandardCharsets.UTF_8));
+
+        a.refreshConnection();
+
+        return a;
+    }
+
     public static class UserLoginBuilder {
-        private String userName;
-        private String hashedPassword;
+
+        private UUID userID;
+        private String email;
+        private String token;
         private String accessToken;
 
-        public UserLoginBuilder setUserName(String userName) {
-            this.userName = userName;
+        public UserLoginBuilder setUserID(UUID userID) {
+            this.userID = userID;
+
             return this;
         }
 
-        public UserLoginBuilder setHashedPassword(String hashedPassword) {
-            this.hashedPassword = hashedPassword;
+        public UserLoginBuilder setEmail(String email) {
+            this.email = email;
+            return this;
+        }
+
+        public UserLoginBuilder setToken(String token) {
+            this.token = token;
             return this;
         }
 
@@ -43,7 +76,7 @@ public class UserLogin {
         }
 
         public UserLogin createUserLogin() {
-            return new UserLogin(userName, hashedPassword, accessToken);
+            return new UserLogin(this.userID, email, token, accessToken);
         }
     }
 }

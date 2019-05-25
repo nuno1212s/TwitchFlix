@@ -4,6 +4,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.GenericJson;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.twitchflix.App;
@@ -12,24 +13,22 @@ import com.twitchflix.authentication.accounts.ActiveConnection;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
 
 /**
  * Handles the OAuth2 google sign in
- *
+ * <p>
  * https://developers.google.com/identity/sign-in/android/sign-in
  * https://developers.google.com/identity/sign-in/android/backend-auth
  */
 @Path("oauth")
 public class OAuth2Handler {
 
-    private static final String CLIENT_ID = "";
-
-    private static final String CLIENT_SECRET = "";
-
-    private static final String REDIRECT_URL = "";
+    private static String CLIENT_ID;
 
     private HttpTransport transport;
 
@@ -38,6 +37,12 @@ public class OAuth2Handler {
     private GoogleIdTokenVerifier verifier;
 
     public OAuth2Handler() throws GeneralSecurityException, IOException {
+
+        File fileFromResource = App.getFileManager().getFileFromResource("config.json");
+
+        GenericJson genericJson = App.getFileManager().readFile(fileFromResource);
+
+        CLIENT_ID = (String) genericJson.get("CLIENT_ID");
 
         transport = GoogleNetHttpTransport.newTrustedTransport();
 
@@ -51,17 +56,17 @@ public class OAuth2Handler {
     @GET
     @Path("clientID")
     @Produces(MediaType.TEXT_PLAIN)
-    public String requestClientID() {
-        return CLIENT_ID;
+    public Response requestClientID() {
+        return Response.ok().entity(CLIENT_ID).build();
     }
 
     @POST
     @Path("authenticate")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ActiveConnection authenticate(String idToken) throws GeneralSecurityException, IOException {
+    public Response authenticate(com.twitchflix.rest.models.GoogleIdToken idToken) throws GeneralSecurityException, IOException {
 
-        GoogleIdToken token = verifier.verify(idToken);
+        GoogleIdToken token = verifier.verify(idToken.getIdToken());
 
         if (token != null) {
             GoogleIdToken.Payload userInformation = token.getPayload();
@@ -75,19 +80,25 @@ public class OAuth2Handler {
             if (App.getUserDatabase().existsAccountWithEmail(email)) {
                 User accountInformation = App.getUserDatabase().getAccountInformation(email);
 
-                return App.getAuthenticationHandler().createOAuthConnection(accountInformation.getUserID());
+                return Response.ok()
+                        .entity(App.getAuthenticationHandler().createOAuthConnection(accountInformation.getUserID()))
+                        .build();
             } else {
 
                 User user = new OAuthUser(name, familyName, email);
 
                 App.getAsync().submit(() -> App.getUserDatabase().createAccount(user));
 
-                return App.getAuthenticationHandler().createOAuthConnection(user.getUserID());
+                return Response.ok()
+                        .entity(App.getAuthenticationHandler().createOAuthConnection(user.getUserID()))
+                        .build();
             }
 
         }
 
-        throw new WebApplicationException("Google token ID is not valid");
+        return Response.status(400)
+                .entity("Google token ID is not valid")
+                .build();
     }
 
 }

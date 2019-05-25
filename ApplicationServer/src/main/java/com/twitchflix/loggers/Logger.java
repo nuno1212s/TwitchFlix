@@ -14,7 +14,7 @@ public class Logger {
 
     private static File outputFile;
 
-    private static PrintStream systemOut, logOut;
+    private static PrintStream systemOut, logOut, errorOut;
 
     public Logger() {
 
@@ -22,36 +22,40 @@ public class Logger {
 
         //Output file already exists, zip the old log file and create a new one
 
-        File storageFile = App.getFileManager().getFileAndCreate("log-" + getDate() + ".zip");
+        if (outputFile.exists()) {
+            File storageFile = App.getFileManager().getFileAndCreate("log-" + getDate() + ".zip");
 
-        try (ZipOutputStream writeStream = new ZipOutputStream(new FileOutputStream(storageFile));
-             //Read the old log file
-             InputStream readStream = new FileInputStream(outputFile)) {
+            try (ZipOutputStream writeStream = new ZipOutputStream(new FileOutputStream(storageFile));
+                 //Read the old log file
+                 InputStream readStream = new FileInputStream(outputFile)) {
 
-            ZipEntry e = new ZipEntry("log.txt");
+                ZipEntry e = new ZipEntry("log.txt");
 
-            writeStream.putNextEntry(e);
+                writeStream.putNextEntry(e);
 
-            int length;
+                int length;
 
-            //1KB read buffer
-            byte[] buffer = new byte[1024];
+                //1KB read buffer
+                byte[] buffer = new byte[1024];
 
-            while ((length = readStream.read(buffer)) != 0) {
+                while ((length = readStream.read(buffer)) > 0) {
 
-                writeStream.write(buffer, 0, length);
+                    writeStream.write(buffer, 0, length);
 
+                }
+
+                //Delete the contents of the output file
+                outputFile.delete();
+                outputFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
-            //Delete the contents of the output file
-            outputFile.delete();
-            outputFile.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        } else {
+            App.getFileManager().checkIfExistsAndCreate(outputFile);
         }
 
-
         systemOut = System.out;
+        errorOut = System.err;
 
         try {
             FileOutputStream fileStream = new FileOutputStream(outputFile);
@@ -59,6 +63,8 @@ public class Logger {
             logOut = new PrintStream(fileStream, false);
 
             System.setOut(logOut);
+
+            System.setErr(logOut);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

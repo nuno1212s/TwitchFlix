@@ -2,11 +2,16 @@ package com.twitchflix.authentication.accounts;
 
 import com.twitchflix.App;
 import com.twitchflix.authentication.User;
+import com.twitchflix.rest.models.EmailLoginModel;
+import com.twitchflix.rest.models.LogoutModel;
+import com.twitchflix.rest.models.RefreshConnectionModel;
+import com.twitchflix.rest.models.RegisterModel;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,68 +34,134 @@ public class AuthenticationHandler {
     /**
      * Attempts to authenticate the user
      *
-     * @param email    The user's email
-     * @param password The salted + hashed password
+     * @param login The login model
      */
     @POST
     @Path("login")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ActiveConnection handleAuthenticationRequest(String email, String password) {
+    public Response handleAuthenticationRequest(EmailLoginModel login) {
 
-        OwnUser accountInformation = App.getUserDatabase().getAccountInformationOwnAccount(email);
+        OwnUser accountInformation = App.getUserDatabase().getAccountInformationOwnAccount(login.getEmail());
 
         if (accountInformation == null) {
-            throw new WebApplicationException("User not found", 404);
+            return Response
+                    .status(404)
+                    .entity("User not found")
+                    .build();
         }
 
-        if (Arrays.equals(password.getBytes(), accountInformation.getPassword())) {
+        if (Arrays.equals(login.getPassword().getBytes(StandardCharsets.UTF_8), accountInformation.getPassword())) {
 
-            return generateActiveConnection(accountInformation.getUserID());
+            return Response
+                    .ok()
+                    .entity(generateActiveConnection(accountInformation.getUserID()))
+                    .build();
 
         }
 
-        throw new WebApplicationException("Wrong password", 400);
+        return Response
+                .status(400)
+                .entity("Password is not correct")
+                .build();
     }
 
+    /**
+     * Logout of the server
+     * @param logout the logout params
+     * @return
+     */
     @POST
     @Path("logout")
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
-    public boolean logOut(String email, String accessToken) {
+    public Response logOut(LogoutModel logout) {
 
-        User user = App.getUserDatabase().getAccountInformation(email);
+        User user = App.getUserDatabase().getAccountInformation(logout.getEmail());
 
-        if (isValid(user.getUserID(), Base64.getDecoder().decode(accessToken))) {
+        if (isValid(user.getUserID(), logout.getAccessToken().getBytes(StandardCharsets.UTF_8))) {
 
             connections.remove(user.getUserID());
 
-            return true;
+            return Response.ok()
+                    .entity(true)
+                    .build();
 
         } else {
 
-            throw new WebApplicationException("Wrong access token.", 403);
+            return Response.status(403)
+                    .entity(false)
+                    .entity("User is not logged in")
+                    .build();
 
         }
     }
 
+    /**
+     * Registers the account
+     * @param register The register data
+     * @return
+     */
     @POST
     @Path("register")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public ActiveConnection registerAccount(String email, String firstName, String lastName, String password, String salt) {
+    public Response registerAccount(RegisterModel register) {
 
-        if (App.getUserDatabase().existsAccountWithEmail(email)) {
-            throw new WebApplicationException("Account with that email already exists", 400);
+        if (App.getUserDatabase().existsAccountWithEmail(register.getEmail())) {
+            Response.status(400)
+                    .entity("Account with that email already exists")
+                    .build();
         }
 
-        OwnUser ownUser = new OwnUser(firstName, lastName, email, password, salt);
+        OwnUser ownUser = new OwnUser(register.getFirstName(), register.getLastName(),
+                register.getEmail(), register.getPassword(), register.getSalt());
 
         App.getAsync().submit(() -> App.getUserDatabase().createAccount(ownUser));
 
         App.getUserDatabase().createAccount(ownUser);
 
-        return generateActiveConnection(ownUser.getUserID());
+        return Response.ok()
+                .entity(generateActiveConnection(ownUser.getUserID()))
+                .build();
+    }
+
+    @POST
+    @Path("refresh")
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response refreshConnection(RefreshConnectionModel refresh) {
+
+        ActiveConnection activeConnection = App.getAuthenticationHandler().getActiveConnection(refresh.getUserID());
+
+        if (!Arrays.equals(activeConnection.getAccessTokenBytes(), refresh.getAccessToken().getBytes(StandardCharsets.UTF_8))) {
+            return Response.status(400)
+                    .entity("Wrong access token")
+                    .build();
+        }
+
+        if (checkPassword(refresh.getUserID(), refresh.getPassword())) {
+
+            return Response.ok()
+                    .entity(activeConnection.refreshToken())
+                    .build();
+
+        }
+
+        return Response.status(400)
+                .entity("Wrong authentication")
+                .build();
+    }
+
+    public boolean checkPassword(UUID userID, String hashed_password) {
+
+        OwnUser accountInformation = App.getUserDatabase().getAccountInformationOwnAccount(userID);
+
+        if (accountInformation == null) {
+            throw new NullPointerException("User not found");
+        }
+
+        return Arrays.equals(hashed_password.getBytes(StandardCharsets.UTF_8), accountInformation.getPassword());
     }
 
     /**
@@ -98,6 +169,10 @@ public class AuthenticationHandler {
      */
     public ActiveConnection createOAuthConnection(UUID userID) {
         return generateActiveConnection(userID);
+    }
+
+    public boolean isValid(UUID userID, String accessToken) {
+        return isValid(userID, accessToken.getBytes(StandardCharsets.UTF_8));
     }
 
     /**

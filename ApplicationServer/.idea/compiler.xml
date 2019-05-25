@@ -9,8 +9,5 @@
         <module name="ApplicationServer" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="ApplicationServer" target="1.8" />
-    </bytecodeTargetLevel>
   </component>
 </project>

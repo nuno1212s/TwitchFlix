@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="account_already_exists" type="id"></item>
+    <item name="email_not_valid" type="id" />
+    <item name="login_progress_bar" type="id" />
+    <item name="login_not_valid" type="id" />
+</resources>

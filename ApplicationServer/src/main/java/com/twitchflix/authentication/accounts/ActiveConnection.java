@@ -1,8 +1,8 @@
 package com.twitchflix.authentication.accounts;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.Base64;
 import java.util.UUID;
 
 public class ActiveConnection {
@@ -52,6 +52,6 @@ public class ActiveConnection {
     }
 
     public String getAccessToken() {
-        return Base64.getEncoder().encodeToString(accessToken);
+        return new String(accessToken, StandardCharsets.UTF_8);
     }
 }

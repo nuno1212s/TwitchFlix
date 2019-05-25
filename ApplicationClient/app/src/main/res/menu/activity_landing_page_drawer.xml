@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/own_channel"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/own_channel" />
+        <item
+            android:id="@+id/start_stream"
+            android:icon="@drawable/ic_menu_camera"
+            android:title="@string/start_stream" />
+    </group>
+
+    <item android:title="@string/title_nav_bar_2">
+        <menu>
+            <item
+                android:id="@+id/account_settings"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="@string/account_settings"/>
+            <item
+                android:id="@+id/logout"
+                android:icon="@drawable/ic_menu_share"
+                android:title="@string/logout" />
+        </menu>
+    </item>
+
+</menu>
