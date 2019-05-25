@@ -20,6 +20,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -146,7 +147,8 @@ public class App {
                         VideoRestHandler.class.getCanonicalName(),
                         OAuth2Handler.class.getCanonicalName(),
                         UserDataHandler.class.getCanonicalName(),
-                        DebugExceptionMapper.class.getCanonicalName()
+                        DebugExceptionMapper.class.getCanonicalName(),
+                        JacksonJsonProvider.class.getCanonicalName()
                 )));
 
         handlers.setHandlers(new Handler[]{ctx, new DefaultHandler()});

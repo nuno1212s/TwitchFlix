@@ -14,7 +14,7 @@ public class Logger {
 
     private static File outputFile;
 
-    private static PrintStream systemOut, logOut;
+    private static PrintStream systemOut, logOut, errorOut;
 
     public Logger() {
 
@@ -55,6 +55,7 @@ public class Logger {
         }
 
         systemOut = System.out;
+        errorOut = System.err;
 
         try {
             FileOutputStream fileStream = new FileOutputStream(outputFile);
@@ -62,6 +63,8 @@ public class Logger {
             logOut = new PrintStream(fileStream, false);
 
             System.setOut(logOut);
+
+            System.setErr(logOut);
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

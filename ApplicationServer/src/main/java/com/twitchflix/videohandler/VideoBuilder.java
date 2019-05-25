@@ -4,6 +4,8 @@ import com.twitchflix.rest.models.VideoStream;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.temporal.ChronoField;
+import java.time.temporal.TemporalField;
 import java.util.UUID;
 
 public class VideoBuilder {
@@ -82,8 +84,8 @@ public class VideoBuilder {
         setDescription(set.getString("DESCRIPTION"));
         setLive(set.getBoolean("LIVE"));
         setLink(set.getString("LINK"));
-        setThumbnailLink(set.getString("THUMBLINK"));
-        setUploadDate(set.getDate("UPLOADDATE").toInstant().toEpochMilli());
+        setThumbnailLink(set.getString("THUMBNAILLINK"));
+//        setUploadDate(set.getDate("UPLOADDATE").toLocalDate().getLong(ChronoField.MILLI_OF_SECOND));
         setLikes(set.getInt("LIKES"));
         setViews(set.getInt("VIEWS"));
 

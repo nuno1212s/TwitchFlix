@@ -139,9 +139,10 @@ public class VideoRestHandler {
 
     @GET
     @Path("start")
-    public Response handleStreamStart(@QueryParam("streamid") UUID streamId) {
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response handleStreamStart(@QueryParam("streamid") String streamId) {
 
-        Video videoByID = App.getVideoDatabase().getVideoByID(streamId);
+        Video videoByID = App.getVideoDatabase().getVideoByID(UUID.fromString(streamId));
 
         if (videoByID == null) {
             return Response.status(404).build();
@@ -156,6 +157,7 @@ public class VideoRestHandler {
 
     @GET
     @Path("endstream")
+    @Produces(MediaType.TEXT_PLAIN)
     public Response handleStreamEnd(@QueryParam("streamid") String streamId) {
 
         Video videoByID = App.getVideoDatabase().getVideoByID(UUID.fromString(streamId));

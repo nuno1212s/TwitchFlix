@@ -28,8 +28,8 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public Video getVideoByID(UUID videoID) {
 
         try (Connection c = getConnection();
-             PreparedStatement s = c.prepareStatement("SELECT HEX(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
-                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VIDEOID = UNHEX(?)")) {
+             PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
+                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VIDEOID = UUID_TO_BIN(?)")) {
 
             s.setString(1, videoID.toString());
 
@@ -64,7 +64,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public List<Video> getAllVideos() {
 
         try (Connection c = getConnection();
-             PreparedStatement s = c.prepareStatement("SELECT HEX(VIDEOID) AS VIDEOID, HEX(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
+             PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(VIDEOID) AS VIDEOID, BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
                      "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS")) {
 
             ResultSet resultSet = s.executeQuery();
@@ -101,9 +101,9 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public void incrementVideoViews(UUID videoID) {
 
         try (Connection c = getConnection();
-             PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET VIEWS=VIEWS + 1 WHERE VIDEOID = UNHEX(?)")) {
+             PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET VIEWS=VIEWS + 1 WHERE VIDEOID = UUID_TO_BIN(?)")) {
 
-            s.setString(1, videoID.toString().replace("-", ""));
+            s.setString(1, videoID.toString());
 
             s.executeUpdate();
 
@@ -118,10 +118,10 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
         try (Connection c = getConnection();
              PreparedStatement s = c.prepareStatement("INSERT INTO VIDEOS(VIDEOID, UPLOADER, TITLE, DESCRIPTION, LINK, THUMBNAILLINK) " +
-                     "values(UNHEX(?), UNHEX(?), ?, ?, ?, ?)")) {
+                     "values(UUID_TO_BIN(?), UUID_TO_BIN(?), ?, ?, ?, ?)")) {
 
-            s.setString(1, video.getVideoID().toString().replace("-", ""));
-            s.setString(2, video.getUploader().toString().replace("-", ""));
+            s.setString(1, video.getVideoID().toString());
+            s.setString(2, video.getUploader().toString());
             s.setString(3, video.getTitle());
             s.setString(4, video.getDescription());
             s.setString(5, video.getLink());
@@ -140,12 +140,12 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
         try (Connection c = getConnection();
             PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET LIVE=?, LINK=?" +
-                    " WHERE VIDEOID=UNHEX(?)")) {
+                    " WHERE VIDEOID=UUID_TO_BIN(?)")) {
 
             s.setBoolean(1, video.isLive());
             s.setString(2, video.getLink());
 
-            s.setString(3, video.getVideoID().toString().replace("-", ""));
+            s.setString(3, video.getVideoID().toString());
 
             s.executeUpdate();
 
