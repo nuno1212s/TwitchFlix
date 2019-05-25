@@ -3,10 +3,7 @@ package com.twitchflix.videohandler;
 import com.twitchflix.App;
 import com.twitchflix.authentication.User;
 import com.twitchflix.authentication.accounts.ActiveConnection;
-import com.twitchflix.rest.models.AcceptView;
-import com.twitchflix.rest.models.RequestStream;
-import com.twitchflix.rest.models.UserVideo;
-import com.twitchflix.rest.models.VideoStream;
+import com.twitchflix.rest.models.*;
 import com.twitchflix.searchengine.SearchEngine;
 import com.twitchflix.util.Pair;
 
@@ -21,18 +18,17 @@ import java.util.UUID;
 @Path("videos")
 public class VideoRestHandler {
 
-    @GET
+    @POST
     @Path("search")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response search(@HeaderParam("videoName") String videoName,
-                           @HeaderParam("UUID") UUID userID,
-                           @HeaderParam("accessToken") String accessToken) {
+    public Response search(LoginModel model, @HeaderParam("search") String videoName) {
 
         SearchEngine videoSearchEngine = App.getVideoSearchEngine();
 
-        if (App.getAuthenticationHandler().isValid(userID, accessToken)) {
+        if (App.getAuthenticationHandler().isValid(model.getUserID(), model.getAccessToken())) {
 
-            User user = App.getUserDatabase().getAccountInformation(userID);
+            User user = App.getUserDatabase().getAccountInformation(model.getUserID());
 
             List<Video> videos = videoSearchEngine.searchVideoByTitle(videoName, user);
 
@@ -114,7 +110,7 @@ public class VideoRestHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response requestStreamLink(RequestStream streamRequest) {
 
-        //if (App.getAuthenticationHandler().isValid(userID, acesstoken)) {
+        if (App.getAuthenticationHandler().isValid(streamRequest.getUserID(), streamRequest.getAccessToken())) {
 
             UUID videoID = UUID.randomUUID();
 
@@ -133,9 +129,9 @@ public class VideoRestHandler {
             App.getAsync().submit(() -> App.getVideoDatabase().registerVideoStream(video));
 
             return Response.ok().entity(video).build();
-       // }
+        }
 
-       // return Response.status(400).entity("Wrong access token").build();
+        return Response.status(400).entity("Wrong access token").build();
     }
 
     @GET

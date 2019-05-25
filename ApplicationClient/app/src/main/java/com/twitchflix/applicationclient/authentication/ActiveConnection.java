@@ -1,7 +1,10 @@
 package com.twitchflix.applicationclient.authentication;
 
 import com.twitchflix.applicationclient.ClientApp;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class ActiveConnection {
@@ -11,6 +14,8 @@ public class ActiveConnection {
     private long createdTime, validFor;
 
     private byte[] accessToken;
+
+    private ActiveConnection() {}
 
     public ActiveConnection(UUID owner, long createdTime, long validFor, byte[] accessToken) {
 
@@ -31,14 +36,42 @@ public class ActiveConnection {
 
     }
 
-    public void refreshConnection() {
+    public boolean refreshConnection() {
 
         ActiveConnection activeConnection = ClientApp.getIns().getAuthRequests().refreshActiveConnection(this);
 
-        this.createdTime = activeConnection.createdTime;
-        this.validFor = activeConnection.validFor;
-        this.accessToken = activeConnection.accessToken;
+        if (activeConnection != null) {
 
+            this.createdTime = activeConnection.createdTime;
+            this.validFor = activeConnection.validFor;
+            this.accessToken = activeConnection.accessToken;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public String getAccessTokenString() {
+        return new String(this.accessToken, StandardCharsets.UTF_8);
+    }
+
+    public JSONObject toJSONObject() {
+
+        if (hasExpired()) {
+            refreshConnection();
+        }
+
+        JSONObject json = new JSONObject();
+
+        try {
+            json.put("userID", owner.toString());
+            json.put("accessToken", getAccessTokenString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return json;
     }
 
     public byte[] getAccessToken() {

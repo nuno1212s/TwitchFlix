@@ -68,19 +68,19 @@ public abstract class User {
     public void addLike(UUID video) {
         this.likedVideos.add(video);
 
-        App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+        App.getAsync().submit(() -> App.getUserDatabase().updateWatchedVideos(this));
     }
 
     public void addUploadedVideo(UUID video) {
         this.uploadedVideos.add(video);
 
-        App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+        App.getAsync().submit(() -> App.getUserDatabase().updateWatchedVideos(this));
     }
 
     public boolean addWatchedVideo(UUID video) {
         if (this.watchedVideos.add(video)) {
 
-            App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+            App.getAsync().submit(() -> App.getUserDatabase().updateWatchedVideos(this));
 
             return true;
         } else {
@@ -102,6 +102,18 @@ public abstract class User {
         return this.uploadedVideos.contains(video);
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+
+        App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+
+        App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+    }
+
     public Document toMongoDB() {
 
         return new Document("userID", this.getUserID())
@@ -110,6 +122,14 @@ public abstract class User {
                 .append("Email", this.getEmail())
                 .append("LikedVideos", this.likedVideos)
                 .append("WatchedVideos", this.watchedVideos)
+                .append("UploadedVideos", this.uploadedVideos);
+
+    }
+
+    public Document videosToMongo() {
+
+        return new Document("WatchedVideos", this.watchedVideos)
+                .append("LikedVideos", this.likedVideos)
                 .append("UploadedVideos", this.uploadedVideos);
 
     }

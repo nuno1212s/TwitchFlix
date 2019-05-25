@@ -119,8 +119,12 @@ public class LandingPage extends AppCompatActivity
 
             Intent intent = new Intent(this, MainActivity.class);
 
+            ClientApp.getIns().getAuthRequests().destroyConnection(ClientApp.getIns().getCurrentActiveAccount());
+
             ClientApp.getIns().setUserData(null);
             ClientApp.getIns().setCurrentActiveAccount(null);
+
+            ClientApp.getIns().getInformationStorage().deleteUserLogin();
 
             startActivity(intent);
             finish();

@@ -124,7 +124,18 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
                 new Document("$set", user.toMongoDB()));
 
         updateResultPublisher.subscribe(new ObservableSubscriber<>());
+    }
 
+    @Override
+    public void updateWatchedVideos(User user) {
+        MongoDatabase database = getDatabase();
+
+        MongoCollection<Document> users = database.getCollection(USERS);
+
+        Publisher<UpdateResult> updateResultPublisher = users.updateOne(Filters.eq("userID", user.getUserID()),
+                new Document("$set", user.videosToMongo()));
+
+        updateResultPublisher.subscribe(new ObservableSubscriber<>());
     }
 
     private User getUser(Publisher<Document> userID1) {

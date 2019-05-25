@@ -2,10 +2,13 @@ package com.twitchflix.applicationclient;
 
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.authentication.AuthRequests;
+import com.twitchflix.applicationclient.authentication.server.AuthServerConnection;
 import com.twitchflix.applicationclient.datastorage.InformationStorage;
 import com.twitchflix.applicationclient.servercomunication.ServerRequests;
 import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
+import com.twitchflix.applicationclient.userdata.server.UserDataServerConnection;
+import okhttp3.OkHttpClient;
 
 public class ClientApp {
 
@@ -32,9 +35,14 @@ public class ClientApp {
 
     private UserData userData;
 
+    private OkHttpClient client;
+
     private ClientApp() {
 //        this.informationStorage = new FileStorage();
+        this.client = new OkHttpClient();
 
+        this.authRequests = new AuthServerConnection();
+        this.userDataRequests = new UserDataServerConnection();
     }
 
     public UserDataRequests getUserDataRequests() {
@@ -59,6 +67,10 @@ public class ClientApp {
 
     public UserData getUserData() {
         return userData;
+    }
+
+    public OkHttpClient getClient() {
+        return this.client;
     }
 
     public void setCurrentActiveAccount(ActiveConnection connection) {

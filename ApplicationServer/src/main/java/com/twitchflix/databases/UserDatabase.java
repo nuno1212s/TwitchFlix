@@ -55,4 +55,10 @@ public interface UserDatabase {
      */
     void updateAccount(User user);
 
+    /**
+     * Updates a user's watched videos
+     * @param user
+     */
+    void updateWatchedVideos(User user);
+
 }

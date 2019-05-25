@@ -1,15 +1,19 @@
 package com.twitchflix.rest.models;
 
+import java.util.UUID;
+
 public class LogoutModel {
 
-    private String email, accessToken;
+    private UUID userID;
 
-    public String getEmail() {
-        return email;
+    private String accessToken;
+
+    public UUID getUserID() {
+        return userID;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUserID(UUID userID) {
+        this.userID = userID;
     }
 
     public String getAccessToken() {

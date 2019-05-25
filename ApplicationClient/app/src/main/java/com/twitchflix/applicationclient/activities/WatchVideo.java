@@ -84,23 +84,29 @@ public class WatchVideo extends AppCompatActivity {
                     return;
                 }
 
-                PlayerView videoPlayer = activity.findViewById(R.id.video_player);
-
-                DataSource.Factory dataSource = new DefaultHttpDataSourceFactory(Util.getUserAgent(activity, "TwitchFlix"));
-
-                HlsMediaSource source = new HlsMediaSource.Factory(dataSource).createMediaSource(Uri.parse(video.getLink()));
-
-                SimpleExoPlayer simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(activity);
-
-                simpleExoPlayer.prepare(source);
-
-                videoPlayer.setPlayer(simpleExoPlayer);
-
                 TextView title = activity.findViewById(R.id.video_title),
                         desc = activity.findViewById(R.id.video_description);
 
                 title.setText(video.getTitle());
                 desc.setText(video.getDescription());
+
+                if (video.isLive()) {
+
+                    PlayerView videoPlayer = activity.findViewById(R.id.video_player);
+
+                    DataSource.Factory dataSource = new DefaultHttpDataSourceFactory(Util.getUserAgent(activity, "TwitchFlix"));
+
+                    HlsMediaSource source = new HlsMediaSource.Factory(dataSource).createMediaSource(Uri.parse(video.getLink()));
+
+                    SimpleExoPlayer simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(activity);
+
+                    simpleExoPlayer.prepare(source);
+
+                    videoPlayer.setPlayer(simpleExoPlayer);
+
+                } else {
+                    //TODO: Make default mp4 video player
+                }
             }
 
         }
