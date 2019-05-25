@@ -1,15 +1,13 @@
 package com.twitchflix.authentication;
 
+import com.twitchflix.App;
 import com.twitchflix.authentication.accounts.OwnUser;
 import com.twitchflix.authentication.oauth2.OAuthUser;
 import org.bson.Document;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -27,28 +25,28 @@ public abstract class User {
 
     private String firstName, lastName, email;
 
-    private List<UUID> uploadedVideos, likedVideos, watchedVideos;
+    private Set<UUID> uploadedVideos, likedVideos, watchedVideos;
 
     public User(String firstName, String lastName, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
 
-        this.uploadedVideos = Collections.synchronizedList(new ArrayList<>());
-        this.likedVideos = Collections.synchronizedList(new ArrayList<>());
-        this.watchedVideos = Collections.synchronizedList(new ArrayList<>());
+        this.uploadedVideos = Collections.synchronizedSet(new HashSet<>());
+        this.likedVideos = Collections.synchronizedSet(new HashSet<>());
+        this.watchedVideos = Collections.synchronizedSet(new HashSet<>());
     }
 
     public User(UUID userID, String firstname, String lastName, String email,
-                List<UUID> uploadedVideos, List<UUID> likedVideos, List<UUID> watchedVideos) {
+                Set<UUID> uploadedVideos, Set<UUID> likedVideos, Set<UUID> watchedVideos) {
         this.userID = userID;
         this.firstName = firstname;
         this.lastName = lastName;
         this.email = email;
 
-        this.uploadedVideos = Collections.synchronizedList(uploadedVideos);
-        this.likedVideos = Collections.synchronizedList(likedVideos);
-        this.watchedVideos = Collections.synchronizedList(watchedVideos);
+        this.uploadedVideos = Collections.synchronizedSet(uploadedVideos);
+        this.likedVideos = Collections.synchronizedSet(likedVideos);
+        this.watchedVideos = Collections.synchronizedSet(watchedVideos);
     }
 
     public UUID getUserID() {
@@ -69,14 +67,25 @@ public abstract class User {
 
     public void addLike(UUID video) {
         this.likedVideos.add(video);
+
+        App.getAsync().submit(() -> App.getUserDatabase().updateWatchedVideos(this));
     }
 
     public void addUploadedVideo(UUID video) {
         this.uploadedVideos.add(video);
+
+        App.getAsync().submit(() -> App.getUserDatabase().updateWatchedVideos(this));
     }
 
-    public void addWatchedVideo(UUID video) {
-        this.watchedVideos.add(video);
+    public boolean addWatchedVideo(UUID video) {
+        if (this.watchedVideos.add(video)) {
+
+            App.getAsync().submit(() -> App.getUserDatabase().updateWatchedVideos(this));
+
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public boolean hasLikedVideo(UUID video) {
@@ -93,14 +102,34 @@ public abstract class User {
         return this.uploadedVideos.contains(video);
     }
 
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+
+        App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+
+        App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+    }
+
     public Document toMongoDB() {
 
-        return new Document("userID", this.getUserID().toString())
+        return new Document("userID", this.getUserID())
                 .append("FirstName", this.getFirstName())
                 .append("LastName", this.getLastName())
                 .append("Email", this.getEmail())
                 .append("LikedVideos", this.likedVideos)
                 .append("WatchedVideos", this.watchedVideos)
+                .append("UploadedVideos", this.uploadedVideos);
+
+    }
+
+    public Document videosToMongo() {
+
+        return new Document("WatchedVideos", this.watchedVideos)
+                .append("LikedVideos", this.likedVideos)
                 .append("UploadedVideos", this.uploadedVideos);
 
     }

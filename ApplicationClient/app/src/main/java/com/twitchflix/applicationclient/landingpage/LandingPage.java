@@ -3,8 +3,6 @@ package com.twitchflix.applicationclient.landingpage;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,13 +12,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
-import com.twitchflix.applicationclient.userdata.UserData;
+import com.twitchflix.applicationclient.rest.models.UserData;
 
 public class LandingPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -123,8 +119,12 @@ public class LandingPage extends AppCompatActivity
 
             Intent intent = new Intent(this, MainActivity.class);
 
+            ClientApp.getIns().getAuthRequests().destroyConnection(ClientApp.getIns().getCurrentActiveAccount());
+
             ClientApp.getIns().setUserData(null);
             ClientApp.getIns().setCurrentActiveAccount(null);
+
+            ClientApp.getIns().getInformationStorage().deleteUserLogin();
 
             startActivity(intent);
             finish();

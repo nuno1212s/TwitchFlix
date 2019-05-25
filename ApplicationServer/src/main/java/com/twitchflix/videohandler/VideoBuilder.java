@@ -43,6 +43,7 @@ public class VideoBuilder {
 
     public VideoBuilder setLink(String link) {
         this.link = link;
+
         return this;
     }
 

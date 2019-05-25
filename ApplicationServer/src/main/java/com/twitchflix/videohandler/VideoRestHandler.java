@@ -3,10 +3,7 @@ package com.twitchflix.videohandler;
 import com.twitchflix.App;
 import com.twitchflix.authentication.User;
 import com.twitchflix.authentication.accounts.ActiveConnection;
-import com.twitchflix.rest.models.AcceptView;
-import com.twitchflix.rest.models.RequestStream;
-import com.twitchflix.rest.models.UserVideo;
-import com.twitchflix.rest.models.VideoStream;
+import com.twitchflix.rest.models.*;
 import com.twitchflix.searchengine.SearchEngine;
 import com.twitchflix.util.Pair;
 
@@ -21,18 +18,17 @@ import java.util.UUID;
 @Path("videos")
 public class VideoRestHandler {
 
-    @GET
+    @POST
     @Path("search")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response search(@HeaderParam("videoName") String videoName,
-                           @HeaderParam("UUID") UUID userID,
-                           @HeaderParam("accessToken") String accessToken) {
+    public Response search(LoginModel model, @HeaderParam("search") String videoName) {
 
         SearchEngine videoSearchEngine = App.getVideoSearchEngine();
 
-        if (App.getAuthenticationHandler().isValid(userID, accessToken)) {
+        if (App.getAuthenticationHandler().isValid(model.getUserID(), model.getAccessToken())) {
 
-            User user = App.getUserDatabase().getAccountInformation(userID);
+            User user = App.getUserDatabase().getAccountInformation(model.getUserID());
 
             List<Video> videos = videoSearchEngine.searchVideoByTitle(videoName, user);
 
@@ -47,9 +43,9 @@ public class VideoRestHandler {
     }
 
     @GET
-    @Path("refreshVideo")
+    @Path("getVideoByID")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response refreshVideo(@HeaderParam("videoID") String videoID) {
+    public Response getVideoByID(@HeaderParam("videoID") String videoID) {
 
         Video videoById = App.getVideoDatabase().getVideoByID(UUID.fromString(videoID));
 
@@ -95,13 +91,14 @@ public class VideoRestHandler {
 
             User user = App.getUserDatabase().getAccountInformation(view.getUserID());
 
-            user.addWatchedVideo(view.getVideoID());
+            if (user.addWatchedVideo(view.getVideoID())) {
 
-            Video vid = App.getVideoDatabase().getVideoByID(view.getVideoID());
+                Video vid = App.getVideoDatabase().getVideoByID(view.getVideoID());
 
-            vid.addView();
+                vid.addView();
 
-            return Response.ok().build();
+                return Response.ok().build();
+            }
         }
 
         return Response.status(400).build();
@@ -113,7 +110,7 @@ public class VideoRestHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response requestStreamLink(RequestStream streamRequest) {
 
-        //if (App.getAuthenticationHandler().isValid(userID, acesstoken)) {
+        if (App.getAuthenticationHandler().isValid(streamRequest.getUserID(), streamRequest.getAccessToken())) {
 
             UUID videoID = UUID.randomUUID();
 
@@ -124,17 +121,17 @@ public class VideoRestHandler {
                     .setDescription(streamRequest.getDescription())
                     .setUploadDate(System.currentTimeMillis())
                     .setLive(false)
-                    .setLink("https://" + App.SERVER_IP + "/watch/hls/" + videoID.toString() + ".m3u8")
-                    .setThumbnailLink("https://" + App.SERVER_IP + "/images/" + videoID.toString() + ".png")
-                    .setStreamLink("rtmp://" + App.SERVER_IP + "/show/" + videoID.toString())
+                    .setLink("https://%SERVER_IP%/watch/hls/" + videoID.toString() + ".m3u8")
+                    .setThumbnailLink("https://%SERVER_IP%/images/" + videoID.toString() + ".png")
+                    .setStreamLink("rtmp://%SERVER_IP%/show/" + videoID.toString())
                     .createVideoStream();
 
             App.getAsync().submit(() -> App.getVideoDatabase().registerVideoStream(video));
 
             return Response.ok().entity(video).build();
-       // }
+        }
 
-       // return Response.status(400).entity("Wrong access token").build();
+        return Response.status(400).entity("Wrong access token").build();
     }
 
     @GET
@@ -149,6 +146,10 @@ public class VideoRestHandler {
         }
 
         videoByID.setLive(true);
+
+        User uploader = App.getUserDatabase().getAccountInformation(videoByID.getUploader());
+
+        uploader.addUploadedVideo(videoByID.getVideoID());
 
         App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
 
@@ -170,7 +171,7 @@ public class VideoRestHandler {
 
         videoByID.setLive(false);
 
-        videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".mp4");
+        videoByID.setLink("https://%SERVER_IP%/recordings/" + streamId + ".mp4");
 
         App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
 

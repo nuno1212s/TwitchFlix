@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Collections;
+import java.util.UUID;
 
 /**
  * Handles the OAuth2 google sign in
@@ -30,11 +31,11 @@ public class OAuth2Handler {
 
     private static String CLIENT_ID;
 
-    private HttpTransport transport;
+    private static HttpTransport transport;
 
-    private JsonFactory factory;
+    private static JsonFactory factory;
 
-    private GoogleIdTokenVerifier verifier;
+    private static GoogleIdTokenVerifier verifier;
 
     public OAuth2Handler() throws GeneralSecurityException, IOException {
 
@@ -99,6 +100,25 @@ public class OAuth2Handler {
         return Response.status(400)
                 .entity("Google token ID is not valid")
                 .build();
+    }
+
+    public static boolean isValid(UUID userID, String google_id) throws GeneralSecurityException, IOException {
+
+        GoogleIdToken token = verifier.verify(google_id);
+
+        if (token != null) {
+            GoogleIdToken.Payload userInformation = token.getPayload();
+
+            User user = App.getUserDatabase().getAccountInformation(userInformation.getEmail());
+
+            if (user != null) {
+
+                return user.getUserID().equals(userID);
+            }
+
+        }
+
+        return false;
     }
 
 }

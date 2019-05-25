@@ -49,4 +49,16 @@ public interface UserDatabase {
 
     OwnUser getAccountInformationOwnAccount(UUID ID);
 
+    /**
+     * Updates a user account
+     * @param user
+     */
+    void updateAccount(User user);
+
+    /**
+     * Updates a user's watched videos
+     * @param user
+     */
+    void updateWatchedVideos(User user);
+
 }

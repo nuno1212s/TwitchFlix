@@ -11,8 +11,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
-import com.twitchflix.applicationclient.servercomunication.Video;
-import com.twitchflix.applicationclient.userdata.UserData;
+import com.twitchflix.applicationclient.rest.models.UserVideo;
+import com.twitchflix.applicationclient.rest.models.Video;
+import com.twitchflix.applicationclient.rest.models.UserData;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,7 +38,7 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected Boolean doInBackground(Void... strings) {
 
-        List<Video> videos = ClientApp.getIns().getServerRequests()
+        List<UserVideo> videos = ClientApp.getIns().getServerRequests()
                 .getLandingPage(ClientApp.getIns().getCurrentActiveAccount());
 
         this.videos = new LinkedHashMap<>();
@@ -118,6 +119,10 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
                     ImageView view = new ImageView(activity);
 
                     view.setLayoutParams(new ViewGroup.LayoutParams(50, 150));
+
+                    view.setClickable(true);
+
+                    view.setOnClickListener(new OnClickVideoListener(activity, video.getVideoID()));
 
                     view.setImageBitmap(this.thumbnails.get(video.getVideoID()));
 

@@ -124,8 +124,8 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
             s.setString(2, video.getUploader().toString());
             s.setString(3, video.getTitle());
             s.setString(4, video.getDescription());
-            s.setString(5, video.getLink());
-            s.setString(6, video.getThumbnailLink());
+            s.setString(5, video.getPureLink());
+            s.setString(6, video.getPureThumbLink());
 
             s.executeUpdate();
 
@@ -143,7 +143,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
                     " WHERE VIDEOID=UUID_TO_BIN(?)")) {
 
             s.setBoolean(1, video.isLive());
-            s.setString(2, video.getLink());
+            s.setString(2, video.getPureLink());
 
             s.setString(3, video.getVideoID().toString());
 

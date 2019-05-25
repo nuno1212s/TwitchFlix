@@ -2,6 +2,7 @@ package com.twitchflix.databases.mongodb;
 
 import com.mongodb.client.model.Filters;
 import com.mongodb.client.result.DeleteResult;
+import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import com.mongodb.reactivestreams.client.MongoDatabase;
 import com.mongodb.reactivestreams.client.Success;
@@ -15,6 +16,8 @@ import java.util.UUID;
 
 public class MongoUserDB extends MongoDB implements UserDatabase {
 
+    private static final String USERS = "users";
+
     public MongoUserDB() {
         super();
     }
@@ -24,7 +27,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoDatabase database = getDatabase();
 
-        MongoCollection<Document> users = database.getCollection("users");
+        MongoCollection<Document> users = database.getCollection(USERS);
 
         Publisher<Document> email1 = users.find(Filters.eq("email", email))
                 .limit(1).first();
@@ -39,7 +42,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoDatabase database = getDatabase();
 
-        MongoCollection<Document> users = database.getCollection("users");
+        MongoCollection<Document> users = database.getCollection(USERS);
 
         Publisher<Success> successPublisher = users.insertOne(user.toMongoDB());
 
@@ -52,7 +55,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoDatabase database = getDatabase();
 
-        MongoCollection<Document> users = database.getCollection("users");
+        MongoCollection<Document> users = database.getCollection(USERS);
 
         Publisher<DeleteResult> deleter = users.deleteOne(new Document("userID", userID.toString()));
 
@@ -67,7 +70,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoDatabase database = getDatabase();
 
-        MongoCollection<Document> users = database.getCollection("users");
+        MongoCollection<Document> users = database.getCollection(USERS);
 
         Publisher<Document> email1 = users.find(new Document("email", email)).limit(1).first();
 
@@ -79,7 +82,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoDatabase database = getDatabase();
 
-        MongoCollection<Document> users = database.getCollection("users");
+        MongoCollection<Document> users = database.getCollection(USERS);
 
         Publisher<Document> userID1 = users.find(new Document("userID", userID)).limit(1).first();
 
@@ -92,7 +95,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoDatabase database = getDatabase();
 
-        MongoCollection<Document> users = database.getCollection("users");
+        MongoCollection<Document> users = database.getCollection(USERS);
 
         Publisher<Document> userData = users.find(new Document("email", email)).limit(1).first();
 
@@ -104,11 +107,35 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoDatabase database = getDatabase();
 
-        MongoCollection<Document> users = database.getCollection("users");
+        MongoCollection<Document> users = database.getCollection(USERS);
 
         Publisher<Document> userData = users.find(new Document("userID", ID)).limit(1).first();
 
         return (OwnUser) getUser(userData);
+    }
+
+    @Override
+    public void updateAccount(User user) {
+        MongoDatabase database = getDatabase();
+
+        MongoCollection<Document> users = database.getCollection(USERS);
+
+        Publisher<UpdateResult> updateResultPublisher = users.updateOne(Filters.eq("userID", user.getUserID()),
+                new Document("$set", user.toMongoDB()));
+
+        updateResultPublisher.subscribe(new ObservableSubscriber<>());
+    }
+
+    @Override
+    public void updateWatchedVideos(User user) {
+        MongoDatabase database = getDatabase();
+
+        MongoCollection<Document> users = database.getCollection(USERS);
+
+        Publisher<UpdateResult> updateResultPublisher = users.updateOne(Filters.eq("userID", user.getUserID()),
+                new Document("$set", user.videosToMongo()));
+
+        updateResultPublisher.subscribe(new ObservableSubscriber<>());
     }
 
     private User getUser(Publisher<Document> userID1) {

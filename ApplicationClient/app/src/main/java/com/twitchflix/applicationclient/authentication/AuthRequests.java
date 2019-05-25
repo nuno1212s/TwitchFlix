@@ -10,7 +10,7 @@ public interface AuthRequests {
 
     void destroyConnection(ActiveConnection activeConnection);
 
-    void registerAccount(String email, String first_name, String last_name, String hashed_password, String salt);
+    ActiveConnection registerAccount(String email, String first_name, String last_name, String hashed_password, String salt);
 
     boolean accountExistsWithEmail(String email);
 

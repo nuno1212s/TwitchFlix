@@ -1,7 +1,5 @@
 package com.twitchflix.rest.models;
 
-import java.util.UUID;
-
 public class RequestStream extends LoginModel {
 
     private String title, description;

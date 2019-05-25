@@ -21,7 +21,7 @@ import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.authentication.PasswordHandler;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
-import com.twitchflix.applicationclient.userdata.UserData;
+import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;

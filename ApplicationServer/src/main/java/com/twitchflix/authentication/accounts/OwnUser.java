@@ -4,7 +4,9 @@ import com.twitchflix.authentication.User;
 import org.bson.Document;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class OwnUser extends User {
@@ -16,7 +18,7 @@ public class OwnUser extends User {
     private boolean confirmed;
 
     public OwnUser(UUID userID, String firstName, String lastName, String email,
-                   List<UUID> watchedVideos, List<UUID> likedVideos, List<UUID> uploadedVideos,
+                   Set<UUID> watchedVideos, Set<UUID> likedVideos, Set<UUID> uploadedVideos,
                    String hashed_password, String salt) {
         super(userID, firstName, lastName, email, uploadedVideos, likedVideos, watchedVideos);
 
@@ -66,9 +68,9 @@ public class OwnUser extends User {
                 salt = d.getString("Salt"),
                 password = d.getString("Password");
 
-        List<UUID> likedVideos = d.getList("LikedVideos", UUID.class),
-                watchedVideos = d.getList("WatchedVideos", UUID.class),
-                uploadedVideos = d.getList("UploadedVideos", UUID.class);
+        Set<UUID> likedVideos = new HashSet<>(d.getList("LikedVideos", UUID.class)),
+                watchedVideos = new HashSet<>(d.getList("WatchedVideos", UUID.class)),
+                uploadedVideos = new HashSet<>(d.getList("UploadedVideos", UUID.class));
 
         return new OwnUser(userID, firstName, lastName, email, watchedVideos, likedVideos, uploadedVideos, password, salt);
     }

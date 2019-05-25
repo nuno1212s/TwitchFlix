@@ -2,6 +2,8 @@ package com.twitchflix.authentication.accounts;
 
 import com.twitchflix.App;
 import com.twitchflix.authentication.User;
+import com.twitchflix.authentication.oauth2.OAuth2Handler;
+import com.twitchflix.authentication.oauth2.OAuthUser;
 import com.twitchflix.rest.models.EmailLoginModel;
 import com.twitchflix.rest.models.LogoutModel;
 import com.twitchflix.rest.models.RefreshConnectionModel;
@@ -10,7 +12,9 @@ import com.twitchflix.rest.models.RegisterModel;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -68,6 +72,7 @@ public class AuthenticationHandler {
 
     /**
      * Logout of the server
+     *
      * @param logout the logout params
      * @return
      */
@@ -77,11 +82,9 @@ public class AuthenticationHandler {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response logOut(LogoutModel logout) {
 
-        User user = App.getUserDatabase().getAccountInformation(logout.getEmail());
+        if (isValid(logout.getUserID(), logout.getAccessToken().getBytes(StandardCharsets.UTF_8))) {
 
-        if (isValid(user.getUserID(), logout.getAccessToken().getBytes(StandardCharsets.UTF_8))) {
-
-            connections.remove(user.getUserID());
+            connections.remove(logout.getUserID());
 
             return Response.ok()
                     .entity(true)
@@ -99,6 +102,7 @@ public class AuthenticationHandler {
 
     /**
      * Registers the account
+     *
      * @param register The register data
      * @return
      */
@@ -109,7 +113,7 @@ public class AuthenticationHandler {
     public Response registerAccount(RegisterModel register) {
 
         if (App.getUserDatabase().existsAccountWithEmail(register.getEmail())) {
-            Response.status(400)
+            return Response.status(400)
                     .entity("Account with that email already exists")
                     .build();
         }
@@ -118,8 +122,6 @@ public class AuthenticationHandler {
                 register.getEmail(), register.getPassword(), register.getSalt());
 
         App.getAsync().submit(() -> App.getUserDatabase().createAccount(ownUser));
-
-        App.getUserDatabase().createAccount(ownUser);
 
         return Response.ok()
                 .entity(generateActiveConnection(ownUser.getUserID()))
@@ -140,11 +142,28 @@ public class AuthenticationHandler {
                     .build();
         }
 
-        if (checkPassword(refresh.getUserID(), refresh.getPassword())) {
+        User user = App.getUserDatabase().getAccountInformation(refresh.getUserID());
 
-            return Response.ok()
-                    .entity(activeConnection.refreshToken())
-                    .build();
+        if (user instanceof OwnUser) {
+
+            if (checkPassword(refresh.getUserID(), refresh.getPassword())) {
+
+                return Response.ok()
+                        .entity(activeConnection.refreshToken())
+                        .build();
+
+            }
+        } else if (user instanceof OAuthUser) {
+
+            try {
+                if (OAuth2Handler.isValid(refresh.getUserID(), refresh.getPassword())) {
+                    return Response.ok()
+                            .entity(activeConnection.refreshToken())
+                            .build();
+                }
+            } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
+            }
 
         }
 

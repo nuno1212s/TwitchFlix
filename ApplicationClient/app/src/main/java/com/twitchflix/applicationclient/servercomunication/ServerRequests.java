@@ -1,16 +1,23 @@
 package com.twitchflix.applicationclient.servercomunication;
 
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
+import com.twitchflix.applicationclient.rest.models.UserVideo;
+import com.twitchflix.applicationclient.rest.models.Video;
+import com.twitchflix.applicationclient.rest.models.VideoStream;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ServerRequests {
 
-    List<Video> getLandingPage(ActiveConnection connection);
+    List<UserVideo> getLandingPage(ActiveConnection connection);
 
-    List<Video> searchVideo(String text, ActiveConnection connection);
+    List<UserVideo> searchVideo(String text, ActiveConnection connection);
+
+    Video getVideoByID(UUID videoID);
 
     void addView(UUID videoID, ActiveConnection connection);
+
+    VideoStream requestVideoStream(String title, String description, ActiveConnection connection);
 
 }
