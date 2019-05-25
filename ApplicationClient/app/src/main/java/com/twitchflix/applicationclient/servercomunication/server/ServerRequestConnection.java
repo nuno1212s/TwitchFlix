@@ -7,10 +7,7 @@ import com.twitchflix.applicationclient.rest.models.UserVideo;
 import com.twitchflix.applicationclient.rest.models.Video;
 import com.twitchflix.applicationclient.rest.models.VideoStream;
 import com.twitchflix.applicationclient.servercomunication.ServerRequests;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -38,16 +35,36 @@ public class ServerRequestConnection implements ServerRequests {
     @Override
     public List<UserVideo> searchVideo(String text, ActiveConnection connection) {
 
-        JSONObject jsonObject = connection.toJSONObject();
-
         Request request = new Request.Builder()
                 .url(ServerConnection.getServerIp() + "videos/search")
+                .header("search", text)
+                .post(RequestBody.create(JSON, connection.toJSONObject().toString()))
+                .build();
 
-        return null;
+        return executeAndLoadVideos(request);
     }
 
     @Override
     public Video getVideoByID(UUID videoID) {
+
+        Request request = new Request.Builder()
+                .url(ServerConnection.getServerIp() + "videos/getVideoByID")
+                .header("videoID", videoID.toString())
+                .get()
+                .build();
+
+        try (Response r = ServerConnection.getIns().getClient().newCall(request).execute()) {
+
+            if (r.code() == 200)  {
+
+                return ServerConnection.getIns().getGson().fromJson(r.body().string(), Video.class);
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 
