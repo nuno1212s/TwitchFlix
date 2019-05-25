@@ -3,7 +3,6 @@ package com.twitchflix.applicationclient.landingpage;
 import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -18,7 +17,6 @@ import com.twitchflix.applicationclient.userdata.UserData;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
-import java.net.URI;
 import java.net.URL;
 import java.util.*;
 
