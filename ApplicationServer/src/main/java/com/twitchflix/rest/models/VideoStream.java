@@ -1,5 +1,6 @@
 package com.twitchflix.rest.models;
 
+import com.twitchflix.App;
 import com.twitchflix.videohandler.Video;
 
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class VideoStream extends Video {
     }
 
     public String getStreamLink() {
-        return streamLink;
+        return streamLink.replace("%SERVER_IP%", App.SERVER_IP);
     }
 
 }

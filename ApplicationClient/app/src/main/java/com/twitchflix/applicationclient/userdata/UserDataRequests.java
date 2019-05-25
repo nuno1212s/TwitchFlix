@@ -1,6 +1,7 @@
 package com.twitchflix.applicationclient.userdata;
 
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
+import com.twitchflix.applicationclient.rest.models.UserData;
 
 import java.util.UUID;
 

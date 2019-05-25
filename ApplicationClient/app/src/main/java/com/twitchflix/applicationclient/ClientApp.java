@@ -4,7 +4,7 @@ import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.authentication.AuthRequests;
 import com.twitchflix.applicationclient.datastorage.InformationStorage;
 import com.twitchflix.applicationclient.servercomunication.ServerRequests;
-import com.twitchflix.applicationclient.userdata.UserData;
+import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
 
 public class ClientApp {

@@ -49,4 +49,10 @@ public interface UserDatabase {
 
     OwnUser getAccountInformationOwnAccount(UUID ID);
 
+    /**
+     * Updates a user account
+     * @param user
+     */
+    void updateAccount(User user);
+
 }

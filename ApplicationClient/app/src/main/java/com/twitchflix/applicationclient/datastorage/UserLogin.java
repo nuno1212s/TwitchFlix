@@ -1,6 +1,5 @@
 package com.twitchflix.applicationclient.datastorage;
 
-import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 
 import java.nio.charset.StandardCharsets;

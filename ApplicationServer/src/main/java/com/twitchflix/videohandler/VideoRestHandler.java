@@ -47,9 +47,9 @@ public class VideoRestHandler {
     }
 
     @GET
-    @Path("refreshVideo")
+    @Path("getVideoByID")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response refreshVideo(@HeaderParam("videoID") String videoID) {
+    public Response getVideoByID(@HeaderParam("videoID") String videoID) {
 
         Video videoById = App.getVideoDatabase().getVideoByID(UUID.fromString(videoID));
 
@@ -95,13 +95,14 @@ public class VideoRestHandler {
 
             User user = App.getUserDatabase().getAccountInformation(view.getUserID());
 
-            user.addWatchedVideo(view.getVideoID());
+            if (user.addWatchedVideo(view.getVideoID())) {
 
-            Video vid = App.getVideoDatabase().getVideoByID(view.getVideoID());
+                Video vid = App.getVideoDatabase().getVideoByID(view.getVideoID());
 
-            vid.addView();
+                vid.addView();
 
-            return Response.ok().build();
+                return Response.ok().build();
+            }
         }
 
         return Response.status(400).build();
@@ -124,9 +125,9 @@ public class VideoRestHandler {
                     .setDescription(streamRequest.getDescription())
                     .setUploadDate(System.currentTimeMillis())
                     .setLive(false)
-                    .setLink("https://" + App.SERVER_IP + "/watch/hls/" + videoID.toString() + ".m3u8")
-                    .setThumbnailLink("https://" + App.SERVER_IP + "/images/" + videoID.toString() + ".png")
-                    .setStreamLink("rtmp://" + App.SERVER_IP + "/show/" + videoID.toString())
+                    .setLink("https://%SERVER_IP%/watch/hls/" + videoID.toString() + ".m3u8")
+                    .setThumbnailLink("https://%SERVER_IP%/images/" + videoID.toString() + ".png")
+                    .setStreamLink("rtmp://%SERVER_IP%/show/" + videoID.toString())
                     .createVideoStream();
 
             App.getAsync().submit(() -> App.getVideoDatabase().registerVideoStream(video));
@@ -150,6 +151,10 @@ public class VideoRestHandler {
 
         videoByID.setLive(true);
 
+        User uploader = App.getUserDatabase().getAccountInformation(videoByID.getUploader());
+
+        uploader.addUploadedVideo(videoByID.getVideoID());
+
         App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
 
         return Response.ok().entity("SUCCESS").build();
@@ -170,7 +175,7 @@ public class VideoRestHandler {
 
         videoByID.setLive(false);
 
-        videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".mp4");
+        videoByID.setLink("https://%SERVER_IP%/recordings/" + streamId + ".mp4");
 
         App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
 

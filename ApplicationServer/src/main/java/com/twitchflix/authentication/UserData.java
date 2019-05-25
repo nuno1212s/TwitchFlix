@@ -38,7 +38,18 @@ public class UserData {
         return salt;
     }
 
-    public static UserData fromUser(User user) {
+    public static UserData fromUserEmail(User user) {
+
+        String salt = "";
+
+        if (user instanceof OwnUser) {
+            salt = ((OwnUser) user).getSalt();
+        }
+
+        return new UserData(user.getUserID(), "NO_PERMISSION", "NO_PERMISSION", user.getEmail(), salt);
+    }
+
+    public static UserData fromActiveConnection(User user) {
 
         String salt = "";
 

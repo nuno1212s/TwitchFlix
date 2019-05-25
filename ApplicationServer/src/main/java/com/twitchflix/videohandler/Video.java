@@ -81,12 +81,16 @@ public class Video {
         this.live = live;
     }
 
+    public String getPureLink() {return link;}
+
+    public String getPureThumbLink() {return thumbnailLink;}
+
     public String getLink() {
-        return link;
+        return link.replace("%SERVER_IP%", App.SERVER_IP);
     }
 
     public String getThumbnailLink() {
-        return thumbnailLink;
+        return thumbnailLink.replace("%SERVER_IP%", App.SERVER_IP);
     }
 
     public int getLikes() {

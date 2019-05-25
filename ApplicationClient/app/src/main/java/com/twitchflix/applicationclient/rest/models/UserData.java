@@ -1,4 +1,4 @@
-package com.twitchflix.applicationclient.userdata;
+package com.twitchflix.applicationclient.rest.models;
 
 import java.util.UUID;
 
@@ -34,5 +34,25 @@ public class UserData {
 
     public String getSalt() {
         return salt;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }
