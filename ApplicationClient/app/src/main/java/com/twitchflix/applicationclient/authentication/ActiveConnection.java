@@ -4,7 +4,6 @@ import com.twitchflix.applicationclient.ClientApp;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class ActiveConnection {
@@ -13,11 +12,11 @@ public class ActiveConnection {
 
     private long createdTime, validFor;
 
-    private byte[] accessToken;
+    private String accessToken;
 
     private ActiveConnection() {}
 
-    public ActiveConnection(UUID owner, long createdTime, long validFor, byte[] accessToken) {
+    public ActiveConnection(UUID owner, long createdTime, long validFor, String accessToken) {
 
         this.owner = owner;
         this.createdTime = createdTime;
@@ -61,12 +60,16 @@ public class ActiveConnection {
     }
 
     public String getAccessToken() {
-        return new String(this.accessToken, StandardCharsets.UTF_8);
+        return this.accessToken;
     }
 
     public JSONObject toJSONObject() {
+        return toJSONObject(false);
+    }
 
-        if (hasExpired()) {
+    public JSONObject toJSONObject(boolean ignoreExpiration) {
+
+        if (hasExpired() && !ignoreExpiration) {
             refreshConnection();
         }
 
@@ -80,10 +83,6 @@ public class ActiveConnection {
         }
 
         return json;
-    }
-
-    public byte[] getAccessTokenBytes() {
-        return accessToken;
     }
 
 

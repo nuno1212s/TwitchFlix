@@ -11,7 +11,7 @@ public class ActiveConnection {
 
     private long createdTime, validFor;
 
-    private byte[] accessToken;
+    private String accessToken;
 
     public ActiveConnection(UUID owner, long validFor) {
         this.owner = owner;
@@ -19,12 +19,14 @@ public class ActiveConnection {
 
         this.createdTime = System.currentTimeMillis();
 
-        this.accessToken = new BigInteger(256, new SecureRandom()).toByteArray();
+        this.accessToken =  new String(new BigInteger(256, new SecureRandom()).toByteArray(),
+                StandardCharsets.UTF_8);
     }
 
     public ActiveConnection refreshToken() {
 
-        this.accessToken = new BigInteger(256, new SecureRandom()).toByteArray();
+        this.accessToken =  new String(new BigInteger(256, new SecureRandom()).toByteArray(),
+                StandardCharsets.UTF_8);
 
         this.createdTime = System.currentTimeMillis();
 
@@ -47,11 +49,12 @@ public class ActiveConnection {
         return validFor;
     }
 
-    public byte[] getAccessTokenBytes() {
+    public String getAccessToken() {
         return accessToken;
     }
 
-    public String getAccessToken() {
-        return new String(accessToken, StandardCharsets.UTF_8);
+    @Override
+    public String toString() {
+        return String.format("{Owner: %s, AccessToken: %s}", owner.toString(), getAccessToken());
     }
 }

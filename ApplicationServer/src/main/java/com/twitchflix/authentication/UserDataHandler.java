@@ -55,8 +55,12 @@ public class UserDataHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response requestUserData(LoginModel model) {
 
+        System.out.println(App.getAuthenticationHandler().getConnections());
+
+        System.out.println(App.getAuthenticationHandler().getConnections().containsKey(model.getUserID()));
+
         System.out.println(model.getUserID());
-        System.out.println(model.getAccessToken());
+
         System.out.println(App.getAuthenticationHandler()
                 .getActiveConnection(model.getUserID()).getAccessToken());
 

@@ -40,7 +40,7 @@ public class UserLogin {
 
     public ActiveConnection toActiveConnection() {
 
-        ActiveConnection a = new ActiveConnection(getUserID(), 0, 0, this.accessToken.getBytes(StandardCharsets.UTF_8));
+        ActiveConnection a = new ActiveConnection(getUserID(), 0, 0, this.accessToken);
 
         a.refreshConnection();
 

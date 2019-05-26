@@ -1,6 +1,8 @@
 package com.twitchflix.databases.mongodb;
 
 import com.mongodb.client.model.Filters;
+import com.mongodb.client.model.IndexOptions;
+import com.mongodb.client.model.Indexes;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import com.mongodb.reactivestreams.client.MongoCollection;
@@ -20,6 +22,14 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
     public MongoUserDB() {
         super();
+
+        MongoDatabase database = getDatabase();
+
+        MongoCollection<Document> users = database.getCollection(USERS);
+
+        users.createIndex(Indexes.compoundIndex(Indexes.ascending("email"),
+                Indexes.ascending("userID")),
+                new IndexOptions().unique(true)).subscribe(new OperationSubscriber<>());
     }
 
     @Override
@@ -46,9 +56,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         Publisher<Success> successPublisher = users.insertOne(user.toMongoDB());
 
-        OperationSubscriber<Success> subscriber = new OperationSubscriber<>();
-
-        successPublisher.subscribe(subscriber);
+        successPublisher.subscribe(new OperationSubscriber<>());
 
     }
 
@@ -74,7 +82,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoCollection<Document> users = database.getCollection(USERS);
 
-        Publisher<Document> email1 = users.find(new Document("email", email)).limit(1).first();
+        Publisher<Document> email1 = users.find(Filters.eq("email", email)).limit(1).first();
 
         return getUser(email1);
     }
@@ -86,7 +94,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoCollection<Document> users = database.getCollection(USERS);
 
-        Publisher<Document> userID1 = users.find(new Document("userID", userID)).limit(1).first();
+        Publisher<Document> userID1 = users.find(Filters.eq("userID", userID)).limit(1).first();
 
         return getUser(userID1);
     }
@@ -99,7 +107,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoCollection<Document> users = database.getCollection(USERS);
 
-        Publisher<Document> userData = users.find(new Document("email", email)).limit(1).first();
+        Publisher<Document> userData = users.find(Filters.eq("email", email)).limit(1).first();
 
         return (OwnUser) getUser(userData);
     }
@@ -111,7 +119,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         MongoCollection<Document> users = database.getCollection(USERS);
 
-        Publisher<Document> userData = users.find(new Document("userID", ID)).limit(1).first();
+        Publisher<Document> userData = users.find(Filters.eq("userID", ID)).limit(1).first();
 
         return (OwnUser) getUser(userData);
     }

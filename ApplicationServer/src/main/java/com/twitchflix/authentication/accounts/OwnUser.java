@@ -61,7 +61,7 @@ public class OwnUser extends User {
 
     public static User fromMongoDB(Document d) {
 
-        UUID userID = UUID.fromString(d.getString("userID"));
+        UUID userID = (UUID) d.get("userID");
         String firstName = d.getString("FirstName"),
                 lastName = d.getString("LastName"),
                 email = d.getString("email"),

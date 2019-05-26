@@ -65,7 +65,7 @@ public class AuthServerConnection implements AuthRequests {
     @Override
     public ActiveConnection refreshActiveConnection(ActiveConnection activeConnection) {
 
-        JSONObject jsonObject = activeConnection.toJSONObject();
+        JSONObject jsonObject = activeConnection.toJSONObject(true);
 
         try {
             jsonObject.put("password", ClientApp.getIns().getInformationStorage().getCurrentLogin().getToken());

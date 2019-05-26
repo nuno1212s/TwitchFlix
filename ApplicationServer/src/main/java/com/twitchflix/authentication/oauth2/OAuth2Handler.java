@@ -26,16 +26,16 @@ import java.util.UUID;
  * https://developers.google.com/identity/sign-in/android/sign-in
  * https://developers.google.com/identity/sign-in/android/backend-auth
  */
-@Path("oauth")
+
 public class OAuth2Handler {
 
-    private static String CLIENT_ID;
+    private String CLIENT_ID;
 
-    private static HttpTransport transport;
+    private HttpTransport transport;
 
-    private static JsonFactory factory;
+    private JsonFactory factory;
 
-    private static GoogleIdTokenVerifier verifier;
+    private GoogleIdTokenVerifier verifier;
 
     public OAuth2Handler() throws GeneralSecurityException, IOException {
 
@@ -54,55 +54,17 @@ public class OAuth2Handler {
                 .build();
     }
 
-    @GET
-    @Path("clientID")
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response requestClientID() {
-        return Response.ok().entity(CLIENT_ID).build();
-    }
-
-    @POST
-    @Path("authenticate")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response authenticate(com.twitchflix.rest.models.GoogleIdToken idToken) throws GeneralSecurityException, IOException {
-
-        GoogleIdToken token = verifier.verify(idToken.getIdToken());
-
-        if (token != null) {
-            GoogleIdToken.Payload userInformation = token.getPayload();
-
-            String email = userInformation.getEmail();
-
-            String name = (String) userInformation.get("name");
-            String familyName = (String) userInformation.get("family_name");
-            String givenName = (String) userInformation.get("given_name");
-
-            if (App.getUserDatabase().existsAccountWithEmail(email)) {
-                User accountInformation = App.getUserDatabase().getAccountInformation(email);
-
-                return Response.ok()
-                        .entity(App.getAuthenticationHandler().createOAuthConnection(accountInformation.getUserID()))
-                        .build();
-            } else {
-
-                User user = new OAuthUser(name, familyName, email);
-
-                App.getAsync().submit(() -> App.getUserDatabase().createAccount(user));
-
-                return Response.ok()
-                        .entity(App.getAuthenticationHandler().createOAuthConnection(user.getUserID()))
-                        .build();
-            }
-
+    public GoogleIdToken verify(String google_id) {
+        try {
+            return verifier.verify(google_id);
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
         }
 
-        return Response.status(400)
-                .entity("Google token ID is not valid")
-                .build();
+        return null;
     }
 
-    public static boolean isValid(UUID userID, String google_id) throws GeneralSecurityException, IOException {
+    public boolean isValid(UUID userID, String google_id) throws GeneralSecurityException, IOException {
 
         GoogleIdToken token = verifier.verify(google_id);
 

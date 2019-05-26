@@ -2,7 +2,9 @@ package com.twitchflix;
 
 import com.twitchflix.authentication.UserDataHandler;
 import com.twitchflix.authentication.accounts.AuthenticationHandler;
+import com.twitchflix.authentication.accounts.AuthenticationRestHandler;
 import com.twitchflix.authentication.oauth2.OAuth2Handler;
+import com.twitchflix.authentication.oauth2.OAuth2RestHandler;
 import com.twitchflix.databases.UserDatabase;
 import com.twitchflix.databases.VideoDatabase;
 import com.twitchflix.databases.mongodb.MongoUserDB;
@@ -24,8 +26,9 @@ import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvi
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 
-import java.io.*;
-import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -44,7 +47,13 @@ public class App {
 
     private static AuthenticationHandler authenticationHandler;
 
+    private static OAuth2Handler auth2Handler;
+
     private static FileManager fileManager;
+
+    public static OAuth2Handler getAuth2Handler() {
+        return auth2Handler;
+    }
 
     public static AuthenticationHandler getAuthenticationHandler() {
         return authenticationHandler;
@@ -81,8 +90,7 @@ public class App {
         initExecutors();
         initDatabases();
         initSearchEngine();
-
-        authenticationHandler = new AuthenticationHandler();
+        initHandlers();
 
         //Setup http multithreading to stop blocking I/O requests
         QueuedThreadPool httpThreadPool = new QueuedThreadPool();
@@ -134,6 +142,16 @@ public class App {
 
     }
 
+    private static void initHandlers() {
+
+        authenticationHandler = new AuthenticationHandler();
+        try {
+            auth2Handler = new OAuth2Handler();
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static HandlerList registerServlets(ServletContextHandler ctx) {
 
         HandlerList handlers = new HandlerList();
@@ -143,9 +161,9 @@ public class App {
 
         authentication.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES,
                 String.join(",", Arrays.asList(
-                        AuthenticationHandler.class.getCanonicalName(),
+                        AuthenticationRestHandler.class.getCanonicalName(),
                         VideoRestHandler.class.getCanonicalName(),
-                        OAuth2Handler.class.getCanonicalName(),
+                        OAuth2RestHandler.class.getCanonicalName(),
                         UserDataHandler.class.getCanonicalName(),
                         DebugExceptionMapper.class.getCanonicalName(),
                         JacksonJsonProvider.class.getCanonicalName()

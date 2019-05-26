@@ -120,10 +120,10 @@ public abstract class User {
         return new Document("userID", this.getUserID())
                 .append("FirstName", this.getFirstName())
                 .append("LastName", this.getLastName())
-                .append("Email", this.getEmail());
-//                .append("LikedVideos", this.likedVideos)
-//                .append("WatchedVideos", this.watchedVideos)
-//                .append("UploadedVideos", this.uploadedVideos);
+                .append("email", this.getEmail())
+                .append("LikedVideos", this.likedVideos)
+                .append("WatchedVideos", this.watchedVideos)
+                .append("UploadedVideos", this.uploadedVideos);
     }
 
     public Document videosToMongo() {
