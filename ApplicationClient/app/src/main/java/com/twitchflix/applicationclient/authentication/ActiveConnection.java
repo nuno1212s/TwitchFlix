@@ -30,6 +30,14 @@ public class ActiveConnection {
         return owner;
     }
 
+    public long getCreatedTime() {
+        return createdTime;
+    }
+
+    public long getValidFor() {
+        return validFor;
+    }
+
     public boolean hasExpired() {
 
         return createdTime + validFor < System.currentTimeMillis();
@@ -52,7 +60,7 @@ public class ActiveConnection {
         return false;
     }
 
-    public String getAccessTokenString() {
+    public String getAccessToken() {
         return new String(this.accessToken, StandardCharsets.UTF_8);
     }
 
@@ -66,7 +74,7 @@ public class ActiveConnection {
 
         try {
             json.put("userID", owner.toString());
-            json.put("accessToken", getAccessTokenString());
+            json.put("accessToken", getAccessToken());
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -74,7 +82,7 @@ public class ActiveConnection {
         return json;
     }
 
-    public byte[] getAccessToken() {
+    public byte[] getAccessTokenBytes() {
         return accessToken;
     }
 

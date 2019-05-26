@@ -6,8 +6,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import androidx.appcompat.app.AppCompatActivity;
 import android.widget.TextView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -66,7 +65,8 @@ public class WatchVideo extends AppCompatActivity {
         protected Video doInBackground(UUID... uuids) {
             Video videoByID = ClientApp.getIns().getServerRequests().getVideoByID(uuids[0]);
 
-            ClientApp.getIns().getServerRequests().addView(videoByID.getVideoID(), ClientApp.getIns().getCurrentActiveAccount());
+            ClientApp.getIns().getServerRequests().addView(videoByID.getVideoID(),
+                    ClientApp.getIns().getLoginHandler().getCurrentActiveConnection());
 
             return videoByID;
         }

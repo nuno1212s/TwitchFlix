@@ -49,6 +49,8 @@ public class UserDataServerConnection implements UserDataRequests {
                 .post(RequestBody.create(JSON, connection.toJSONObject().toString()))
                 .build();
 
+        System.out.println(connection.toJSONObject().toString());
+
         return executeAndGetUserData(request);
     }
 
@@ -109,8 +111,15 @@ public class UserDataServerConnection implements UserDataRequests {
 
             if (r.code() == 200) {
 
-                return ServerConnection.getIns().getGson().fromJson(r.body().string(), UserData.class);
+                String string = r.body().string();
+                System.out.println(string);
 
+                return ServerConnection.getIns().getGson().fromJson(string, UserData.class);
+
+            } else {
+                System.out.println("ERROR:");
+                System.out.println(r.code());
+                System.out.println(r.body().string());
             }
 
         } catch (IOException e) {

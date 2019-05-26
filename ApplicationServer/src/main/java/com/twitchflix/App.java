@@ -27,15 +27,14 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import java.io.*;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 import java.util.logging.Level;
 
 public class App {
 
     public static String SERVER_IP;
 
-    private static ExecutorService executors = Executors.newFixedThreadPool(15);
+    private static ExecutorService executors;
 
     private static UserDatabase userDatabase;
 
@@ -75,10 +74,11 @@ public class App {
     public static void main(String[] args) throws Exception {
 
         //Initialize the logger
-        SERVER_IP = retrieveIpAddress();
+        SERVER_IP = "nuno1212s.ovh";
 
         initFileManager();
         initLoggers();
+        initExecutors();
         initDatabases();
         initSearchEngine();
 
@@ -93,7 +93,7 @@ public class App {
 
         Logger.log(Level.INFO, "Exporting keystore file.");
 
-        File f = getFileManager().getFileFromResource("keystore2.jks");
+        File f = getFileManager().getFileFromResource("keystore.jks");
 
         HttpConfiguration configuration = new HttpConfiguration();
 
@@ -104,8 +104,8 @@ public class App {
         SslContextFactory contextFactory = new SslContextFactory();
 
         contextFactory.setKeyStorePath(f.getAbsolutePath());
-        contextFactory.setKeyStorePassword("123456");
-        contextFactory.setKeyManagerPassword("123456");
+        contextFactory.setKeyStorePassword("trabalhopdm");
+        contextFactory.setKeyManagerPassword("trabalhopdm");
 
         HttpConfiguration config = new HttpConfiguration(configuration);
         SecureRequestCustomizer customizer = new SecureRequestCustomizer();
@@ -119,7 +119,7 @@ public class App {
                 new HttpConnectionFactory(config));
 
         https.setPort(8443);
-        https.setHost("localhost");
+        https.setHost("0.0.0.0");
         https.setIdleTimeout(500000);
 
         ServletContextHandler servletContextHandler = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
@@ -179,21 +179,37 @@ public class App {
         new Logger();
     }
 
-    private static String retrieveIpAddress() throws IOException {
+    private static void initExecutors() {
+        final Thread.UncaughtExceptionHandler exceptionHandler = (t, e) -> {
+            Logger.logException(e);
+        };
 
+        // create thread factory
 
-        URL whatismyip = new URL("http://checkip.amazonaws.com");
+        ThreadFactory threadFactory = r -> {
+            // System.out.println("creating pooled thread");
+            final Thread thread = new Thread(r);
+            thread.setUncaughtExceptionHandler(exceptionHandler);
+            return thread;
+        };
 
-        try (InputStream stream = whatismyip.openStream();
-             InputStreamReader reader1 = new InputStreamReader(stream);
-             BufferedReader reader = new BufferedReader(reader1)) {
+        executors = new CustomThreadPoolExecutor(20, 20, 0L, TimeUnit.MILLISECONDS, new LinkedTransferQueue<>(), threadFactory);
+    }
+}
 
-            return reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+class CustomThreadPoolExecutor extends ThreadPoolExecutor {
 
-        return null;
+    public CustomThreadPoolExecutor(int i, int i1, long l, TimeUnit timeUnit, BlockingQueue<Runnable> blockingQueue, ThreadFactory factory) {
+        super(i, i1, l, timeUnit, blockingQueue, factory);
     }
 
+
+    @Override
+    protected void afterExecute(Runnable runnable, Throwable throwable) {
+
+        if (throwable != null) {
+            Logger.logException(throwable);
+        }
+
+    }
 }

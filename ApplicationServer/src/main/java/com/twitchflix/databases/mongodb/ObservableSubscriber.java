@@ -1,6 +1,7 @@
 package com.twitchflix.databases.mongodb;
 
 import com.mongodb.MongoTimeoutException;
+import com.twitchflix.loggers.Logger;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
@@ -25,6 +26,8 @@ public class ObservableSubscriber<T> implements Subscriber<T> {
         this.received = new ArrayList<>();
         this.errors = new ArrayList<>();
         this.latch = new CountDownLatch(1);
+
+
     }
 
     @Override
@@ -40,6 +43,9 @@ public class ObservableSubscriber<T> implements Subscriber<T> {
     @Override
     public void onError(final Throwable t) {
         errors.add(t);
+
+        Logger.logException(t);
+
         onComplete();
     }
 
@@ -78,12 +84,15 @@ public class ObservableSubscriber<T> implements Subscriber<T> {
 
     public ObservableSubscriber<T> await(final long timeout, final TimeUnit unit) throws Throwable {
         subscription.request(Integer.MAX_VALUE);
+
         if (!latch.await(timeout, unit)) {
             throw new MongoTimeoutException("Publisher onComplete timed out");
         }
+
         if (!errors.isEmpty()) {
             throw errors.get(0);
         }
+
         return this;
     }
 }

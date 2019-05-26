@@ -28,6 +28,7 @@ public abstract class User {
     private Set<UUID> uploadedVideos, likedVideos, watchedVideos;
 
     public User(String firstName, String lastName, String email) {
+        this.userID = UUID.randomUUID();
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -119,11 +120,10 @@ public abstract class User {
         return new Document("userID", this.getUserID())
                 .append("FirstName", this.getFirstName())
                 .append("LastName", this.getLastName())
-                .append("Email", this.getEmail())
-                .append("LikedVideos", this.likedVideos)
-                .append("WatchedVideos", this.watchedVideos)
-                .append("UploadedVideos", this.uploadedVideos);
-
+                .append("Email", this.getEmail());
+//                .append("LikedVideos", this.likedVideos)
+//                .append("WatchedVideos", this.watchedVideos)
+//                .append("UploadedVideos", this.uploadedVideos);
     }
 
     public Document videosToMongo() {

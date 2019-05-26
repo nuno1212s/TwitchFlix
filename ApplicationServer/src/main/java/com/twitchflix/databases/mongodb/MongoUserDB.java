@@ -34,7 +34,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         ObservableSubscriber<Document> subscriber = subcribeAndWait(email1);
 
-        return subscriber.getReceived().isEmpty();
+        return !subscriber.getReceived().isEmpty();
     }
 
     @Override
@@ -46,7 +46,9 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         Publisher<Success> successPublisher = users.insertOne(user.toMongoDB());
 
-        successPublisher.subscribe(new ObservableSubscriber<>());
+        OperationSubscriber<Success> subscriber = new OperationSubscriber<>();
+
+        successPublisher.subscribe(subscriber);
 
     }
 
@@ -59,7 +61,7 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
 
         Publisher<DeleteResult> deleter = users.deleteOne(new Document("userID", userID.toString()));
 
-        ObservableSubscriber<DeleteResult> subscriber = new ObservableSubscriber<>();
+        OperationSubscriber<DeleteResult> subscriber = new OperationSubscriber<>();
 
         deleter.subscribe(subscriber);
 
@@ -123,7 +125,8 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
         Publisher<UpdateResult> updateResultPublisher = users.updateOne(Filters.eq("userID", user.getUserID()),
                 new Document("$set", user.toMongoDB()));
 
-        updateResultPublisher.subscribe(new ObservableSubscriber<>());
+        OperationSubscriber<UpdateResult> subscriber = new OperationSubscriber<>();
+        updateResultPublisher.subscribe(subscriber);
     }
 
     @Override
@@ -135,11 +138,17 @@ public class MongoUserDB extends MongoDB implements UserDatabase {
         Publisher<UpdateResult> updateResultPublisher = users.updateOne(Filters.eq("userID", user.getUserID()),
                 new Document("$set", user.videosToMongo()));
 
-        updateResultPublisher.subscribe(new ObservableSubscriber<>());
+        OperationSubscriber<UpdateResult> subscriber = new OperationSubscriber<>();
+
+        updateResultPublisher.subscribe(subscriber);
     }
 
     private User getUser(Publisher<Document> userID1) {
         ObservableSubscriber<Document> subscriber = subcribeAndWait(userID1);
+
+        if (subscriber.getReceived().isEmpty()) {
+            return null;
+        }
 
         return User.fromMongoDB(subscriber.getReceived().get(0));
     }

@@ -39,7 +39,7 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
     protected Boolean doInBackground(Void... strings) {
 
         List<UserVideo> videos = ClientApp.getIns().getServerRequests()
-                .getLandingPage(ClientApp.getIns().getCurrentActiveAccount());
+                .getLandingPage(ClientApp.getIns().getLoginHandler().getCurrentActiveConnection());
 
         this.videos = new LinkedHashMap<>();
         this.channelNames = new HashMap<>();

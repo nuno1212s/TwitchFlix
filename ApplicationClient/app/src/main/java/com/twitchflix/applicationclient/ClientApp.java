@@ -2,10 +2,12 @@ package com.twitchflix.applicationclient;
 
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.authentication.AuthRequests;
+import com.twitchflix.applicationclient.authentication.LoginHandler;
 import com.twitchflix.applicationclient.authentication.server.AuthServerConnection;
 import com.twitchflix.applicationclient.datastorage.InformationStorage;
 import com.twitchflix.applicationclient.servercomunication.ServerRequests;
 import com.twitchflix.applicationclient.rest.models.UserData;
+import com.twitchflix.applicationclient.servercomunication.server.ServerRequestConnection;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
 import com.twitchflix.applicationclient.userdata.server.UserDataServerConnection;
 import okhttp3.OkHttpClient;
@@ -31,9 +33,7 @@ public class ClientApp {
 
     private ServerRequests serverRequests;
 
-    private ActiveConnection currentActiveAccount;
-
-    private UserData userData;
+    private LoginHandler loginHandler;
 
     private OkHttpClient client;
 
@@ -43,6 +43,9 @@ public class ClientApp {
 
         this.authRequests = new AuthServerConnection();
         this.userDataRequests = new UserDataServerConnection();
+        this.serverRequests = new ServerRequestConnection();
+
+        this.loginHandler = new LoginHandler();
     }
 
     public UserDataRequests getUserDataRequests() {
@@ -61,28 +64,16 @@ public class ClientApp {
         return authRequests;
     }
 
-    public ActiveConnection getCurrentActiveAccount() {
-        return currentActiveAccount;
-    }
-
-    public UserData getUserData() {
-        return userData;
+    public LoginHandler getLoginHandler() {
+        return loginHandler;
     }
 
     public OkHttpClient getClient() {
         return this.client;
     }
 
-    public void setCurrentActiveAccount(ActiveConnection connection) {
-        this.currentActiveAccount = connection;
-    }
-
-
     public void setInformationStorage(InformationStorage storage) {
         this.informationStorage = storage;
     }
 
-    public void setUserData(UserData loggedInUserData) {
-        this.userData = loggedInUserData;
-    }
 }

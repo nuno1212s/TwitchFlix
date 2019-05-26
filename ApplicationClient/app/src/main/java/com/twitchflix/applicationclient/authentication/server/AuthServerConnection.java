@@ -150,7 +150,10 @@ public class AuthServerConnection implements AuthRequests {
 
             if (response.code() == 200) {
 
-                return ServerConnection.getIns().getGson().fromJson(response.body().string(), ActiveConnection.class);
+                String string = response.body().string();
+                System.out.println(string);
+
+                return ServerConnection.getIns().getGson().fromJson(string, ActiveConnection.class);
 
             }
 

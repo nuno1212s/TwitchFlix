@@ -3,12 +3,10 @@ package com.twitchflix.applicationclient;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import com.twitchflix.applicationclient.authentication.ActiveConnection;
-import com.twitchflix.applicationclient.landingpage.LandingPage;
+import androidx.appcompat.app.AppCompatActivity;
 import com.twitchflix.applicationclient.activities.LoginActivity;
 import com.twitchflix.applicationclient.datastorage.FileStorage;
-import com.twitchflix.applicationclient.datastorage.UserLogin;
+import com.twitchflix.applicationclient.landingpage.LandingPage;
 
 import java.lang.ref.WeakReference;
 
@@ -20,6 +18,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         ClientApp.getIns().setInformationStorage(new FileStorage(this));
+
+        ServerConnection.init(getApplication().getApplicationContext());
 
         if (!ClientApp.getIns().getInformationStorage().isUserLoggedIn()) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -41,20 +41,8 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(String... strings) {
 
-            UserLogin currentLogin = ClientApp.getIns().getInformationStorage().getCurrentLogin();
+            return ClientApp.getIns().getLoginHandler().attemptRelogin();
 
-            ActiveConnection activeConnection = currentLogin.toActiveConnection();
-
-            if (activeConnection.refreshConnection()) {
-                ClientApp.getIns().setCurrentActiveAccount(activeConnection);
-                ClientApp.getIns().setUserData(ClientApp.getIns().getUserDataRequests().requestUserData(activeConnection));
-
-                return true;
-            }
-
-            ClientApp.getIns().getInformationStorage().deleteUserLogin();
-
-            return false;
         }
 
         @Override

@@ -55,6 +55,11 @@ public class UserDataHandler {
     @Produces(MediaType.APPLICATION_JSON)
     public Response requestUserData(LoginModel model) {
 
+        System.out.println(model.getUserID());
+        System.out.println(model.getAccessToken());
+        System.out.println(App.getAuthenticationHandler()
+                .getActiveConnection(model.getUserID()).getAccessToken());
+
         if (App.getAuthenticationHandler().isValid(model.getUserID(), model.getAccessToken())) {
 
             User user = App.getUserDatabase().getAccountInformation(model.getUserID());
@@ -87,8 +92,6 @@ public class UserDataHandler {
                         .entity("User has not been found")
                         .build();
             }
-
-
 
         }
 

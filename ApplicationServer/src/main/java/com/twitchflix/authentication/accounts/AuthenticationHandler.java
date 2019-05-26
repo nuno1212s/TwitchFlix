@@ -110,7 +110,7 @@ public class AuthenticationHandler {
     @Path("register")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response registerAccount(RegisterModel register) {
+    public Response register(RegisterModel register) {
 
         if (App.getUserDatabase().existsAccountWithEmail(register.getEmail())) {
             return Response.status(400)
@@ -121,7 +121,9 @@ public class AuthenticationHandler {
         OwnUser ownUser = new OwnUser(register.getFirstName(), register.getLastName(),
                 register.getEmail(), register.getPassword(), register.getSalt());
 
-        App.getAsync().submit(() -> App.getUserDatabase().createAccount(ownUser));
+
+        //TODO: ASYNC
+        App.getUserDatabase().createAccount(ownUser);
 
         return Response.ok()
                 .entity(generateActiveConnection(ownUser.getUserID()))
@@ -219,7 +221,11 @@ public class AuthenticationHandler {
     }
 
     private ActiveConnection generateActiveConnection(UUID owner) {
-        return new ActiveConnection(owner, DEFAULT_VALID_TIME);
+        ActiveConnection activeConnection = new ActiveConnection(owner, DEFAULT_VALID_TIME);
+
+        this.connections.put(owner, activeConnection);
+
+        return activeConnection;
     }
 
 }

@@ -3,8 +3,8 @@ package com.twitchflix.applicationclient.activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -16,12 +16,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
-import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.ClientApp;
-import com.twitchflix.applicationclient.authentication.ActiveConnection;
-import com.twitchflix.applicationclient.authentication.PasswordHandler;
+import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
-import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;
@@ -183,18 +180,7 @@ public class LoginActivity extends AppCompatActivity {
         protected Boolean doInBackground(String... strings) {
             String email = strings[0], password = strings[1];
 
-            UserData userData = ClientApp.getIns().getUserDataRequests().requestUserData(email);
-
-            String hashedPassword = PasswordHandler.hashPassword(password, userData.getSalt());
-
-            ActiveConnection activeConnection = ClientApp.getIns().getAuthRequests().requestConnection(email, hashedPassword);
-
-            if (activeConnection != null) {
-                ClientApp.getIns().setCurrentActiveAccount(activeConnection);
-                ClientApp.getIns().setUserData(userData);
-            }
-
-            return activeConnection != null;
+            return ClientApp.getIns().getLoginHandler().attemptLogin(email, password);
         }
 
         @Override
@@ -246,15 +232,7 @@ public class LoginActivity extends AppCompatActivity {
 
             String idToken = strings[0];
 
-            ActiveConnection activeConnection = ClientApp.getIns().getAuthRequests().requestConnection(idToken);
-
-            if (activeConnection != null) {
-                ClientApp.getIns().setCurrentActiveAccount(activeConnection);
-
-                ClientApp.getIns().setUserData(ClientApp.getIns().getUserDataRequests().requestUserData(activeConnection));
-            }
-
-            return activeConnection != null;
+            return ClientApp.getIns().getLoginHandler().attempLogin(idToken);
         }
 
         @Override

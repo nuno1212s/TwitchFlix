@@ -40,7 +40,7 @@ public class ActiveConnection {
     }
 
     public boolean isValid() {
-        return getCreatedTime() + getValidFor() <= System.currentTimeMillis();
+        return getCreatedTime() + getValidFor() > System.currentTimeMillis();
     }
 
     public long getValidFor() {

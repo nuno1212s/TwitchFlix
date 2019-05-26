@@ -1,6 +1,7 @@
 package com.twitchflix.applicationclient.datastorage;
 
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
+import com.twitchflix.applicationclient.rest.models.UserData;
 
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -71,6 +72,15 @@ public class UserLogin {
 
         public UserLoginBuilder setAccessToken(String accessToken) {
             this.accessToken = accessToken;
+            return this;
+        }
+
+        public UserLoginBuilder fromUserDataAndToken(ActiveConnection connection, UserData data) {
+
+            this.userID = connection.getOwner();
+            this.email = data.getEmail();
+            this.accessToken = connection.getAccessToken();
+
             return this;
         }
 

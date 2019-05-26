@@ -86,7 +86,10 @@ public class ServerRequestConnection implements ServerRequests {
                 Type type = new TypeToken<List<UserVideo>>() {
                 }.getType();
 
-                return ServerConnection.getIns().getGson().fromJson(response.body().string(), type);
+                String string = response.body().string();
+                System.out.println(string);
+
+                return ServerConnection.getIns().getGson().fromJson(string, type);
             }
 
         } catch (IOException e) {
