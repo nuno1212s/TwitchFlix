@@ -13,6 +13,7 @@ import com.twitchflix.filesystem.DefaultFileManager;
 import com.twitchflix.filesystem.FileManager;
 import com.twitchflix.loggers.Logger;
 import com.twitchflix.searchengine.SearchEngine;
+import com.twitchflix.searchengine.TerribleSearchEngine;
 import com.twitchflix.videohandler.VideoRestHandler;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
@@ -142,16 +143,6 @@ public class App {
 
     }
 
-    private static void initHandlers() {
-
-        authenticationHandler = new AuthenticationHandler();
-        try {
-            auth2Handler = new OAuth2Handler();
-        } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     private static HandlerList registerServlets(ServletContextHandler ctx) {
 
         HandlerList handlers = new HandlerList();
@@ -175,6 +166,16 @@ public class App {
 
     }
 
+    private static void initHandlers() {
+
+        authenticationHandler = new AuthenticationHandler();
+        try {
+            auth2Handler = new OAuth2Handler();
+        } catch (GeneralSecurityException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     private static void initDatabases() {
 
         userDatabase = new MongoUserDB();
@@ -183,8 +184,7 @@ public class App {
     }
 
     private static void initSearchEngine() {
-
-
+        videoSearchEngine = new TerribleSearchEngine();
     }
 
     private static void initFileManager() {
@@ -198,36 +198,6 @@ public class App {
     }
 
     private static void initExecutors() {
-        final Thread.UncaughtExceptionHandler exceptionHandler = (t, e) -> {
-            Logger.logException(e);
-        };
-
-        // create thread factory
-
-        ThreadFactory threadFactory = r -> {
-            // System.out.println("creating pooled thread");
-            final Thread thread = new Thread(r);
-            thread.setUncaughtExceptionHandler(exceptionHandler);
-            return thread;
-        };
-
-        executors = new CustomThreadPoolExecutor(20, 20, 0L, TimeUnit.MILLISECONDS, new LinkedTransferQueue<>(), threadFactory);
-    }
-}
-
-class CustomThreadPoolExecutor extends ThreadPoolExecutor {
-
-    public CustomThreadPoolExecutor(int i, int i1, long l, TimeUnit timeUnit, BlockingQueue<Runnable> blockingQueue, ThreadFactory factory) {
-        super(i, i1, l, timeUnit, blockingQueue, factory);
-    }
-
-
-    @Override
-    protected void afterExecute(Runnable runnable, Throwable throwable) {
-
-        if (throwable != null) {
-            Logger.logException(throwable);
-        }
-
+        executors = Executors.newFixedThreadPool(20);
     }
 }

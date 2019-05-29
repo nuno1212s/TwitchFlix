@@ -3,6 +3,7 @@ package com.twitchflix.authentication.accounts;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.UUID;
 
 public class ActiveConnection {
@@ -19,14 +20,14 @@ public class ActiveConnection {
 
         this.createdTime = System.currentTimeMillis();
 
-        this.accessToken =  new String(new BigInteger(256, new SecureRandom()).toByteArray(),
-                StandardCharsets.UTF_8);
+        this.accessToken = Base64.getEncoder()
+                .encodeToString(new BigInteger(256, new SecureRandom()).toByteArray());
     }
 
     public ActiveConnection refreshToken() {
 
-        this.accessToken =  new String(new BigInteger(256, new SecureRandom()).toByteArray(),
-                StandardCharsets.UTF_8);
+        this.accessToken = Base64.getEncoder()
+                .encodeToString(new BigInteger(256, new SecureRandom()).toByteArray());
 
         this.createdTime = System.currentTimeMillis();
 

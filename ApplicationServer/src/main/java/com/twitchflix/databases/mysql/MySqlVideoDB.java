@@ -14,7 +14,8 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
             " UPLOADER BINARY(16) NOT NULL, TITLE varchar(255) NOT NULL, DESCRIPTION TEXT NOT NULL," +
             " UPLOADDATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, LIKES BIGINT NOT NULL DEFAULT 0," +
             " VIEWS BIGINT NOT NULL DEFAULT 0, LIVE BOOLEAN NOT NULL DEFAULT FALSE," +
-            " LINK varchar(2048), THUMBNAILLINK varchar(2048)" +
+            " LINK varchar(2048), THUMBNAILLINK varchar(2048), VALID BOOLEAN NOT NULL DEFAULT FALSE," +
+            "TRANSCODING NOT NULL DEFAULT FALSE"+
             ", UNIQUE(VIDEOID));";
 
     public MySqlVideoDB() {
@@ -65,7 +66,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
         try (Connection c = getConnection();
              PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(VIDEOID) AS VIDEOID, BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
-                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS")) {
+                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VALID=TRUE AND TRANSCODING=FALSE")) {
 
             ResultSet resultSet = s.executeQuery();
 
@@ -124,8 +125,8 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
             s.setString(2, video.getUploader().toString());
             s.setString(3, video.getTitle());
             s.setString(4, video.getDescription());
-            s.setString(5, video.getPureLink());
-            s.setString(6, video.getPureThumbLink());
+            s.setString(5, video.getLink());
+            s.setString(6, video.getThumbnailLink());
 
             s.executeUpdate();
 
@@ -139,13 +140,14 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public void updateVideo(Video video) {
 
         try (Connection c = getConnection();
-            PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET LIVE=?, LINK=?" +
+            PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET LIVE=?, LINK=?, TRANSCODING=?, VALID=TRUE" +
                     " WHERE VIDEOID=UUID_TO_BIN(?)")) {
 
             s.setBoolean(1, video.isLive());
-            s.setString(2, video.getPureLink());
+            s.setString(2, video.getLink());
+            s.setBoolean(3, video.isTranscoding());
 
-            s.setString(3, video.getVideoID().toString());
+            s.setString(4, video.getVideoID().toString());
 
             s.executeUpdate();
 

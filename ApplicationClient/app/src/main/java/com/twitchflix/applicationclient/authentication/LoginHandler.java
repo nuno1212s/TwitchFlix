@@ -1,6 +1,12 @@
 package com.twitchflix.applicationclient.authentication;
 
+import android.content.Context;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.twitchflix.applicationclient.ClientApp;
+import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.datastorage.UserLogin;
 import com.twitchflix.applicationclient.rest.models.UserData;
 
@@ -10,7 +16,34 @@ public class LoginHandler {
 
     private UserData currentUserData;
 
-    public LoginHandler() { }
+    private GoogleSignInClient googleAccount;
+
+    /**
+     * Creates the google sign in client with the application context
+     *
+     * @param context The context
+     */
+    public void mainActivityCreate(Context context) {
+
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .requestProfile()
+                .requestIdToken(context.getString(R.string.server_client_id))
+                .build();
+
+        googleAccount = GoogleSignIn.getClient(context, gso);
+
+    }
+
+    /**
+     * Check if the user is signed in
+     *
+     * @param context The application context
+     * @return
+     */
+    public GoogleSignInAccount checkIfSignedInGoogle(Context context) {
+        return GoogleSignIn.getLastSignedInAccount(context);
+    }
 
     public boolean attemptRelogin() {
 
@@ -49,11 +82,7 @@ public class LoginHandler {
             if (activeConnection != null) {
                 setCurrentActiveConnection(activeConnection);
 
-                System.out.println(activeConnection.getOwner().toString());
-
                 UserData currentUserData = ClientApp.getIns().getUserDataRequests().requestUserData(this.currentActiveConnection);
-
-                System.out.println(currentUserData);
 
                 setCurrentUserData(currentUserData);
 
@@ -74,7 +103,7 @@ public class LoginHandler {
 
     }
 
-    public boolean attempLogin(String googleIdToken) {
+    public boolean attemptLogin(String googleIdToken) {
 
         ActiveConnection activeConnection = ClientApp.getIns().getAuthRequests().requestConnection(googleIdToken);
 
@@ -110,11 +139,7 @@ public class LoginHandler {
 
             setCurrentActiveConnection(activeConnection);
 
-            System.out.println(activeConnection.getOwner());
-
             UserData currentUserData = ClientApp.getIns().getUserDataRequests().requestUserData(activeConnection);
-
-            System.out.println(currentUserData);
 
             setCurrentUserData(currentUserData);
 
@@ -134,10 +159,28 @@ public class LoginHandler {
 
     public void logOut() {
 
+        ClientApp.getIns().getAuthRequests().destroyConnection(getCurrentActiveConnection());
+
+        if (googleAccount != null) {
+            logOutOfGoogle();
+        }
+
         setCurrentActiveConnection(null);
         setCurrentUserData(null);
 
         ClientApp.getIns().getInformationStorage().deleteUserLogin();
+    }
+
+    public void logOutOfGoogle() {
+        googleAccount.signOut();
+    }
+
+    public GoogleSignInClient getGoogleClient() {
+        return googleAccount;
+    }
+
+    public void setCurrentGoogleLogin(GoogleSignInClient client) {
+        this.googleAccount = client;
     }
 
     public ActiveConnection getCurrentActiveConnection() {

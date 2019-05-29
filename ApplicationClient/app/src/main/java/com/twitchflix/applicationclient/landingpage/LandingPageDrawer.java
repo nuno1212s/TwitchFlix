@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
@@ -93,7 +94,9 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
 
         if (activity != null) {
 
-            ScrollView layout = activity.findViewById(R.id.main_landing_page_scroll);
+            SwipeRefreshLayout refreshLayout = activity.findViewById(R.id.main_landing_page_refresh);
+
+            ScrollView layout = refreshLayout.findViewById(R.id.main_landing_page_scroll);
 
             LinearLayout landing_page_layout = layout.findViewById(R.id.main_landing_page_layout);
 
@@ -102,6 +105,8 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
                 TextView textView = new TextView(activity);
 
                 textView.setText(this.channelNames.get(videos.getKey()));
+
+                textView.setTextSize(25);
 
                 textView.setPadding(10, 40, 0, 15);
 
@@ -118,18 +123,28 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
                 for (Video video : videos.getValue()) {
                     ImageView view = new ImageView(activity);
 
-                    view.setLayoutParams(new ViewGroup.LayoutParams(50, 150));
+                    view.setLayoutParams(new ViewGroup.MarginLayoutParams(320, 240));
 
                     view.setClickable(true);
 
+                    view.setPadding(15, 0, 0, 0);
+
                     view.setOnClickListener(new OnClickVideoListener(activity, video.getVideoID()));
+
+                    view.setAdjustViewBounds(true);
+
+                    view.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
                     view.setImageBitmap(this.thumbnails.get(video.getVideoID()));
 
                     videoLayout.addView(view);
                 }
 
+                landing_page_layout.addView(videoLayout);
+
             }
+
+            refreshLayout.setRefreshing(false);
 
         }
 

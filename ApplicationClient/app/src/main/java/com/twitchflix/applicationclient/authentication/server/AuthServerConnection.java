@@ -53,11 +53,12 @@ public class AuthServerConnection implements AuthRequests {
             e.printStackTrace();
         }
 
+        System.out.println(google_token_id);
+
         Request request = new Request.Builder()
                 .url(getIp() + "oauth/authenticate")
                 .post(RequestBody.create(JSON, idToken.toString()))
                 .build();
-
 
         return executeAndGetConnection(request);
     }
@@ -89,8 +90,9 @@ public class AuthServerConnection implements AuthRequests {
                 .post(RequestBody.create(JSON, activeConnection.toJSONObject().toString()))
                 .build();
 
-        try (Response response = ClientApp.getIns().getClient().newCall(request).execute()) {
+        try {
 
+            ClientApp.getIns().getClient().newCall(request).execute();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -150,13 +152,12 @@ public class AuthServerConnection implements AuthRequests {
 
             if (response.code() == 200) {
 
-                String string = response.body().string();
-                System.out.println(string);
-
-                return ServerConnection.getIns().getGson().fromJson(string, ActiveConnection.class);
+                return ServerConnection.getIns().getGson().fromJson(response.body().string(), ActiveConnection.class);
 
             }
 
+            String string = response.body().string();
+            System.out.println(string);
         } catch (IOException e) {
             e.printStackTrace();
         }

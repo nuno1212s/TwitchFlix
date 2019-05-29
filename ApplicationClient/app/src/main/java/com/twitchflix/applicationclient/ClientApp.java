@@ -1,27 +1,22 @@
 package com.twitchflix.applicationclient;
 
-import com.twitchflix.applicationclient.authentication.ActiveConnection;
+import android.app.Application;
 import com.twitchflix.applicationclient.authentication.AuthRequests;
 import com.twitchflix.applicationclient.authentication.LoginHandler;
 import com.twitchflix.applicationclient.authentication.server.AuthServerConnection;
+import com.twitchflix.applicationclient.datastorage.FileStorage;
 import com.twitchflix.applicationclient.datastorage.InformationStorage;
 import com.twitchflix.applicationclient.servercomunication.ServerRequests;
-import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.servercomunication.server.ServerRequestConnection;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
 import com.twitchflix.applicationclient.userdata.server.UserDataServerConnection;
 import okhttp3.OkHttpClient;
 
-public class ClientApp {
+public class ClientApp extends Application {
 
     private static ClientApp ins;
 
     public synchronized static ClientApp getIns() {
-
-        if (ins == null) {
-            ins = new ClientApp();
-        }
-
         return ins;
     }
 
@@ -37,8 +32,12 @@ public class ClientApp {
 
     private OkHttpClient client;
 
-    private ClientApp() {
-//        this.informationStorage = new FileStorage();
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        ins = this;
+
         this.client = new OkHttpClient();
 
         this.authRequests = new AuthServerConnection();
@@ -46,6 +45,12 @@ public class ClientApp {
         this.serverRequests = new ServerRequestConnection();
 
         this.loginHandler = new LoginHandler();
+
+        setInformationStorage(new FileStorage(getApplicationContext()));
+
+        ServerConnection.init(getApplicationContext());
+
+        this.loginHandler.mainActivityCreate(getApplicationContext());
     }
 
     public UserDataRequests getUserDataRequests() {

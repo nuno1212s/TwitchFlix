@@ -3,6 +3,10 @@ package com.twitchflix.applicationclient.landingpage;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -16,7 +20,10 @@ import android.widget.TextView;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
+import com.twitchflix.applicationclient.activities.StreamOptions;
 import com.twitchflix.applicationclient.rest.models.UserData;
+
+import java.lang.ref.WeakReference;
 
 public class LandingPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -38,30 +45,13 @@ public class LandingPage extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        initAndDraw();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
-
-        NavigationView navView = drawerLayout.findViewById(R.id.nav_view);
-
-        View headerView = navView.getHeaderView(0);
-
-        TextView userEmail = headerView.findViewById(R.id.display_userEmail),
-                userName = headerView.findViewById(R.id.display_userName);
-
-        UserData userData = ClientApp.getIns().getLoginHandler().getCurrentUserData();
-
-        userEmail.setText(userData.getEmail());
-
-        String userFullName = userData.getFirstName() + " " + userData.getLastName();
-
-        userName.setText(userFullName);
-
-        new LandingPageDrawer(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     @Override
@@ -109,26 +99,88 @@ public class LandingPage extends AppCompatActivity
 
         } else if (id == R.id.start_stream) {
 
-            //TODO: Start a new stream
+            Intent intent = new Intent(this, StreamOptions.class);
+
+            startActivity(intent);
 
         } else if (id == R.id.account_settings) {
 
             //TODO: Open account settings
 
         } else if (id == R.id.logout) {
-
-            Intent intent = new Intent(this, MainActivity.class);
-
-            ClientApp.getIns().getLoginHandler().logOut();
-
-            startActivity(intent);
-
-            finish();
+            new LogOut(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void initAndDraw() {
+
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+
+        NavigationView navView = drawerLayout.findViewById(R.id.nav_view);
+
+        View headerView = navView.getHeaderView(0);
+
+        TextView userEmail = headerView.findViewById(R.id.display_userEmail),
+                userName = headerView.findViewById(R.id.display_userName);
+
+        UserData userData = ClientApp.getIns().getLoginHandler().getCurrentUserData();
+
+        userEmail.setText(userData.getEmail());
+
+        String userFullName = userData.getFirstName() + " " + userData.getLastName();
+
+        userName.setText(userFullName);
+
+        new LandingPageDrawer(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+        SwipeRefreshLayout refreshLayout = findViewById(R.id.main_landing_page_refresh);
+
+        ScrollView layout = refreshLayout.findViewById(R.id.main_landing_page_scroll);
+
+        LinearLayout landing_page_layout = layout.findViewById(R.id.main_landing_page_layout);
+
+        refreshLayout.setOnRefreshListener(() -> {
+
+            landing_page_layout.removeAllViews();
+
+            new LandingPageDrawer(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        });
+    }
+
+    private static class LogOut extends AsyncTask<Void, Void, Void> {
+
+        private WeakReference<LandingPage> landingPage;
+
+        public LogOut(LandingPage page) {
+            landingPage = new WeakReference<>(page);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            ClientApp.getIns().getLoginHandler().logOut();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+
+            LandingPage landingPage = this.landingPage.get();
+
+            if (landingPage != null) {
+
+                Intent intent = new Intent(landingPage, MainActivity.class);
+
+                landingPage.startActivity(intent);
+
+                landingPage.finish();
+
+            }
+
+        }
     }
 }

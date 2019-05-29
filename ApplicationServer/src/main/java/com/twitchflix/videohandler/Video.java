@@ -21,6 +21,8 @@ public class Video {
 
     private String link, thumbnailLink;
 
+    private transient boolean transcoding = false;
+
     Video(UUID uploader, String title, String description, boolean live,
           String link, String thumbnailLink) {
 
@@ -81,16 +83,20 @@ public class Video {
         this.live = live;
     }
 
-    public String getPureLink() {return link;}
+    public void setTranscoding(boolean transcoding) {
+        this.transcoding = transcoding;
+    }
 
-    public String getPureThumbLink() {return thumbnailLink;}
+    public boolean isTranscoding() {
+        return this.transcoding;
+    }
 
     public String getLink() {
-        return link.replace("%SERVER_IP%", App.SERVER_IP);
+        return link;
     }
 
     public String getThumbnailLink() {
-        return thumbnailLink.replace("%SERVER_IP%", App.SERVER_IP);
+        return thumbnailLink;
     }
 
     public int getLikes() {

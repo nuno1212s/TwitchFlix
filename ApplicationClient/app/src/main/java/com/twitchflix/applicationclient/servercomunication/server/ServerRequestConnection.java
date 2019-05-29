@@ -8,6 +8,7 @@ import com.twitchflix.applicationclient.rest.models.Video;
 import com.twitchflix.applicationclient.rest.models.VideoStream;
 import com.twitchflix.applicationclient.servercomunication.ServerRequests;
 import okhttp3.*;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -55,7 +56,7 @@ public class ServerRequestConnection implements ServerRequests {
 
         try (Response r = ServerConnection.getIns().getClient().newCall(request).execute()) {
 
-            if (r.code() == 200)  {
+            if (r.code() == 200) {
 
                 return ServerConnection.getIns().getGson().fromJson(r.body().string(), Video.class);
 
@@ -71,10 +72,56 @@ public class ServerRequestConnection implements ServerRequests {
     @Override
     public void addView(UUID videoID, ActiveConnection connection) {
 
+        JSONObject jsonObject = connection.toJSONObject();
+
+        try {
+            jsonObject.put("videoID", videoID);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Request request = new Request.Builder()
+                .url(ServerConnection.getServerIp() + "videos/view")
+                .post(RequestBody.create(JSON, jsonObject.toString()))
+                .build();
+
+        try {
+            ServerConnection.getIns().getClient().newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public VideoStream requestVideoStream(String title, String description, ActiveConnection connection) {
+
+        JSONObject jsonObject = connection.toJSONObject();
+
+        try {
+            jsonObject.put("title", title);
+            jsonObject.put("description", description);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Request request = new Request.Builder()
+                .url(ServerConnection.getServerIp() + "videos/stream")
+                .post(RequestBody.create(JSON, jsonObject.toString()))
+                .build();
+
+        try (Response r = ServerConnection.getIns().getClient().newCall(request).execute()) {
+
+            if (r.code() == 200) {
+
+                return ServerConnection.getIns().getGson().fromJson(r.body().string(), VideoStream.class);
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return null;
     }
 

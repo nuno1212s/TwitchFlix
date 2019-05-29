@@ -3,7 +3,6 @@ package com.twitchflix.authentication;
 import com.twitchflix.App;
 import com.twitchflix.rest.models.LoginModel;
 import com.twitchflix.rest.models.UpdateNameModel;
-import jdk.nashorn.internal.objects.annotations.Getter;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -45,7 +44,7 @@ public class UserDataHandler {
         }
 
         return Response.ok()
-                .entity(UserData.fromUserEmail(accountInformation))
+                .entity(UserData.fromActiveConnection(accountInformation))
                 .build();
     }
 
@@ -54,15 +53,6 @@ public class UserDataHandler {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response requestUserData(LoginModel model) {
-
-        System.out.println(App.getAuthenticationHandler().getConnections());
-
-        System.out.println(App.getAuthenticationHandler().getConnections().containsKey(model.getUserID()));
-
-        System.out.println(model.getUserID());
-
-        System.out.println(App.getAuthenticationHandler()
-                .getActiveConnection(model.getUserID()).getAccessToken());
 
         if (App.getAuthenticationHandler().isValid(model.getUserID(), model.getAccessToken())) {
 

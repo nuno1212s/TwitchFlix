@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.widget.TextView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
 import com.google.android.exoplayer2.ui.PlayerView;
 import com.google.android.exoplayer2.upstream.DataSource;
@@ -49,6 +52,23 @@ public class WatchVideo extends AppCompatActivity {
                     videoId);
         }
 
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        PlayerView videoPlayer = findViewById(R.id.video_player);
+
+        videoPlayer.getPlayer().stop();
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+
+        finish();
     }
 
     private static class LoadVideo extends AsyncTask<UUID, Void, Video> {
@@ -102,11 +122,27 @@ public class WatchVideo extends AppCompatActivity {
 
                     simpleExoPlayer.prepare(source);
 
+                    simpleExoPlayer.setPlayWhenReady(true);
+
                     videoPlayer.setPlayer(simpleExoPlayer);
 
                 } else {
-                    //TODO: Make default mp4 video player
+                    PlayerView videoPlayer = activity.findViewById(R.id.video_player);
+
+                    DataSource.Factory dataSource = new DefaultHttpDataSourceFactory(Util.getUserAgent(activity, "TwitchFlix"));
+
+                    MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(video.getLink()),
+                            dataSource, new DefaultExtractorsFactory(), null, null);
+                    SimpleExoPlayer simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(activity);
+
+                    simpleExoPlayer.prepare(mediaSource);
+
+                    simpleExoPlayer.setPlayWhenReady(true);
+
+                    videoPlayer.setPlayer(simpleExoPlayer);
+
                 }
+
             }
 
         }

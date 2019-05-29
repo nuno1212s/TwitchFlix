@@ -6,6 +6,7 @@ import com.twitchflix.authentication.accounts.ActiveConnection;
 import com.twitchflix.rest.models.*;
 import com.twitchflix.searchengine.SearchEngine;
 import com.twitchflix.util.Pair;
+import jdk.nashorn.internal.objects.annotations.Getter;
 
 import javax.annotation.PostConstruct;
 import javax.ws.rs.*;
@@ -56,17 +57,17 @@ public class VideoRestHandler {
         return Response.ok().entity(videoById).build();
     }
 
-    @GET
+    @POST
     @Path("mainPage")
+    @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response mainPage(@HeaderParam("UUID") UUID userID,
-                             @HeaderParam("accessToken") String accessToken) {
+    public Response mainPage(LoginModel model) {
 
         SearchEngine engine = App.getVideoSearchEngine();
 
-        if (App.getAuthenticationHandler().isValid(userID, accessToken)) {
+        if (App.getAuthenticationHandler().isValid(model.getUserID(), model.getAccessToken())) {
 
-            User user = App.getUserDatabase().getAccountInformation(userID);
+            User user = App.getUserDatabase().getAccountInformation(model.getUserID());
 
             List<Video> videos = engine.getFeed(user);
 
@@ -122,7 +123,7 @@ public class VideoRestHandler {
                     .setUploadDate(System.currentTimeMillis())
                     .setLive(false)
                     .setLink("https://" + App.SERVER_IP + "/watch/hls/" + videoID.toString() + ".m3u8")
-                    .setThumbnailLink("https://"  + App.SERVER_IP + "/images/" + videoID.toString() + ".png")
+                    .setThumbnailLink("https://"  + App.SERVER_IP + "/images/" + videoID.toString() + ".jpg")
                     .setStreamLink("rtmp://"  + App.SERVER_IP + "/show/" + videoID.toString())
                     .createVideoStream();
 
@@ -169,7 +170,7 @@ public class VideoRestHandler {
 
         }
 
-        videoByID.setLive(false);
+        videoByID.setTranscoding(false);
 
         videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".mp4");
 
@@ -177,6 +178,27 @@ public class VideoRestHandler {
 
         return Response.ok()
                 .entity("SUCCESS")
+                .build();
+    }
+
+    @GET
+    @Path("processing")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response handleProcessingStart(@QueryParam("streamid") String streamId) {
+
+        Video videoByID = App.getVideoDatabase().getVideoByID(UUID.fromString(streamId));
+
+        if (videoByID == null) {
+            return Response.status(404).build();
+        }
+
+        videoByID.setLive(false);
+
+        videoByID.setTranscoding(true);
+
+        App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
+
+        return Response.ok().entity("SUCCESS")
                 .build();
     }
 

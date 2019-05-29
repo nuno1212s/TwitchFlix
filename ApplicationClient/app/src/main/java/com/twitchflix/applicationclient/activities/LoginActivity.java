@@ -3,17 +3,15 @@ package com.twitchflix.applicationclient.activities;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.twitchflix.applicationclient.ClientApp;
@@ -25,8 +23,6 @@ import java.lang.ref.WeakReference;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private GoogleSignInClient signInClient;
-
     private static final short RC_SIGN_IN = 6002;
 
     @Override
@@ -34,27 +30,12 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
-                .requestIdToken(getString(R.string.server_client_id))
-                .requestProfile()
-                .build();
-
-        signInClient = GoogleSignIn.getClient(this, gso);
-
         findViewById(R.id.sign_in_button).setOnClickListener(this::onLoginGoogle);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        GoogleSignInAccount lastSignedInAccount = GoogleSignIn.getLastSignedInAccount(this);
-
-        if (lastSignedInAccount != null) {
-            handleSignIn(lastSignedInAccount);
-        }
-
     }
 
     private void removeErrorText() {
@@ -77,7 +58,7 @@ public class LoginActivity extends AppCompatActivity {
     public void onLoginGoogle(View view) {
         removeErrorText();
 
-        Intent signInIntent = signInClient.getSignInIntent();
+        Intent signInIntent = ClientApp.getIns().getLoginHandler().getGoogleClient().getSignInIntent();
 
         startActivityForResult(signInIntent, RC_SIGN_IN);
 
@@ -119,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             handleSignIn(null);
+            e.printStackTrace();
 
         }
 
@@ -232,7 +214,7 @@ public class LoginActivity extends AppCompatActivity {
 
             String idToken = strings[0];
 
-            return ClientApp.getIns().getLoginHandler().attempLogin(idToken);
+            return ClientApp.getIns().getLoginHandler().attemptLogin(idToken);
         }
 
         @Override
