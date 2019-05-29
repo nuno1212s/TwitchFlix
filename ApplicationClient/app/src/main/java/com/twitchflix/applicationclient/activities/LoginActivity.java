@@ -1,5 +1,6 @@
 package com.twitchflix.applicationclient.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
+import com.twitchflix.applicationclient.utils.NetworkUser;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;
@@ -135,20 +137,19 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    private static class AttemptToLogin extends AsyncTask<String, Void, Boolean> {
-
-        private WeakReference<LoginActivity> loginActivity;
+    private static class AttemptToLogin extends NetworkUser<String, Void, Boolean> {
 
         public AttemptToLogin(LoginActivity activity) {
-            this.loginActivity = new WeakReference<>(activity);
+            super(activity);
         }
 
         @Override
         protected void onPreExecute() {
 
-            LoginActivity loginActivity = this.loginActivity.get();
+            super.onPreExecute();
 
-            if (loginActivity != null) {
+            if (isContextPresent()) {
+                Activity loginActivity = getContextIfPresent();
 
                 loginActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -160,6 +161,9 @@ public class LoginActivity extends AppCompatActivity {
 
         @Override
         protected Boolean doInBackground(String... strings) {
+            if (!isInternetConnectionAvailable()) {
+                return false;
+            }
             String email = strings[0], password = strings[1];
 
             return ClientApp.getIns().getLoginHandler().attemptLogin(email, password);
@@ -168,9 +172,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean successful) {
 
-            LoginActivity activity = this.loginActivity.get();
-
-            if (activity != null) {
+            if (isContextPresent()) {
+                Activity activity = getContextIfPresent();
 
                 activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -178,27 +181,27 @@ public class LoginActivity extends AppCompatActivity {
 
                 Utils.removeViewsFrom(layout, R.id.login_progress_bar);
 
-                activity.handleUserSignIn(successful, layout);
+                ((LoginActivity) activity).handleUserSignIn(successful, layout);
 
             }
 
         }
     }
 
-    private static class AttemptToLoginGoogleAuth extends AsyncTask<String, Void, Boolean> {
+    private static class AttemptToLoginGoogleAuth extends NetworkUser<String, Void, Boolean> {
 
-        private WeakReference<LoginActivity> loginActivity;
 
         public AttemptToLoginGoogleAuth(LoginActivity activity) {
-            this.loginActivity = new WeakReference<>(activity);
+            super(activity);
         }
 
         @Override
         protected void onPreExecute() {
+            super.onPreExecute();
 
-            LoginActivity loginActivity = this.loginActivity.get();
+            if (isContextPresent()) {
 
-            if (loginActivity != null) {
+                Activity loginActivity = getContextIfPresent();
 
                 loginActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -212,6 +215,10 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(String... strings) {
 
+            if (!isInternetConnectionAvailable()) {
+                return false;
+            }
+
             String idToken = strings[0];
 
             return ClientApp.getIns().getLoginHandler().attemptLogin(idToken);
@@ -220,9 +227,8 @@ public class LoginActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean successful) {
 
-            LoginActivity loginActivity = this.loginActivity.get();
-
-            if (loginActivity != null) {
+            if (isContextPresent()) {
+                Activity loginActivity = getContextIfPresent();
 
                 loginActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -230,7 +236,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 Utils.removeViewsFrom(layout, R.id.login_progress_bar);
 
-                loginActivity.handleUserSignIn(successful, layout);
+                ((LoginActivity) loginActivity).handleUserSignIn(successful, layout);
 
             }
 

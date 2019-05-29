@@ -22,6 +22,7 @@ import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.activities.StreamOptions;
 import com.twitchflix.applicationclient.rest.models.UserData;
+import com.twitchflix.applicationclient.utils.NetworkUser;
 
 import java.lang.ref.WeakReference;
 
@@ -152,33 +153,31 @@ public class LandingPage extends AppCompatActivity
         });
     }
 
-    private static class LogOut extends AsyncTask<Void, Void, Void> {
-
-        private WeakReference<LandingPage> landingPage;
+    private static class LogOut extends NetworkUser<Void, Void, Boolean> {
 
         public LogOut(LandingPage page) {
-            landingPage = new WeakReference<>(page);
+            super(page);
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Boolean doInBackground(Void... voids) {
+            if (!isInternetConnectionAvailable()) {
+                return false;
+            }
+
             ClientApp.getIns().getLoginHandler().logOut();
-            return null;
+            return true;
         }
 
         @Override
-        protected void onPostExecute(Void aVoid) {
+        protected void onPostExecute(Boolean successfull) {
 
-            LandingPage landingPage = this.landingPage.get();
+            if (isContextPresent()) {
+                if (successfull) {
+                    sendToActivity(MainActivity.class);
 
-            if (landingPage != null) {
-
-                Intent intent = new Intent(landingPage, MainActivity.class);
-
-                landingPage.startActivity(intent);
-
-                landingPage.finish();
-
+                    finishActivity();
+                }
             }
 
         }

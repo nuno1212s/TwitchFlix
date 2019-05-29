@@ -9,6 +9,7 @@ import android.os.Bundle;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.rest.models.VideoStream;
+import com.twitchflix.applicationclient.utils.NetworkUser;
 
 import java.lang.ref.WeakReference;
 
@@ -36,16 +37,18 @@ public class StreamOptions extends AppCompatActivity {
                 stream_desc);
     }
 
-    private static class RequestStreamLink extends AsyncTask<String, Void, VideoStream> {
-
-        private WeakReference<StreamOptions> options;
+    private static class RequestStreamLink extends NetworkUser<String, Void, VideoStream> {
 
         RequestStreamLink(StreamOptions options) {
-            this.options = new WeakReference<>(options);
+            super(options);
         }
 
         @Override
         protected VideoStream doInBackground(String... args) {
+            if (isInternetConnectionAvailable()) {
+                return null;
+            }
+
             return ClientApp.getIns().getServerRequests().requestVideoStream(args[0],
                     args[1],
                     ClientApp.getIns().getLoginHandler().getCurrentActiveConnection());
@@ -54,17 +57,15 @@ public class StreamOptions extends AppCompatActivity {
         @Override
         protected void onPostExecute(VideoStream videoStream) {
 
-            StreamOptions streamOptions = options.get();
+            if (isContextPresent() && videoStream != null) {
 
-            if (streamOptions != null && videoStream != null) {
-
-                Intent intent = new Intent(streamOptions, StreamVideo.class);
+                Intent intent = new Intent(getContextIfPresent(), StreamVideo.class);
 
                 intent.putExtra("streamLink", videoStream.getStreamLink());
 
-                streamOptions.startActivity(intent);
+                getContextIfPresent().startActivity(intent);
 
-                streamOptions.finish();
+                finishActivity();
             }
         }
     }

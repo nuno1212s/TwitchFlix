@@ -2,6 +2,7 @@ package com.twitchflix.applicationclient.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -32,6 +33,8 @@ public class StreamVideo extends AppCompatActivity implements ConnectCheckerRtmp
         camera = new RtmpCamera1(cameraView, this);
 
         cameraView.getHolder().addCallback(this);
+
+        camera.setPreviewOrientation(Surface.ROTATION_0);
     }
 
 

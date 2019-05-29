@@ -15,6 +15,7 @@ import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
 import com.twitchflix.applicationclient.rest.models.Video;
 import com.twitchflix.applicationclient.rest.models.UserData;
+import com.twitchflix.applicationclient.utils.NetworkUser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,9 +23,7 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.*;
 
-public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
-
-    private WeakReference<Activity> landingPage;
+public class LandingPageDrawer extends NetworkUser<Void, Void, Boolean> {
 
     private Map<UUID, List<Video>> videos;
 
@@ -32,19 +31,23 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
 
     private Map<UUID, Bitmap> thumbnails;
 
-    public LandingPageDrawer(Activity landingPage) {
-        this.landingPage = new WeakReference<>(landingPage);
+    LandingPageDrawer(Activity landingPage) {
+        super(landingPage);
+
+        this.videos = new LinkedHashMap<>();
+        this.channelNames = new HashMap<>();
+        this.thumbnails = new HashMap<>();
     }
 
     @Override
     protected Boolean doInBackground(Void... strings) {
 
+        if (!isInternetConnectionAvailable()) {
+            return false;
+        }
+
         List<UserVideo> videos = ClientApp.getIns().getServerRequests()
                 .getLandingPage(ClientApp.getIns().getLoginHandler().getCurrentActiveConnection());
-
-        this.videos = new LinkedHashMap<>();
-        this.channelNames = new HashMap<>();
-        this.thumbnails = new HashMap<>();
 
         for (Video video : videos) {
 
@@ -90,9 +93,9 @@ public class LandingPageDrawer extends AsyncTask<Void, Void, Boolean> {
     @Override
     protected void onPostExecute(Boolean successful) {
 
-        Activity activity = landingPage.get();
+        if (isContextPresent()) {
 
-        if (activity != null) {
+            Activity activity = getContextIfPresent();
 
             SwipeRefreshLayout refreshLayout = activity.findViewById(R.id.main_landing_page_refresh);
 

@@ -1,5 +1,6 @@
 package com.twitchflix.applicationclient.activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.ProgressBar;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
+import com.twitchflix.applicationclient.utils.NetworkUser;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;
@@ -52,17 +54,14 @@ public class RegisterActivity extends AppCompatActivity {
 
     }
 
-    private static class AttemptRegisterAccount extends AsyncTask<String, Void, Boolean> {
-
-        private WeakReference<RegisterActivity> context;
+    private static class AttemptRegisterAccount extends NetworkUser<String, Void, Boolean> {
 
         private WeakReference<LinearLayout> layout;
 
         private WeakReference<ProgressBar> bar;
 
         public AttemptRegisterAccount(RegisterActivity activity) {
-
-            this.context = new WeakReference<>(activity);
+            super(activity);
 
             this.layout = new WeakReference<>(activity.findViewById(R.id.register_screen));
 
@@ -72,6 +71,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
+            super.onPreExecute();
+
             LinearLayout layout = this.layout.get();
 
             ProgressBar progressBar = this.bar.get();
@@ -87,6 +88,10 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(String... strings) {
 
+            if (!isInternetConnectionAvailable()) {
+                return false;
+            }
+
             String firstName = strings[0],
                     lastName = strings[1],
                     email = strings[2],
@@ -99,20 +104,18 @@ public class RegisterActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean successful) {
 
             LinearLayout layout = this.layout.get();
-
-            RegisterActivity activity = this.context.get();
             ProgressBar bar = this.bar.get();
 
-            if (layout != null && activity != null && bar != null) {
+            if (isContextPresent() && layout != null && bar != null) {
                 layout.removeView(bar);
+
+                Activity activity = getContextIfPresent();
 
                 if (successful) {
 
-                    Intent intent = new Intent(activity, LandingPage.class);
+                    sendToActivity(LandingPage.class);
 
-                    activity.startActivity(intent);
-
-                    activity.finish();
+                    finishActivity();
 
                 } else {
                     Utils.addErrorText(activity, layout, R.id.account_already_exists, R.string.account_already_exists);

@@ -21,6 +21,7 @@ import com.google.android.exoplayer2.util.Util;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.rest.models.Video;
+import com.twitchflix.applicationclient.utils.NetworkUser;
 
 import java.lang.ref.WeakReference;
 import java.util.UUID;
@@ -71,18 +72,18 @@ public class WatchVideo extends AppCompatActivity {
         finish();
     }
 
-    private static class LoadVideo extends AsyncTask<UUID, Void, Video> {
-
-        private WeakReference<Activity> activity;
+    private static class LoadVideo extends NetworkUser<UUID, Void, Video> {
 
         public LoadVideo(Activity activity) {
-
-            this.activity = new WeakReference<>(activity);
-
+            super(activity);
         }
 
         @Override
         protected Video doInBackground(UUID... uuids) {
+            if (!isInternetConnectionAvailable()) {
+                return null;
+            }
+
             Video videoByID = ClientApp.getIns().getServerRequests().getVideoByID(uuids[0]);
 
             ClientApp.getIns().getServerRequests().addView(videoByID.getVideoID(),
@@ -94,15 +95,15 @@ public class WatchVideo extends AppCompatActivity {
         @Override
         protected void onPostExecute(Video video) {
 
-            Activity activity = this.activity.get();
-
-            if (activity != null) {
+            if (isContextPresent()) {
 
                 if (video == null) {
-                    activity.finish();
+                    finishActivity();
 
                     return;
                 }
+
+                Activity activity = getContextIfPresent();
 
                 TextView title = activity.findViewById(R.id.video_title),
                         desc = activity.findViewById(R.id.video_description);
