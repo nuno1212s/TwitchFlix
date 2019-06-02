@@ -72,11 +72,24 @@ public class UserDataHandler {
     }
 
     @POST
-    @Path("updateFirstname")
+    @Path("updateFirstName")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.TEXT_PLAIN)
     public Response updateFirstName(UpdateNameModel model) {
 
+        return getResponse(model, true);
+    }
+
+    @POST
+    @Path("updateLastName")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response updateLastName(UpdateNameModel model) {
+
+        return getResponse(model, false);
+    }
+
+    private Response getResponse(UpdateNameModel model, boolean firstName) {
         if (App.getAuthenticationHandler().isValid(model.getUserID(), model.getAccessToken())) {
 
             User user = App.getUserDatabase().getAccountInformation(model.getUserID());
@@ -87,10 +100,19 @@ public class UserDataHandler {
                         .build();
             }
 
+            if (firstName)
+                user.setFirstName(model.getName());
+            else
+                user.setLastName(model.getName());
+
+            App.getAsync().submit(() ->
+                    App.getUserDatabase().updateAccount(user));
+
         }
 
         return Response.status(400).entity("Connection is not valid").build();
     }
+
 
     @GET
     @Path("test")

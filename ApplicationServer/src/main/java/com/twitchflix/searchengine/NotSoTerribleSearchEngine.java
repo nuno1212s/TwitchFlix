@@ -4,26 +4,27 @@ import com.twitchflix.App;
 import com.twitchflix.authentication.User;
 import com.twitchflix.videohandler.Video;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class TerribleSearchEngine implements SearchEngine{
+public class NotSoTerribleSearchEngine implements SearchEngine{
 
-    @Override
     public List<Video> searchVideoByTitle(String toLookFor, User userSearching) {
 
-        List<Video> videosSortedByUploadDate = App.getVideoDatabase().getVideosSortedByUploadDate();
+        List<Video> videos = App.getVideoDatabase().getAllVideos();
+        List<Video> results = new ArrayList<>();
 
-        videosSortedByUploadDate.sort((v1, v2) -> {
+        for (Video v : videos) {
+            if (v.getTitle().toLowerCase().contains(toLookFor.toLowerCase())) {
+                results.add(v);
+            }
+        }
 
-            return 0;
-        });
-
-        return videosSortedByUploadDate;
+        return results;
     }
 
     @Override
     public List<Video> getFeed(User toPresent) {
-
         return App.getVideoDatabase().getVideosSortedByUploadDate();
     }
 }

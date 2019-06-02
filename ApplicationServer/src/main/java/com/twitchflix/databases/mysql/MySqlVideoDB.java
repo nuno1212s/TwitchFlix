@@ -157,6 +157,8 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
     }
 
+
+
     @Override
     public List<Video> getVideosWithUploader(UUID uploader) {
         try (Connection c = getConnection();

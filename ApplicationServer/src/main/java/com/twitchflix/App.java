@@ -12,6 +12,7 @@ import com.twitchflix.databases.mysql.MySqlVideoDB;
 import com.twitchflix.filesystem.DefaultFileManager;
 import com.twitchflix.filesystem.FileManager;
 import com.twitchflix.loggers.Logger;
+import com.twitchflix.searchengine.NotSoTerribleSearchEngine;
 import com.twitchflix.searchengine.SearchEngine;
 import com.twitchflix.searchengine.TerribleSearchEngine;
 import com.twitchflix.videohandler.VideoRestHandler;
@@ -184,7 +185,7 @@ public class App {
     }
 
     private static void initSearchEngine() {
-        videoSearchEngine = new TerribleSearchEngine();
+        videoSearchEngine = new NotSoTerribleSearchEngine();
     }
 
     private static void initFileManager() {

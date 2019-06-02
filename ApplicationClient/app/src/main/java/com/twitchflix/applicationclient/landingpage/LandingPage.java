@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SearchView;
+import androidx.core.view.MenuItemCompat;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
@@ -20,10 +22,12 @@ import android.widget.TextView;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
+import com.twitchflix.applicationclient.activities.AccountSettings;
 import com.twitchflix.applicationclient.activities.StreamOptions;
 import com.twitchflix.applicationclient.authentication.LoginHandler;
 import com.twitchflix.applicationclient.channelview.ChannelView;
 import com.twitchflix.applicationclient.rest.models.UserData;
+import com.twitchflix.applicationclient.searchvideos.SearchActivity;
 import com.twitchflix.applicationclient.utils.NetworkUser;
 
 import java.lang.ref.WeakReference;
@@ -73,6 +77,26 @@ public class LandingPage extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.landing_page, menu);
+
+        MenuItem item = menu.findItem(R.id.action_search);
+
+        SearchView view = (SearchView) item.getActionView();
+
+        view.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+
+                SearchActivity.start(LandingPage.this, s);
+
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String s) {
+                return false;
+            }
+        });
+
         return true;
     }
 
@@ -84,7 +108,7 @@ public class LandingPage extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_search) {
             return true;
         }
 
@@ -109,7 +133,9 @@ public class LandingPage extends AppCompatActivity
 
         } else if (id == R.id.account_settings) {
 
-            //TODO: Open account settings
+            Intent intent = new Intent(this, AccountSettings.class);
+
+            startActivity(intent);
 
         } else if (id == R.id.logout) {
             new LogOut(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);

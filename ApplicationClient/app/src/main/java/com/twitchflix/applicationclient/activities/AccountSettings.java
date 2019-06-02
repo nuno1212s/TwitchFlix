@@ -29,7 +29,6 @@ public class AccountSettings extends AppCompatActivity {
         lastName = findViewById(R.id.edit_text_last_name);
     }
 
-
     public void onClickUpdateAccount(View view) {
         String firstName = this.firstName.getText().toString(),
                 lastName = this.lastName.getText().toString();
@@ -68,10 +67,14 @@ public class AccountSettings extends AppCompatActivity {
             if (!firstName.isEmpty()) {
                 ClientApp.getIns().getUserDataRequests().updateFirstName(currentConnection,
                         firstName);
+
+                System.out.println(firstName);
             }
 
             if (!lastName.isEmpty()) {
                 ClientApp.getIns().getUserDataRequests().updateLastName(currentConnection, lastName);
+
+                System.out.println(lastName);
             }
 
             return true;
