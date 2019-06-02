@@ -190,7 +190,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private static class AttemptToLoginGoogleAuth extends NetworkUser<String, Void, Boolean> {
 
-
         public AttemptToLoginGoogleAuth(LoginActivity activity) {
             super(activity);
         }

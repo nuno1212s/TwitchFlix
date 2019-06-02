@@ -14,6 +14,8 @@ public interface ServerRequests {
 
     List<UserVideo> searchVideo(String text, ActiveConnection connection);
 
+    List<UserVideo> getVideosByUser(UUID userID);
+
     Video getVideoByID(UUID videoID);
 
     void addView(UUID videoID, ActiveConnection connection);

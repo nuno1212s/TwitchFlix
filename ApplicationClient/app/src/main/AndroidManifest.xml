@@ -3,15 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.twitchflix.applicationclient">
 
-    <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.FLASHLIGHT"/>
-
-    <uses-feature android:name="android.hardware.camera"/>
-    <uses-feature android:name="android.hardware.camera2.full"/>
-    <uses-feature android:name="android.hardware.camera2.autofocus"/>
-
     <application
         android:name=".ClientApp"
         android:allowBackup="true"
@@ -20,15 +11,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.StreamOptions"></activity>
-        <activity android:name=".activities.WatchVideo"></activity>
-        <activity android:name=".activities.StreamVideo" />
+        <activity
+            android:windowSoftInputMode="adjustResize"
+            android:name=".activities.AccountSettings"
+            android:label="@string/title_activity_account_settings"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".channelview.ChannelView"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".activities.StreamOptions"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".activities.WatchVideo" />
+        <activity android:name=".activities.StreamVideo"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".landingpage.LandingPage"
             android:label="@string/title_activity_landing_page_n"
-            android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".activities.RegisterActivity" />
-        <activity android:name=".activities.LoginActivity" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".activities.RegisterActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait" />
+        <activity android:name=".activities.LoginActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:screenOrientation="portrait"/>
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,4 +42,14 @@
             </intent-filter>
         </activity>
     </application>
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera2.full" />
+
+    <uses-feature android:name="android.hardware.camera2.autofocus" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
 </manifest>

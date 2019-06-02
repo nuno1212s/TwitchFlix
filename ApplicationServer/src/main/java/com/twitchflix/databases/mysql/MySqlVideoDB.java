@@ -15,7 +15,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
             " UPLOADDATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, LIKES BIGINT NOT NULL DEFAULT 0," +
             " VIEWS BIGINT NOT NULL DEFAULT 0, LIVE BOOLEAN NOT NULL DEFAULT FALSE," +
             " LINK varchar(2048), THUMBNAILLINK varchar(2048), VALID BOOLEAN NOT NULL DEFAULT FALSE," +
-            "TRANSCODING NOT NULL DEFAULT FALSE"+
+            "TRANSCODING BOOLEAN NOT NULL DEFAULT FALSE"+
             ", UNIQUE(VIDEOID));";
 
     public MySqlVideoDB() {
@@ -155,6 +155,35 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public List<Video> getVideosWithUploader(UUID uploader) {
+        try (Connection c = getConnection();
+             PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(VIDEOID) AS VIDEOID, BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
+                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VALID=TRUE AND TRANSCODING=FALSE AND UPLOADER=UUID_TO_BIN(?) ORDER BY UPLOADDATE")) {
+
+            s.setString(1, uploader.toString());
+
+            ResultSet resultSet = s.executeQuery();
+
+            List<Video> totalVideos = new ArrayList<>();
+
+            while (resultSet.next()) {
+
+                totalVideos.add(new VideoBuilder()
+                        .setVideoID(UUID.fromString(resultSet.getString("VIDEOID")))
+                        .fromResultSet(resultSet).createVideo());
+
+            }
+
+            return totalVideos;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private void createTable() {

@@ -12,6 +12,8 @@ public interface VideoDatabase {
 
     List<Video> getVideosByID(HashSet<UUID> videoID);
 
+    List<Video> getVideosWithUploader(UUID uploader);
+
     List<Video> getAllVideos();
 
     List<Video> getVideosSortedByUploadDate();

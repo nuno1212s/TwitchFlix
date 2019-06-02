@@ -21,6 +21,8 @@ import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.activities.StreamOptions;
+import com.twitchflix.applicationclient.authentication.LoginHandler;
+import com.twitchflix.applicationclient.channelview.ChannelView;
 import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.utils.NetworkUser;
 
@@ -33,6 +35,7 @@ public class LandingPage extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
+        setTitle("TwitchFlix");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -96,7 +99,7 @@ public class LandingPage extends AppCompatActivity
 
         if (id == R.id.own_channel) {
 
-            //TODO: Open own channel activity
+            ChannelView.start(this, ClientApp.getIns().getLoginHandler().getCurrentActiveConnection().getOwner());
 
         } else if (id == R.id.start_stream) {
 

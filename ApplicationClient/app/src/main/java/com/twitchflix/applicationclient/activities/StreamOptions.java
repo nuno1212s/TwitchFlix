@@ -45,7 +45,7 @@ public class StreamOptions extends AppCompatActivity {
 
         @Override
         protected VideoStream doInBackground(String... args) {
-            if (isInternetConnectionAvailable()) {
+            if (!isInternetConnectionAvailable()) {
                 return null;
             }
 

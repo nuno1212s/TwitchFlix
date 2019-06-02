@@ -134,6 +134,7 @@ public class WatchVideo extends AppCompatActivity {
 
                     MediaSource mediaSource = new ExtractorMediaSource(Uri.parse(video.getLink()),
                             dataSource, new DefaultExtractorsFactory(), null, null);
+
                     SimpleExoPlayer simpleExoPlayer = ExoPlayerFactory.newSimpleInstance(activity);
 
                     simpleExoPlayer.prepare(mediaSource);

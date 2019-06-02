@@ -172,7 +172,7 @@ public class VideoRestHandler {
 
         videoByID.setTranscoding(false);
 
-        videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".mp4");
+        videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".flv");
 
         App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
 
@@ -200,6 +200,20 @@ public class VideoRestHandler {
 
         return Response.ok().entity("SUCCESS")
                 .build();
+    }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("byUploader")
+    public Response getVideosByUploader(@HeaderParam("user") String userID) {
+
+        List<Video> byUploader = App.getVideoDatabase().getVideosWithUploader(UUID.fromString(userID));
+
+        if (byUploader == null) {
+            return Response.status(404).build();
+        }
+
+        return Response.ok().entity(byUploader).build();
     }
 
     private List<UserVideo> instantiateVideos(List<Video> videos, User user) {

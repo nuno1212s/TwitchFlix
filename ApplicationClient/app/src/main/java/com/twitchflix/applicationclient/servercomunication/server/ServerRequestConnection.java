@@ -125,6 +125,18 @@ public class ServerRequestConnection implements ServerRequests {
         return null;
     }
 
+    @Override
+    public List<UserVideo> getVideosByUser(UUID userID) {
+
+        Request r = new Request.Builder().url(ServerConnection.getServerIp() + "videos/byUploader")
+                .header("user", userID.toString())
+                .get()
+                .build();
+
+        return executeAndLoadVideos(r);
+
+    }
+
     private List<UserVideo> executeAndLoadVideos(Request request) {
         try (Response response = ServerConnection.getIns().getClient().newCall(request).execute()) {
 

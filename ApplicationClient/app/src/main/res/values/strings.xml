@@ -32,4 +32,12 @@
     <string name="stream_desc">Stream Description:</string>
     <string name="description">Stream description</string>
     <string name="start_stream_button">Start Stream</string>
+    <string name="title_activity_account_settings">AccountSettings</string>
+    <string name="changepassword">Change password</string>
+    <string name="old_password">Old password</string>
+    <string name="changefirstname">Change First Name</string>
+    <string name="new_first_name">New first name</string>
+    <string name="change_last_name">Change Last Name</string>
+    <string name="new_last_name">New last name</string>
+    <string name="update_account_settings">Update Account</string>
 </resources>

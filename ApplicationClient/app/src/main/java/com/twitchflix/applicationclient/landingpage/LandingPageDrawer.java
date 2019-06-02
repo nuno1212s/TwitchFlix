@@ -5,10 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
@@ -16,6 +13,7 @@ import com.twitchflix.applicationclient.rest.models.UserVideo;
 import com.twitchflix.applicationclient.rest.models.Video;
 import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.utils.NetworkUser;
+import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -109,13 +107,21 @@ public class LandingPageDrawer extends NetworkUser<Void, Void, Boolean> {
 
                 textView.setText(this.channelNames.get(videos.getKey()));
 
+                textView.setClickable(true);
+
                 textView.setTextSize(25);
 
                 textView.setPadding(10, 40, 0, 15);
 
                 textView.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
+                textView.setOnClickListener(new OnClickChannelListener(activity, videos.getKey()));
+
                 landing_page_layout.addView(textView);
+
+                HorizontalScrollView videoScroll = new HorizontalScrollView(activity);
+
+                videoScroll.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
                 LinearLayout videoLayout = new LinearLayout(activity);
 
@@ -124,15 +130,19 @@ public class LandingPageDrawer extends NetworkUser<Void, Void, Boolean> {
                 videoLayout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
                 for (Video video : videos.getValue()) {
+                    LinearLayout individualVideoLayout = new LinearLayout(activity);
+
+                    individualVideoLayout.setLayoutParams(new ViewGroup.LayoutParams(320, 300));
+
+                    individualVideoLayout.setOrientation(LinearLayout.VERTICAL);
+
+                    individualVideoLayout.setClickable(true);
+
+                    individualVideoLayout.setPadding(15, 0, 0, 0);
+
                     ImageView view = new ImageView(activity);
 
                     view.setLayoutParams(new ViewGroup.MarginLayoutParams(320, 240));
-
-                    view.setClickable(true);
-
-                    view.setPadding(15, 0, 0, 0);
-
-                    view.setOnClickListener(new OnClickVideoListener(activity, video.getVideoID()));
 
                     view.setAdjustViewBounds(true);
 
@@ -140,10 +150,24 @@ public class LandingPageDrawer extends NetworkUser<Void, Void, Boolean> {
 
                     view.setImageBitmap(this.thumbnails.get(video.getVideoID()));
 
-                    videoLayout.addView(view);
+                    TextView videoTitle = new TextView(activity);
+
+                    videoTitle.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT));
+
+                    videoTitle.setText(video.getTitle());
+
+                    individualVideoLayout.addView(view);
+                    individualVideoLayout.addView(videoTitle);
+
+                    individualVideoLayout.setOnClickListener(new OnClickVideoListener(activity, video.getVideoID()));
+
+                    videoLayout.addView(individualVideoLayout);
                 }
 
-                landing_page_layout.addView(videoLayout);
+                videoScroll.addView(videoLayout);
+
+                landing_page_layout.addView(videoScroll);
 
             }
 
