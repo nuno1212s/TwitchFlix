@@ -70,9 +70,11 @@ public class SearchDrawer extends NetworkUser<String, Void, Boolean> {
 
                 SwipeRefreshLayout refreshLayout = activity.findViewById(R.id.search_refresh);
 
-                ScrollView scrollView = refreshLayout.findViewById(R.id.search_view);
+                ScrollView scrollView = refreshLayout.findViewById(R.id.scroll_search);
 
                 LinearLayout displayResults = scrollView.findViewById(R.id.display_results);
+
+                displayResults.removeAllViews();
 
                 for (Video video : videos) {
 

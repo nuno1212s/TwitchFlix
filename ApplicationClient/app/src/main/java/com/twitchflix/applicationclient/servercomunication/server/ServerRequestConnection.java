@@ -36,10 +36,17 @@ public class ServerRequestConnection implements ServerRequests {
     @Override
     public List<UserVideo> searchVideo(String text, ActiveConnection connection) {
 
+        JSONObject jsonObject = connection.toJSONObject();
+
+        try {
+            jsonObject.put("search", text);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
         Request request = new Request.Builder()
                 .url(ServerConnection.getServerIp() + "videos/search")
-                .header("search", text)
-                .post(RequestBody.create(JSON, connection.toJSONObject().toString()))
+                .post(RequestBody.create(JSON, jsonObject.toString()))
                 .build();
 
         return executeAndLoadVideos(request);

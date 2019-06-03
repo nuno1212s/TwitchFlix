@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.SearchView;
+import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -38,24 +39,9 @@ public class SearchActivity extends AppCompatActivity {
 
         swipeRefresh.setOnRefreshListener(() -> search(SearchActivity.this.search));
 
-        SearchView viewById = findViewById(R.id.search_view);
+        TextView text = findViewById(R.id.search_view);
 
-        viewById.setQuery(search, false);
-
-        viewById.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-
-                search(s);
-
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                return true;
-            }
-        });
+        text.setText(search);
 
     }
 

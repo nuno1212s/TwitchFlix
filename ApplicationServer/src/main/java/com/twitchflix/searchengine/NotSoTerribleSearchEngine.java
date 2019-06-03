@@ -7,11 +7,13 @@ import com.twitchflix.videohandler.Video;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotSoTerribleSearchEngine implements SearchEngine{
+public class NotSoTerribleSearchEngine implements SearchEngine {
 
+    @Override
     public List<Video> searchVideoByTitle(String toLookFor, User userSearching) {
 
         List<Video> videos = App.getVideoDatabase().getAllVideos();
+
         List<Video> results = new ArrayList<>();
 
         for (Video v : videos) {

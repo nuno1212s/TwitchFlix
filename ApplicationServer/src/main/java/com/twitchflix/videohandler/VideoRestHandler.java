@@ -23,7 +23,7 @@ public class VideoRestHandler {
     @Path("search")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response search(LoginModel model, @HeaderParam("search") String videoName) {
+    public Response search(SearchModel model) {
 
         SearchEngine videoSearchEngine = App.getVideoSearchEngine();
 
@@ -31,7 +31,7 @@ public class VideoRestHandler {
 
             User user = App.getUserDatabase().getAccountInformation(model.getUserID());
 
-            List<Video> videos = videoSearchEngine.searchVideoByTitle(videoName, user);
+            List<Video> videos = videoSearchEngine.searchVideoByTitle(model.getSearch(), user);
 
             List<UserVideo> userVideos = instantiateVideos(videos, user);
 
