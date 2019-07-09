@@ -1,14 +1,11 @@
 package com.twitchflix.applicationclient.landingpage;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.SearchView;
-import androidx.core.view.MenuItemCompat;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -23,17 +20,21 @@ import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.activities.AccountSettings;
-import com.twitchflix.applicationclient.activities.StreamOptions;
-import com.twitchflix.applicationclient.authentication.LoginHandler;
+import com.twitchflix.applicationclient.activities.Stream;
 import com.twitchflix.applicationclient.channelview.ChannelView;
 import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.searchvideos.SearchActivity;
 import com.twitchflix.applicationclient.utils.NetworkUser;
 
-import java.lang.ref.WeakReference;
+import java.io.ByteArrayOutputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class LandingPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private Map<UUID, List<VideoDAO>> videos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +102,12 @@ public class LandingPage extends AppCompatActivity
     }
 
     @Override
+    public void onOptionsMenuClosed(Menu menu) {
+        super.onOptionsMenuClosed(menu);
+
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -115,7 +122,6 @@ public class LandingPage extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         // Handle navigation view item clicks here.
@@ -127,7 +133,7 @@ public class LandingPage extends AppCompatActivity
 
         } else if (id == R.id.start_stream) {
 
-            Intent intent = new Intent(this, StreamOptions.class);
+            Intent intent = new Intent(this, Stream.class);
 
             startActivity(intent);
 
@@ -165,21 +171,10 @@ public class LandingPage extends AppCompatActivity
         String userFullName = userData.getFirstName() + " " + userData.getLastName();
 
         userName.setText(userFullName);
+    }
 
-        new LandingPageDrawer(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-        SwipeRefreshLayout refreshLayout = findViewById(R.id.main_landing_page_refresh);
-
-        ScrollView layout = refreshLayout.findViewById(R.id.main_landing_page_scroll);
-
-        LinearLayout landing_page_layout = layout.findViewById(R.id.main_landing_page_layout);
-
-        refreshLayout.setOnRefreshListener(() -> {
-
-            landing_page_layout.removeAllViews();
-
-            new LandingPageDrawer(this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        });
+    public void setVideos(Map<UUID, List<VideoDAO>> videos) {
+        this.videos = videos;
     }
 
     private static class LogOut extends NetworkUser<Void, Void, Boolean> {
@@ -210,5 +205,68 @@ public class LandingPage extends AppCompatActivity
             }
 
         }
+    }
+
+    public static class VideoDAO {
+
+        private static final String UPLOADER = "uploader";
+        private static final String THUMBNAIL = "thumbnail";
+        private static final String TITLE = "title";
+        private static final String DESCRIPTION = "desc";
+        private static final String VIDEO_ID = "videoID";
+
+        private Bitmap thumbnail;
+
+        private String title, description, uploader;
+
+        private UUID videoID;
+
+        private VideoDAO(Bitmap thumbnail, String title, String description, String uploader, UUID videoID) {
+            this.thumbnail = thumbnail;
+            this.title = title;
+            this.description = description;
+            this.videoID = videoID;
+            this.uploader = uploader;
+        }
+
+        public Bundle storeInBundle() {
+
+            Bundle bundle = new Bundle();
+
+            bundle.putString(TITLE, title);
+            bundle.putString(DESCRIPTION, description);
+            bundle.putString(VIDEO_ID, videoID.toString());
+            bundle.putString(UPLOADER, uploader);
+
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+            thumbnail.compress(Bitmap.CompressFormat.PNG, 100, stream);
+
+            byte[] byteArray = stream.toByteArray();
+
+            bundle.putByteArray(THUMBNAIL, byteArray);
+
+            return bundle;
+        }
+
+        public static VideoDAO fromBundle(Bundle bundle) {
+
+            String title = bundle.getString(TITLE),
+                    description = bundle.getString(DESCRIPTION),
+                    uploader = bundle.getString(UPLOADER);
+
+            UUID videoID = UUID.fromString(bundle.getString(VIDEO_ID));
+
+            byte[] byteArray = bundle.getByteArray(THUMBNAIL);
+
+            Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
+
+            return new VideoDAO(bmp, title, description, uploader , videoID);
+        }
+
+        public static VideoDAO fromData(Bitmap thumbnail, String title, String description, String uploader, UUID videoID) {
+            return new VideoDAO(thumbnail, title, description, uploader, videoID);
+        }
+
     }
 }

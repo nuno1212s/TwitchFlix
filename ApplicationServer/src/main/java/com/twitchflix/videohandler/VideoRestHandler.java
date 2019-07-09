@@ -172,7 +172,7 @@ public class VideoRestHandler {
 
         videoByID.setTranscoding(false);
 
-        videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".flv");
+        videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".mp4");
 
         App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
 

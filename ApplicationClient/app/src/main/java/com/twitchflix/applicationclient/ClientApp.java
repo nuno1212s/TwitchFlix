@@ -10,6 +10,7 @@ import com.twitchflix.applicationclient.servercomunication.ServerRequests;
 import com.twitchflix.applicationclient.servercomunication.server.ServerRequestConnection;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
 import com.twitchflix.applicationclient.userdata.server.UserDataServerConnection;
+import com.twitchflix.applicationclient.utils.NetworkHandler;
 import okhttp3.OkHttpClient;
 
 public class ClientApp extends Application {
@@ -32,6 +33,8 @@ public class ClientApp extends Application {
 
     private OkHttpClient client;
 
+    private NetworkHandler networkHandler;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -43,6 +46,7 @@ public class ClientApp extends Application {
         this.authRequests = new AuthServerConnection();
         this.userDataRequests = new UserDataServerConnection();
         this.serverRequests = new ServerRequestConnection();
+        this.networkHandler = new NetworkHandler(getApplicationContext());
 
         this.loginHandler = new LoginHandler();
 
@@ -52,6 +56,8 @@ public class ClientApp extends Application {
 
         this.loginHandler.mainActivityCreate(getApplicationContext());
     }
+
+    public NetworkHandler getNetworkHandler() {return this.networkHandler;}
 
     public UserDataRequests getUserDataRequests() {
         return userDataRequests;
