@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.SearchView;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import com.google.android.material.navigation.NavigationView;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -25,6 +27,7 @@ import com.twitchflix.applicationclient.channelview.ChannelView;
 import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.searchvideos.SearchActivity;
 import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -34,12 +37,19 @@ import java.util.UUID;
 public class LandingPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Map<UUID, List<VideoDAO>> videos;
+    private LandingPageViewModel pageViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing_page);
+
+        this.pageViewModel = ViewModelProviders.of(this).get(LandingPageViewModel.class);
+
+        this.pageViewModel.getLandingPageVideos().observe(this, (videos) -> {
+
+        });
+
         setTitle("TwitchFlix");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -56,6 +66,7 @@ public class LandingPage extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         initAndDraw();
+
     }
 
     @Override
@@ -173,10 +184,6 @@ public class LandingPage extends AppCompatActivity
         userName.setText(userFullName);
     }
 
-    public void setVideos(Map<UUID, List<VideoDAO>> videos) {
-        this.videos = videos;
-    }
-
     private static class LogOut extends NetworkUser<Void, Void, Boolean> {
 
         public LogOut(LandingPage page) {
@@ -205,68 +212,5 @@ public class LandingPage extends AppCompatActivity
             }
 
         }
-    }
-
-    public static class VideoDAO {
-
-        private static final String UPLOADER = "uploader";
-        private static final String THUMBNAIL = "thumbnail";
-        private static final String TITLE = "title";
-        private static final String DESCRIPTION = "desc";
-        private static final String VIDEO_ID = "videoID";
-
-        private Bitmap thumbnail;
-
-        private String title, description, uploader;
-
-        private UUID videoID;
-
-        private VideoDAO(Bitmap thumbnail, String title, String description, String uploader, UUID videoID) {
-            this.thumbnail = thumbnail;
-            this.title = title;
-            this.description = description;
-            this.videoID = videoID;
-            this.uploader = uploader;
-        }
-
-        public Bundle storeInBundle() {
-
-            Bundle bundle = new Bundle();
-
-            bundle.putString(TITLE, title);
-            bundle.putString(DESCRIPTION, description);
-            bundle.putString(VIDEO_ID, videoID.toString());
-            bundle.putString(UPLOADER, uploader);
-
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-
-            thumbnail.compress(Bitmap.CompressFormat.PNG, 100, stream);
-
-            byte[] byteArray = stream.toByteArray();
-
-            bundle.putByteArray(THUMBNAIL, byteArray);
-
-            return bundle;
-        }
-
-        public static VideoDAO fromBundle(Bundle bundle) {
-
-            String title = bundle.getString(TITLE),
-                    description = bundle.getString(DESCRIPTION),
-                    uploader = bundle.getString(UPLOADER);
-
-            UUID videoID = UUID.fromString(bundle.getString(VIDEO_ID));
-
-            byte[] byteArray = bundle.getByteArray(THUMBNAIL);
-
-            Bitmap bmp = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-
-            return new VideoDAO(bmp, title, description, uploader , videoID);
-        }
-
-        public static VideoDAO fromData(Bitmap thumbnail, String title, String description, String uploader, UUID videoID) {
-            return new VideoDAO(thumbnail, title, description, uploader, videoID);
-        }
-
     }
 }

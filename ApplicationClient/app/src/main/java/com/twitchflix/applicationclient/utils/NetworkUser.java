@@ -13,9 +13,9 @@ import java.lang.ref.WeakReference;
 
 public abstract class NetworkUser<Params, Progress, Result> extends AsyncTask<Params, Progress, Result> {
 
-    private WeakReference<Activity> context;
+    private WeakReference<Context> context;
 
-    public NetworkUser(Activity context) {
+    public NetworkUser(Context context) {
         this.context = new WeakReference<>(context);
     }
 
@@ -30,7 +30,7 @@ public abstract class NetworkUser<Params, Progress, Result> extends AsyncTask<Pa
 
     protected boolean isInternetConnectionAvailable() {
 
-        Activity context = this.context.get();
+        Context context = this.context.get();
 
         if (context != null) {
 
@@ -56,13 +56,17 @@ public abstract class NetworkUser<Params, Progress, Result> extends AsyncTask<Pa
 
     }
 
+    /**
+     * This is no longer supported
+     */
+    @Deprecated
     public void finishActivity() {
         if (isContextPresent()) {
-            getContextIfPresent().finish();
+//            getContextIfPresent().finish();
         }
     }
 
-    public Activity getContextIfPresent() {
+    public Context getContextIfPresent() {
         return this.context.get();
     }
 
