@@ -1,6 +1,5 @@
 package com.twitchflix.applicationclient.viewmodels;
 
-import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.graphics.Bitmap;
