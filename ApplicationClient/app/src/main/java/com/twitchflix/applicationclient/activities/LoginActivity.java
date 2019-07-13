@@ -149,7 +149,7 @@ public class LoginActivity extends AppCompatActivity {
             super.onPreExecute();
 
             if (isContextPresent()) {
-                Activity loginActivity = getContextIfPresent();
+                Activity loginActivity = (Activity) getContextIfPresent();
 
                 loginActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -173,7 +173,7 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean successful) {
 
             if (isContextPresent()) {
-                Activity activity = getContextIfPresent();
+                Activity activity = (Activity) getContextIfPresent();
 
                 activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -200,7 +200,7 @@ public class LoginActivity extends AppCompatActivity {
 
             if (isContextPresent()) {
 
-                Activity loginActivity = getContextIfPresent();
+                Activity loginActivity = (Activity) getContextIfPresent();
 
                 loginActivity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE, WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 
@@ -227,7 +227,7 @@ public class LoginActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean successful) {
 
             if (isContextPresent()) {
-                Activity loginActivity = getContextIfPresent();
+                Activity loginActivity = (Activity) getContextIfPresent();
 
                 loginActivity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE);
 

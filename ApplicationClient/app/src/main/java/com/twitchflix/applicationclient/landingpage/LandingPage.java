@@ -1,43 +1,45 @@
 package com.twitchflix.applicationclient.landingpage;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.widget.SearchView;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
-import com.google.android.material.navigation.NavigationView;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.SearchView;
 import android.widget.TextView;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.lifecycle.ViewModelProviders;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import com.google.android.material.navigation.NavigationView;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.activities.AccountSettings;
 import com.twitchflix.applicationclient.activities.Stream;
 import com.twitchflix.applicationclient.channelview.ChannelView;
+import com.twitchflix.applicationclient.landingpage.drawers.Drawer;
+import com.twitchflix.applicationclient.landingpage.drawers.LandingPageDrawer;
+import com.twitchflix.applicationclient.landingpage.drawers.SearchPageDrawer;
 import com.twitchflix.applicationclient.rest.models.UserData;
-import com.twitchflix.applicationclient.searchvideos.SearchActivity;
 import com.twitchflix.applicationclient.utils.NetworkUser;
 import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
-
-import java.io.ByteArrayOutputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public class LandingPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LandingPageViewModel pageViewModel;
+
+    private Drawer searchPageDrawer, landingPageDrawer;
+
+    private SwipeRefreshLayout refreshLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,14 +48,13 @@ public class LandingPage extends AppCompatActivity
 
         this.pageViewModel = ViewModelProviders.of(this).get(LandingPageViewModel.class);
 
-        this.pageViewModel.getLandingPageVideos().observe(this, (videos) -> {
-
-        });
-
         setTitle("TwitchFlix");
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        View viewById = findViewById(R.id.action_search);
+        System.out.println("TESTE: " + viewById);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
@@ -94,27 +95,48 @@ public class LandingPage extends AppCompatActivity
 
         SearchView view = (SearchView) item.getActionView();
 
+        view.setOnCloseListener(this::onCloseSearchItem);
+
         view.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
 
-                SearchActivity.start(LandingPage.this, s);
+                pageViewModel.setQueryString(s);
 
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String s) {
-                return false;
+
+                pageViewModel.setQueryString(s);
+
+                return true;
             }
+        });
+
+        pageViewModel.getSearchQueryVideos().observe(this, (videos) -> {
+
+            searchPageDrawer.draw(videos);
+
+            refreshLayout.setRefreshing(false);
+
         });
 
         return true;
     }
 
+    public boolean onCloseSearchItem() {
+        return false;
+    }
+
     @Override
     public void onOptionsMenuClosed(Menu menu) {
         super.onOptionsMenuClosed(menu);
+
+        pageViewModel.getSearchQueryVideos().removeObservers(this);
+
+        pageViewModel.requestRefresh();
 
     }
 
@@ -182,6 +204,31 @@ public class LandingPage extends AppCompatActivity
         String userFullName = userData.getFirstName() + " " + userData.getLastName();
 
         userName.setText(userFullName);
+
+        this.refreshLayout = findViewById(R.id.main_landing_page_refresh);
+
+        ScrollView layout = refreshLayout.findViewById(R.id.main_landing_page_scroll);
+
+        LinearLayout videoLayout = layout.findViewById(R.id.main_landing_page_layout);
+
+        refreshLayout.setOnRefreshListener(() -> this.pageViewModel.requestRefresh());
+
+        this.searchPageDrawer = new SearchPageDrawer(this, videoLayout);
+
+        this.landingPageDrawer = new LandingPageDrawer(this, videoLayout);
+
+        refreshLayout.setRefreshing(true);
+
+        this.pageViewModel.getLandingPageVideos().observe(this, (videos) -> {
+
+            landingPageDrawer.draw(videos);
+
+            refreshLayout.setRefreshing(false);
+
+        });
+
+        this.pageViewModel.requestRefresh();
+
     }
 
     private static class LogOut extends NetworkUser<Void, Void, Boolean> {

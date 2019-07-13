@@ -109,7 +109,7 @@ public class RegisterActivity extends AppCompatActivity {
             if (isContextPresent() && layout != null && bar != null) {
                 layout.removeView(bar);
 
-                Activity activity = getContextIfPresent();
+                Activity activity = (Activity) getContextIfPresent();
 
                 if (successful) {
 

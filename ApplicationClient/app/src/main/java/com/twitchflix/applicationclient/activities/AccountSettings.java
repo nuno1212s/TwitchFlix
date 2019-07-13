@@ -48,7 +48,7 @@ public class AccountSettings extends AppCompatActivity {
         protected void onPreExecute() {
             super.onPreExecute();
 
-            ProgressBar viewById = getContextIfPresent().findViewById(R.id.progressbar_id);
+            ProgressBar viewById = ((Activity) getContextIfPresent()).findViewById(R.id.progressbar_id);
 
             viewById.setVisibility(View.VISIBLE);
         }
@@ -84,7 +84,7 @@ public class AccountSettings extends AppCompatActivity {
         protected void onPostExecute(Boolean successful) {
 
             if (isContextPresent()) {
-                ProgressBar viewById = getContextIfPresent().findViewById(R.id.progressbar_id);
+                ProgressBar viewById = ((Activity) getContextIfPresent()).findViewById(R.id.progressbar_id);
 
                 viewById.setVisibility(View.GONE);
 

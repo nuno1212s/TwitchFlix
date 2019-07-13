@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean successful) {
-            Activity mainActivity = getContextIfPresent();
+            Activity mainActivity = (Activity) getContextIfPresent();
 
             if (mainActivity != null) {
                 if (successful) {
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Boolean success) {
 
-            Activity mainActivity = getContextIfPresent();
+            Activity mainActivity = (Activity) getContextIfPresent();
 
             if (mainActivity != null) {
 

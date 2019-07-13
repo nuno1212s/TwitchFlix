@@ -72,7 +72,7 @@ public class ChannelDrawer extends NetworkUser<UUID, Void, Boolean> {
     protected void onPostExecute(Boolean successful) {
         if (isContextPresent() && successful) {
 
-            Activity activity = getContextIfPresent();
+            Activity activity = (Activity) getContextIfPresent();
 
             SwipeRefreshLayout refreshLayout = activity.findViewById(R.id.channel_activity);
 
