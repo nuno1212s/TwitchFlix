@@ -15,6 +15,7 @@ public class LandingPageDrawer extends Drawer {
 
     public LandingPageDrawer(Activity parent, ViewGroup parentView) {
         super(parent, parentView);
+
     }
 
     @Override

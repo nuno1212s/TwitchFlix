@@ -39,6 +39,8 @@ public class LandingPage extends AppCompatActivity
 
     private Drawer searchPageDrawer, landingPageDrawer;
 
+    private SwipeRefreshLayout refreshLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +52,9 @@ public class LandingPage extends AppCompatActivity
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        View viewById = findViewById(R.id.action_search);
+        System.out.println("TESTE: " + viewById);
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
@@ -90,6 +95,8 @@ public class LandingPage extends AppCompatActivity
 
         SearchView view = (SearchView) item.getActionView();
 
+        view.setOnCloseListener(this::onCloseSearchItem);
+
         view.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
@@ -112,9 +119,15 @@ public class LandingPage extends AppCompatActivity
 
             searchPageDrawer.draw(videos);
 
+            refreshLayout.setRefreshing(false);
+
         });
 
         return true;
+    }
+
+    public boolean onCloseSearchItem() {
+        return false;
     }
 
     @Override
@@ -122,6 +135,8 @@ public class LandingPage extends AppCompatActivity
         super.onOptionsMenuClosed(menu);
 
         pageViewModel.getSearchQueryVideos().removeObservers(this);
+
+        pageViewModel.requestRefresh();
 
     }
 
@@ -190,21 +205,30 @@ public class LandingPage extends AppCompatActivity
 
         userName.setText(userFullName);
 
-        SwipeRefreshLayout refreshLayout = findViewById(R.id.search_refresh);
+        this.refreshLayout = findViewById(R.id.main_landing_page_refresh);
 
-        ScrollView scrollView = refreshLayout.findViewById(R.id.scroll_search);
+        ScrollView layout = refreshLayout.findViewById(R.id.main_landing_page_scroll);
 
-        LinearLayout videoLayout = scrollView.findViewById(R.id.display_results);
+        LinearLayout videoLayout = layout.findViewById(R.id.main_landing_page_layout);
+
+        refreshLayout.setOnRefreshListener(() -> this.pageViewModel.requestRefresh());
 
         this.searchPageDrawer = new SearchPageDrawer(this, videoLayout);
 
         this.landingPageDrawer = new LandingPageDrawer(this, videoLayout);
 
+        refreshLayout.setRefreshing(true);
+
         this.pageViewModel.getLandingPageVideos().observe(this, (videos) -> {
 
             landingPageDrawer.draw(videos);
 
+            refreshLayout.setRefreshing(false);
+
         });
+
+        this.pageViewModel.requestRefresh();
+
     }
 
     private static class LogOut extends NetworkUser<Void, Void, Boolean> {
