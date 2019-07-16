@@ -1,4 +1,4 @@
-package com.twitchflix.applicationclient.utils;
+package com.twitchflix.applicationclient.utils.loaders;
 
 import android.app.Activity;
 import android.app.AlertDialog;

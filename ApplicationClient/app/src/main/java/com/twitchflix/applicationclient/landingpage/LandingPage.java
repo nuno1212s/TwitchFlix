@@ -26,9 +26,9 @@ import com.twitchflix.applicationclient.utils.Drawer;
 import com.twitchflix.applicationclient.landingpage.drawers.LandingPageDrawer;
 import com.twitchflix.applicationclient.landingpage.drawers.SearchPageDrawer;
 import com.twitchflix.applicationclient.rest.models.UserData;
-import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
 import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
-import com.twitchflix.applicationclient.utils.UserDataLoader;
+import com.twitchflix.applicationclient.utils.loaders.UserDataLoader;
 
 public class LandingPage extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, UserDataLoader {
@@ -199,17 +199,19 @@ public class LandingPage extends AppCompatActivity
 
         ImageView userPhoto = headerView.findViewById(R.id.userPhoto);
 
-        UserData userData = ClientApp.getIns().getLoginHandler().getCurrentUserData();
+        this.pageViewModel.getUserPhoto().observe(this, (user) -> {
 
-        userEmail.setText(userData.getEmail());
+            userPhoto.setImageBitmap(user.getChannelThumbnail());
 
-        String userFullName = userData.getFirstName() + " " + userData.getLastName();
+            userEmail.setText(user.getEmail());
 
-        userName.setText(userFullName);
+            userName.setText(user.getFullName());
 
-        this.pageViewModel.requestLoadUserPhoto();
+        });
 
-        this.pageViewModel.getUserPhoto().observe(this, userPhoto::setImageBitmap);
+        UserData currentUserData = ClientApp.getIns().getLoginHandler().getCurrentUserData();
+
+        this.pageViewModel.setUserID(currentUserData.getUuid());
     }
 
     /**

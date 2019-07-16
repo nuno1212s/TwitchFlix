@@ -24,9 +24,8 @@ import com.google.android.exoplayer2.util.Util;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.rest.models.Video;
-import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
 
-import java.lang.ref.WeakReference;
 import java.util.UUID;
 
 public class WatchVideo extends AppCompatActivity {

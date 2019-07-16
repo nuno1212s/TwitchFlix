@@ -1,7 +1,6 @@
 package com.twitchflix.applicationclient.activities;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,7 +11,7 @@ import android.widget.ProgressBar;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
-import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
 import com.twitchflix.applicationclient.utils.Utils;
 
 import java.lang.ref.WeakReference;

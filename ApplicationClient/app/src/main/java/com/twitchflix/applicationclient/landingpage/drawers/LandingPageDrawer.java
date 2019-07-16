@@ -1,16 +1,17 @@
 package com.twitchflix.applicationclient.landingpage.drawers;
 
 import android.app.Activity;
-import android.view.View;
+import android.view.Gravity;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.twitchflix.applicationclient.customview.RoundedView;
+import com.twitchflix.applicationclient.landingpage.OnClickChannelListener;
 import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
 import com.twitchflix.applicationclient.utils.Drawer;
-import com.twitchflix.applicationclient.utils.VideoDAO;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
 import java.util.*;
 
@@ -18,7 +19,6 @@ public class LandingPageDrawer extends Drawer {
 
     public LandingPageDrawer(Activity parent, ViewGroup parentView) {
         super(parent, parentView);
-
     }
 
     @Override
@@ -29,7 +29,7 @@ public class LandingPageDrawer extends Drawer {
         Map<UUID, List<VideoDAO>> groupedVideos = new HashMap<>();
 
         for (VideoDAO video : videos) {
-            List<VideoDAO> videoDAOS = groupedVideos.get(video.getUploader().getUuid());
+            List<VideoDAO> videoDAOS = groupedVideos.get(video.getUploader().getUserID());
 
             if (videoDAOS == null) {
                 videoDAOS = new ArrayList<>();
@@ -37,7 +37,7 @@ public class LandingPageDrawer extends Drawer {
 
             videoDAOS.add(video);
 
-            groupedVideos.put(video.getUploader().getUuid(), videoDAOS);
+            groupedVideos.put(video.getUploader().getUserID(), videoDAOS);
         }
 
         for (Map.Entry<UUID, List<VideoDAO>> channels : groupedVideos.entrySet()) {
@@ -46,7 +46,9 @@ public class LandingPageDrawer extends Drawer {
 
             channelNameLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-            ViewGroup.MarginLayoutParams channelNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50);
+            ViewGroup.MarginLayoutParams channelNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 128);
+
+            channelNameParams.setMargins(25, 10, 0, 0);
 
             channelNameLayout.setLayoutParams(channelNameParams);
 
@@ -55,9 +57,11 @@ public class LandingPageDrawer extends Drawer {
             //Draw the channel thumbnail
             RoundedView channelThumbnail = new RoundedView(getParentActivity());
 
-            ViewGroup.LayoutParams channelParams = new ViewGroup.LayoutParams(32, 32);
+            ViewGroup.LayoutParams channelParams = new ViewGroup.LayoutParams(128, 128);
 
-            channelThumbnail.setPadding(9, 9, 9, 9);
+            channelThumbnail.setPadding(15, 15, 15, 15);
+
+            channelThumbnail.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
             channelThumbnail.setLayoutParams(channelParams);
 
@@ -66,13 +70,15 @@ public class LandingPageDrawer extends Drawer {
             //Channel name
             String channel_name_text = videoDAO.getUploaderName();
 
-            ViewGroup.MarginLayoutParams channelTextNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 50);
+            ViewGroup.MarginLayoutParams channelTextNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 128);
+
+            channelTextNameParams.setMargins(25, 0, 0, 0);
 
             TextView channelName = new TextView(getParentActivity());
 
-            channelName.setLayoutParams(channelTextNameParams);
+            channelName.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
 
-            channelName.setGravity(View.TEXT_ALIGNMENT_CENTER);
+            channelName.setLayoutParams(channelTextNameParams);
 
             channelName.setText(channel_name_text);
 
@@ -80,6 +86,8 @@ public class LandingPageDrawer extends Drawer {
             channelNameLayout.addView(channelThumbnail);
 
             channelNameLayout.addView(channelName);
+
+            channelNameLayout.setOnClickListener(new OnClickChannelListener(getParentActivity(), channels.getKey()));
 
             getParentView().addView(channelNameLayout);
 

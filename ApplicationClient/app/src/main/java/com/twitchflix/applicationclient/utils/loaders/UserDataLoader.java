@@ -1,9 +1,10 @@
-package com.twitchflix.applicationclient.utils;
+package com.twitchflix.applicationclient.utils.loaders;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.rest.models.UserData;
+import com.twitchflix.applicationclient.utils.daos.UserDAO;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,7 +26,7 @@ public interface UserDataLoader {
 
         UserData userData = ClientApp.getIns().getUserDataRequests().requestUserData(userID);
 
-        UserDAO userDAO = UserDAO.fromData(userID, userData.getFirstName(), userData.getLastName(), getUserPhoto(userData));
+        UserDAO userDAO = UserDAO.fromData(userID, userData.getFirstName(), userData.getLastName(), userData.getEmail(), getUserPhoto(userData));
 
         UserDataLoader.userData.put(userID, userDAO);
 
@@ -44,7 +45,7 @@ public interface UserDataLoader {
 
         try {
 
-            InputStream inputStream = new URL(user.getUserPhotoLink()).openStream();
+            InputStream inputStream = new URL(user.getPhotoLink()).openStream();
 
             return BitmapFactory.decodeStream(inputStream);
 

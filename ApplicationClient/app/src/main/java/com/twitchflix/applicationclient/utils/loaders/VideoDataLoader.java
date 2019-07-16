@@ -1,9 +1,10 @@
-package com.twitchflix.applicationclient.utils;
+package com.twitchflix.applicationclient.utils.loaders;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
+import com.twitchflix.applicationclient.utils.daos.UserDAO;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
 import java.io.IOException;
 import java.io.InputStream;

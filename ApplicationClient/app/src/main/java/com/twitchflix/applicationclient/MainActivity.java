@@ -1,7 +1,6 @@
 package com.twitchflix.applicationclient;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -9,9 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.twitchflix.applicationclient.activities.LoginActivity;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
-import com.twitchflix.applicationclient.utils.NetworkUser;
-
-import java.lang.ref.WeakReference;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
 
 public class MainActivity extends AppCompatActivity {
 

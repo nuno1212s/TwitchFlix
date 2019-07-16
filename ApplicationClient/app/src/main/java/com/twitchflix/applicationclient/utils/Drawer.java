@@ -2,8 +2,7 @@ package com.twitchflix.applicationclient.utils;
 
 import android.app.Activity;
 import android.view.ViewGroup;
-import com.twitchflix.applicationclient.utils.VideoDAO;
-import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
 import java.util.List;
 

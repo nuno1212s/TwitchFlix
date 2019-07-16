@@ -39,6 +39,10 @@ public class UserData {
         return salt;
     }
 
+    public String getPhotoLink() {
+        return photoLink;
+    }
+
     public static UserData fromUserEmail(User user) {
 
         String salt = "";

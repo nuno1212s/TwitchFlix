@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.twitchflix.applicationclient.utils.Drawer;
-import com.twitchflix.applicationclient.utils.VideoDAO;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
 import java.util.List;
 

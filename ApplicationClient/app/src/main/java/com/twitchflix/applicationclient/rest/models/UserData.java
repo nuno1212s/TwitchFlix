@@ -8,15 +8,15 @@ public class UserData {
 
     private String firstName, lastName, email, salt;
 
-    private String userPhotoLink;
+    private String photoLink;
 
-    public UserData(UUID playerID, String firstName, String lastName, String email, String salt, String userPhotoLink) {
+    public UserData(UUID playerID, String firstName, String lastName, String email, String salt, String photoLink) {
         this.uuid = playerID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.salt = salt;
-        this.userPhotoLink = userPhotoLink;
+        this.photoLink = photoLink;
     }
 
     public UUID getUuid() {
@@ -39,8 +39,8 @@ public class UserData {
         return salt;
     }
 
-    public String getUserPhotoLink() {
-        return this.userPhotoLink;
+    public String getPhotoLink() {
+        return this.photoLink;
     }
 
     public String getFullName() {
@@ -65,5 +65,9 @@ public class UserData {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public void setPhotoLink(String photoLink) {
+        this.photoLink = photoLink;
     }
 }

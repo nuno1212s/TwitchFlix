@@ -9,7 +9,11 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
-import com.twitchflix.applicationclient.utils.*;
+import com.twitchflix.applicationclient.utils.daos.UserDAO;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.UserDataLoader;
+import com.twitchflix.applicationclient.utils.loaders.VideoDataLoader;
 
 import java.util.ArrayList;
 import java.util.List;

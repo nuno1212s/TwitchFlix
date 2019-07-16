@@ -1,4 +1,4 @@
-package com.twitchflix.applicationclient.utils;
+package com.twitchflix.applicationclient.utils.daos;
 
 import android.graphics.Bitmap;
 
@@ -8,16 +8,19 @@ public class UserDAO {
 
     private UUID userID;
 
-    private String firstName, lastName;
+    private String firstName, lastName, email;
 
     private Bitmap channelThumbnail;
 
-    private UserDAO(UUID userID, String firstName, String lastName, Bitmap channelThumbnail) {
+    private UserDAO(UUID userID, String firstName, String lastName, String email, Bitmap channelThumbnail) {
         this.userID = userID;
         this.firstName = firstName;
         this.lastName = lastName;
+        this.email = email;
         this.channelThumbnail = channelThumbnail;
     }
+
+    public String getEmail() {return this.email;}
 
     public UUID getUserID() {
         return userID;
@@ -39,8 +42,8 @@ public class UserDAO {
         return channelThumbnail;
     }
 
-    public static UserDAO fromData(UUID userID, String firstName, String lastName, Bitmap channelThumbnail) {
-        return new UserDAO(userID, firstName, lastName, channelThumbnail);
+    public static UserDAO fromData(UUID userID, String firstName, String lastName, String email, Bitmap channelThumbnail) {
+        return new UserDAO(userID, firstName, lastName, email, channelThumbnail);
     }
 
 }

@@ -5,15 +5,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.view.View;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
-import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
 
 public class AccountSettings extends AppCompatActivity {
 

@@ -1,11 +1,9 @@
 package com.twitchflix.applicationclient.activities;
 
 import android.content.Intent;
-import android.hardware.Camera;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
@@ -20,7 +18,7 @@ import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
 import com.twitchflix.applicationclient.rest.models.VideoStream;
-import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
 import net.ossrs.rtmp.ConnectCheckerRtmp;
 
 public class Stream extends AppCompatActivity implements ConnectCheckerRtmp, SurfaceHolder.Callback {

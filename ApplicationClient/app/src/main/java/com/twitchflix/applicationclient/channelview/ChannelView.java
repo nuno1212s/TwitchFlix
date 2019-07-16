@@ -65,14 +65,17 @@ public class ChannelView extends AppCompatActivity {
     }
 
     private void initAndDraw() {
+        SwipeRefreshLayout refreshLayout = findViewById(R.id.channelView);
 
-        SwipeRefreshLayout refreshLayout = findViewById(R.id.channel_activity);
+        LinearLayout channelLayout = refreshLayout.findViewById(R.id.channelNameLayout);
 
-        ScrollView scrollView = refreshLayout.findViewById(R.id.channel_scroll_view);
+        ScrollView scrollView = channelLayout.findViewById(R.id.channel_scroll_view);
 
-        LinearLayout clearable = scrollView.findViewById(R.id.channel_main_layout);
+        LinearLayout videoPlace = scrollView.findViewById(R.id.channel_main_layout);
 
-        channelDrawer = new ChannelDrawer(this, clearable);
+        refreshLayout.setRefreshing(true);
+
+        channelDrawer = new ChannelDrawer(this, videoPlace);
 
         channelViewer.getChannelVideos().observe(this, (videos) -> {
             channelDrawer.draw(videos);

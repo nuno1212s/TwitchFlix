@@ -2,22 +2,22 @@ package com.twitchflix.applicationclient.viewmodels;
 
 import android.app.Application;
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.twitchflix.applicationclient.ClientApp;
-import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
-import com.twitchflix.applicationclient.utils.NetworkUser;
-import com.twitchflix.applicationclient.utils.UserDataLoader;
-import com.twitchflix.applicationclient.utils.VideoDAO;
-import com.twitchflix.applicationclient.utils.VideoDataLoader;
+import com.twitchflix.applicationclient.utils.daos.UserDAO;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.UserDataLoader;
+import com.twitchflix.applicationclient.utils.loaders.VideoDataLoader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class LandingPageViewModel extends AndroidViewModel {
 
@@ -25,7 +25,9 @@ public class LandingPageViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<VideoDAO>> searchVideos;
 
-    private MutableLiveData<Bitmap> userPhoto;
+    private MutableLiveData<UserDAO> userPhoto;
+
+    private UUID userID;
 
     private String queryString;
 
@@ -41,6 +43,12 @@ public class LandingPageViewModel extends AndroidViewModel {
         this.queryString = query;
 
         runSearchQuery();
+    }
+
+    public void setUserID(UUID userID) {
+        this.userID = userID;
+
+        runPhotoLoad();
     }
 
     public void requestRefresh() {
@@ -62,9 +70,9 @@ public class LandingPageViewModel extends AndroidViewModel {
     }
 
     private void runPhotoLoad() {
-        new PhotoLoader(this.getApplication().getApplicationContext(),
-                this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
+        new PhotoLoader(this.getApplication().getApplicationContext(),
+                this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this.userID);
     }
 
     private void setLoadedVideos(List<VideoDAO> videos) {
@@ -75,7 +83,7 @@ public class LandingPageViewModel extends AndroidViewModel {
         this.searchVideos.setValue(searchVideos);
     }
 
-    private void setUserPhoto(Bitmap bitmap) {
+    private void setUserPhoto(UserDAO bitmap) {
         this.userPhoto.setValue(bitmap);
     }
 
@@ -87,7 +95,7 @@ public class LandingPageViewModel extends AndroidViewModel {
         return videos;
     }
 
-    public LiveData<Bitmap> getUserPhoto() {
+    public LiveData<UserDAO> getUserPhoto() {
         return this.userPhoto;
     }
 
@@ -126,7 +134,7 @@ public class LandingPageViewModel extends AndroidViewModel {
         }
     }
 
-    private static class PhotoLoader extends NetworkUser<UserData, Void, Bitmap>
+    private static class PhotoLoader extends NetworkUser<UUID, Void, UserDAO>
             implements UserDataLoader {
 
         private LandingPageViewModel storage;
@@ -138,15 +146,14 @@ public class LandingPageViewModel extends AndroidViewModel {
         }
 
         @Override
-        protected Bitmap doInBackground(UserData... userDatas) {
+        protected UserDAO doInBackground(UUID... uuids) {
+            UUID uuid = uuids[0];
 
-            UserData userData = userDatas[0];
-
-            return getUserPhoto(userData);
+            return getUserData(uuid);
         }
 
         @Override
-        protected void onPostExecute(Bitmap bitmap) {
+        protected void onPostExecute(UserDAO bitmap) {
             super.onPostExecute(bitmap);
 
             storage.setUserPhoto(bitmap);

@@ -1,7 +1,6 @@
-package com.twitchflix.applicationclient.utils;
+package com.twitchflix.applicationclient.utils.daos;
 
 import android.graphics.Bitmap;
-import com.twitchflix.applicationclient.rest.models.UserData;
 
 import java.util.UUID;
 

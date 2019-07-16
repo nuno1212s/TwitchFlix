@@ -8,7 +8,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
 import com.twitchflix.applicationclient.utils.Drawer;
-import com.twitchflix.applicationclient.utils.VideoDAO;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
 import java.util.List;
 
@@ -20,6 +20,8 @@ public class ChannelDrawer extends Drawer {
 
     @Override
     public void draw(List<VideoDAO> videos) {
+
+        System.out.println(videos);
 
         getParentView().removeAllViews();
 
@@ -67,6 +69,14 @@ public class ChannelDrawer extends Drawer {
 
             getParentView().addView(eachVideo);
         }
+
+    }
+
+    private void drawInto(ViewGroup group, VideoDAO video) {
+
+        LinearLayout eachVideo = new LinearLayout(getParentActivity());
+
+
 
     }
 }

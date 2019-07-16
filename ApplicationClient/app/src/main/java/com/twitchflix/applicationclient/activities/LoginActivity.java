@@ -18,10 +18,8 @@ import com.google.android.gms.tasks.Task;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.landingpage.LandingPage;
-import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
 import com.twitchflix.applicationclient.utils.Utils;
-
-import java.lang.ref.WeakReference;
 
 public class LoginActivity extends AppCompatActivity {
 
