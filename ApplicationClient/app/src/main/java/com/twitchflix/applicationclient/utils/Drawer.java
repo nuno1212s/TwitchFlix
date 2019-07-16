@@ -1,7 +1,8 @@
-package com.twitchflix.applicationclient.landingpage.drawers;
+package com.twitchflix.applicationclient.utils;
 
 import android.app.Activity;
 import android.view.ViewGroup;
+import com.twitchflix.applicationclient.utils.VideoDAO;
 import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
 
 import java.util.List;
@@ -27,6 +28,6 @@ public abstract class Drawer {
         return parentViewGroup;
     }
 
-    public abstract void draw(List<LandingPageViewModel.VideoDAO> videos);
+    public abstract void draw(List<VideoDAO> videos);
 
 }

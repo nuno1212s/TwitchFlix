@@ -1,16 +1,13 @@
 package com.twitchflix.applicationclient.landingpage;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.SearchView;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -25,15 +22,16 @@ import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.activities.AccountSettings;
 import com.twitchflix.applicationclient.activities.Stream;
 import com.twitchflix.applicationclient.channelview.ChannelView;
-import com.twitchflix.applicationclient.landingpage.drawers.Drawer;
+import com.twitchflix.applicationclient.utils.Drawer;
 import com.twitchflix.applicationclient.landingpage.drawers.LandingPageDrawer;
 import com.twitchflix.applicationclient.landingpage.drawers.SearchPageDrawer;
 import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.utils.NetworkUser;
 import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
+import com.twitchflix.applicationclient.utils.UserDataLoader;
 
 public class LandingPage extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, UserDataLoader {
 
     private LandingPageViewModel pageViewModel;
 
@@ -53,9 +51,6 @@ public class LandingPage extends AppCompatActivity
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        View viewById = findViewById(R.id.action_search);
-        System.out.println("TESTE: " + viewById);
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -66,8 +61,8 @@ public class LandingPage extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        initUserInformationDisplay();
         initAndDraw();
-
     }
 
     @Override
@@ -82,7 +77,7 @@ public class LandingPage extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            return;
+            super.onBackPressed();
         }
     }
 
@@ -95,14 +90,39 @@ public class LandingPage extends AppCompatActivity
 
         SearchView view = (SearchView) item.getActionView();
 
-        view.setOnCloseListener(this::onCloseSearchItem);
+        item.setOnActionExpandListener(new MenuItem.OnActionExpandListener() {
+            @Override
+            public boolean onMenuItemActionExpand(MenuItem item) {
+
+                pageViewModel.getSearchQueryVideos().observe(LandingPage.this, (videos) -> {
+
+                    searchPageDrawer.draw(videos);
+
+                    refreshLayout.setRefreshing(false);
+
+                });
+
+                pageViewModel.setQueryString("");
+
+                return true;
+            }
+
+            @Override
+            public boolean onMenuItemActionCollapse(MenuItem item) {
+
+                refreshLayout.setRefreshing(true);
+
+                pageViewModel.getSearchQueryVideos().removeObservers(LandingPage.this);
+
+                pageViewModel.requestRefresh();
+
+                return true;
+            }
+        });
 
         view.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String s) {
-
-                pageViewModel.setQueryString(s);
-
                 return true;
             }
 
@@ -115,29 +135,7 @@ public class LandingPage extends AppCompatActivity
             }
         });
 
-        pageViewModel.getSearchQueryVideos().observe(this, (videos) -> {
-
-            searchPageDrawer.draw(videos);
-
-            refreshLayout.setRefreshing(false);
-
-        });
-
         return true;
-    }
-
-    public boolean onCloseSearchItem() {
-        return false;
-    }
-
-    @Override
-    public void onOptionsMenuClosed(Menu menu) {
-        super.onOptionsMenuClosed(menu);
-
-        pageViewModel.getSearchQueryVideos().removeObservers(this);
-
-        pageViewModel.requestRefresh();
-
     }
 
     @Override
@@ -186,8 +184,10 @@ public class LandingPage extends AppCompatActivity
         return true;
     }
 
-    private void initAndDraw() {
-
+    /**
+     * Initializes and displays the users information
+     */
+    private void initUserInformationDisplay() {
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
 
         NavigationView navView = drawerLayout.findViewById(R.id.nav_view);
@@ -197,6 +197,8 @@ public class LandingPage extends AppCompatActivity
         TextView userEmail = headerView.findViewById(R.id.display_userEmail),
                 userName = headerView.findViewById(R.id.display_userName);
 
+        ImageView userPhoto = headerView.findViewById(R.id.userPhoto);
+
         UserData userData = ClientApp.getIns().getLoginHandler().getCurrentUserData();
 
         userEmail.setText(userData.getEmail());
@@ -205,6 +207,15 @@ public class LandingPage extends AppCompatActivity
 
         userName.setText(userFullName);
 
+        this.pageViewModel.requestLoadUserPhoto();
+
+        this.pageViewModel.getUserPhoto().observe(this, userPhoto::setImageBitmap);
+    }
+
+    /**
+     * Initializes and displays the landing page videos
+     */
+    private void initAndDraw() {
         this.refreshLayout = findViewById(R.id.main_landing_page_refresh);
 
         ScrollView layout = refreshLayout.findViewById(R.id.main_landing_page_scroll);
@@ -254,7 +265,7 @@ public class LandingPage extends AppCompatActivity
                 if (successfull) {
                     sendToActivity(MainActivity.class);
 
-                    finishActivity();
+                    ((Activity) getContextIfPresent()).finish();
                 }
             }
 

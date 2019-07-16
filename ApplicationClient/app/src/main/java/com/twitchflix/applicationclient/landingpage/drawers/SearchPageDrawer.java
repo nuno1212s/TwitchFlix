@@ -6,7 +6,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
+import com.twitchflix.applicationclient.utils.Drawer;
+import com.twitchflix.applicationclient.utils.VideoDAO;
 
 import java.util.List;
 
@@ -17,11 +18,11 @@ public class SearchPageDrawer extends Drawer {
     }
 
     @Override
-    public void draw(List<LandingPageViewModel.VideoDAO> videos) {
+    public void draw(List<VideoDAO> videos) {
 
         getParentView().removeAllViews();
 
-        for (LandingPageViewModel.VideoDAO video : videos) {
+        for (VideoDAO video : videos) {
 
             getParentView().addView(draw(video));
 
@@ -29,7 +30,7 @@ public class SearchPageDrawer extends Drawer {
 
     }
 
-    public View draw(LandingPageViewModel.VideoDAO video) {
+    public View draw(VideoDAO video) {
 
         LinearLayout videoLayout = new LinearLayout(getParentActivity());
 

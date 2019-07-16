@@ -1,5 +1,6 @@
 package com.twitchflix.authentication.accounts;
 
+import com.twitchflix.App;
 import com.twitchflix.authentication.User;
 import org.bson.Document;
 
@@ -17,10 +18,10 @@ public class OwnUser extends User {
 
     private boolean confirmed;
 
-    public OwnUser(UUID userID, String firstName, String lastName, String email,
+    public OwnUser(UUID userID, String firstName, String lastName, String email, String photoLink,
                    Set<UUID> watchedVideos, Set<UUID> likedVideos, Set<UUID> uploadedVideos,
                    String hashed_password, String salt) {
-        super(userID, firstName, lastName, email, uploadedVideos, likedVideos, watchedVideos);
+        super(userID, firstName, lastName, email, photoLink, uploadedVideos, likedVideos, watchedVideos);
 
         this.password = hashed_password.getBytes(StandardCharsets.UTF_8);
         this.salt = salt;
@@ -66,12 +67,17 @@ public class OwnUser extends User {
                 lastName = d.getString("LastName"),
                 email = d.getString("email"),
                 salt = d.getString("Salt"),
-                password = d.getString("Password");
+                password = d.getString("Password"),
+                photoLink = d.getString("photolink");
+
+        if (photoLink == null) {
+            photoLink = "https://" + App.SERVER_IP + "/" + App.USER_PHOTOS + "/NO_PHOTO.png";
+        }
 
         Set<UUID> likedVideos = new HashSet<>(d.getList("LikedVideos", UUID.class)),
                 watchedVideos = new HashSet<>(d.getList("WatchedVideos", UUID.class)),
                 uploadedVideos = new HashSet<>(d.getList("UploadedVideos", UUID.class));
 
-        return new OwnUser(userID, firstName, lastName, email, watchedVideos, likedVideos, uploadedVideos, password, salt);
+        return new OwnUser(userID, firstName, lastName, email, photoLink, watchedVideos, likedVideos, uploadedVideos, password, salt);
     }
 }

@@ -1,13 +1,16 @@
 package com.twitchflix.applicationclient.landingpage.drawers;
 
 import android.app.Activity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.twitchflix.applicationclient.customview.RoundedView;
 import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
-import com.twitchflix.applicationclient.viewmodels.LandingPageViewModel;
+import com.twitchflix.applicationclient.utils.Drawer;
+import com.twitchflix.applicationclient.utils.VideoDAO;
 
 import java.util.*;
 
@@ -19,14 +22,14 @@ public class LandingPageDrawer extends Drawer {
     }
 
     @Override
-    public void draw(List<LandingPageViewModel.VideoDAO> videos) {
+    public void draw(List<VideoDAO> videos) {
 
         getParentView().removeAllViews();
 
-        Map<UUID, List<LandingPageViewModel.VideoDAO>> groupedVideos = new HashMap<>();
+        Map<UUID, List<VideoDAO>> groupedVideos = new HashMap<>();
 
-        for (LandingPageViewModel.VideoDAO video : videos) {
-            List<LandingPageViewModel.VideoDAO> videoDAOS = groupedVideos.get(video.getUploader());
+        for (VideoDAO video : videos) {
+            List<VideoDAO> videoDAOS = groupedVideos.get(video.getUploader().getUuid());
 
             if (videoDAOS == null) {
                 videoDAOS = new ArrayList<>();
@@ -34,29 +37,51 @@ public class LandingPageDrawer extends Drawer {
 
             videoDAOS.add(video);
 
-            groupedVideos.put(video.getUploader(), videoDAOS);
+            groupedVideos.put(video.getUploader().getUuid(), videoDAOS);
         }
 
-        for (Map.Entry<UUID, List<LandingPageViewModel.VideoDAO>> channels : groupedVideos.entrySet()) {
+        for (Map.Entry<UUID, List<VideoDAO>> channels : groupedVideos.entrySet()) {
 
-            String channel_name_text = channels.getValue().get(0).getUploaderName();
+            LinearLayout channelNameLayout = new LinearLayout(getParentActivity());
 
-            TextView channel_name = new TextView(getParentActivity());
+            channelNameLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-            channel_name.setText(channel_name_text);
+            ViewGroup.MarginLayoutParams channelNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 50);
 
-            channel_name.setClickable(true);
+            channelNameLayout.setLayoutParams(channelNameParams);
 
-            channel_name.setTextSize(25);
+            VideoDAO videoDAO = channels.getValue().get(0);
 
-            ViewGroup.MarginLayoutParams viewParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            //Draw the channel thumbnail
+            RoundedView channelThumbnail = new RoundedView(getParentActivity());
 
-            viewParams.setMargins(10, 40, 0, 15);
+            ViewGroup.LayoutParams channelParams = new ViewGroup.LayoutParams(32, 32);
 
-            channel_name.setLayoutParams(viewParams);
+            channelThumbnail.setPadding(9, 9, 9, 9);
 
-            getParentView().addView(channel_name);
+            channelThumbnail.setLayoutParams(channelParams);
+
+            channelThumbnail.setImageBitmap(videoDAO.getChannelThumbnail());
+
+            //Channel name
+            String channel_name_text = videoDAO.getUploaderName();
+
+            ViewGroup.MarginLayoutParams channelTextNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 50);
+
+            TextView channelName = new TextView(getParentActivity());
+
+            channelName.setLayoutParams(channelTextNameParams);
+
+            channelName.setGravity(View.TEXT_ALIGNMENT_CENTER);
+
+            channelName.setText(channel_name_text);
+
+            //Add all to the layout
+            channelNameLayout.addView(channelThumbnail);
+
+            channelNameLayout.addView(channelName);
+
+            getParentView().addView(channelNameLayout);
 
             drawIntoView(getParentView(), channels.getValue());
 
@@ -64,7 +89,7 @@ public class LandingPageDrawer extends Drawer {
 
     }
 
-    private void drawIntoView(ViewGroup parent, List<LandingPageViewModel.VideoDAO> toDraw) {
+    private void drawIntoView(ViewGroup parent, List<VideoDAO> toDraw) {
 
         HorizontalScrollView scrollingVideo = new HorizontalScrollView(getParentActivity());
 
@@ -80,12 +105,12 @@ public class LandingPageDrawer extends Drawer {
 
         parent.addView(scrollingVideo);
 
-        for (LandingPageViewModel.VideoDAO videoDAO : toDraw) {
+        for (VideoDAO videoDAO : toDraw) {
             drawIntoView(videos, videoDAO);
         }
     }
 
-    private void drawIntoView(ViewGroup parent, LandingPageViewModel.VideoDAO toDraw) {
+    private void drawIntoView(ViewGroup parent, VideoDAO toDraw) {
 
         LinearLayout linearVideoLayout = new LinearLayout(getParentActivity());
 

@@ -1,137 +1,72 @@
 package com.twitchflix.applicationclient.channelview;
 
 import android.app.Activity;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.twitchflix.applicationclient.ClientApp;
-import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
-import com.twitchflix.applicationclient.rest.models.UserData;
-import com.twitchflix.applicationclient.rest.models.UserVideo;
-import com.twitchflix.applicationclient.rest.models.Video;
-import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.Drawer;
+import com.twitchflix.applicationclient.utils.VideoDAO;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.*;
+import java.util.List;
 
-public class ChannelDrawer extends NetworkUser<UUID, Void, Boolean> {
+public class ChannelDrawer extends Drawer {
 
-    public ChannelDrawer(Activity context) {
-        super(context);
-    }
-
-    private List<Video> videos;
-
-    private Map<UUID, Bitmap> thumbnails;
-
-    private String channelName;
-
-    @Override
-    protected Boolean doInBackground(UUID... ids) {
-
-        if (!isInternetConnectionAvailable()) {
-            return false;
-        }
-
-        UserData user = ClientApp.getIns().getUserDataRequests().requestUserData(ids[0]);
-
-        channelName = user.getFirstName() + " " + user.getLastName();
-
-        videos = new ArrayList<>();
-        thumbnails = new HashMap<>();
-
-        List<UserVideo> videosByUser = ClientApp.getIns().getServerRequests().getVideosByUser(user.getUuid());
-
-        for (UserVideo userVideo : videosByUser) {
-
-            videos.add(userVideo);
-
-            try {
-                InputStream inputStream = new URL(userVideo.getThumbnailLink()).openStream();
-
-                this.thumbnails.put(userVideo.getVideoID(), BitmapFactory.decodeStream(inputStream));
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return true;
+    public ChannelDrawer(Activity parent, ViewGroup parentView) {
+        super(parent, parentView);
     }
 
     @Override
-    protected void onPostExecute(Boolean successful) {
-        if (isContextPresent() && successful) {
+    public void draw(List<VideoDAO> videos) {
 
-            Activity activity = (Activity) getContextIfPresent();
+        getParentView().removeAllViews();
 
-            SwipeRefreshLayout refreshLayout = activity.findViewById(R.id.channel_activity);
+        for (VideoDAO video : videos) {
 
-            LinearLayout mainChannelActivity = refreshLayout.findViewById(R.id.main_channel_activity);
+            LinearLayout eachVideo = new LinearLayout(getParentActivity());
 
-            TextView channelName = mainChannelActivity.findViewById(R.id.channel_name);
+            eachVideo.setClickable(true);
 
-            channelName.setText(this.channelName);
+            eachVideo.setOnClickListener(new OnClickVideoListener(getParentActivity(), video.getVideoID()));
 
-            ScrollView view = mainChannelActivity.findViewById(R.id.channel_scroll_view);
+            eachVideo.setPadding(0, 35, 0, 0);
 
-            LinearLayout videoLayout = view.findViewById(R.id.channel_main_layout);
+            eachVideo.setOrientation(LinearLayout.HORIZONTAL);
 
-            for (Video video : videos) {
+            ImageView thumbnail = new ImageView(getParentActivity());
 
-                LinearLayout eachVideo = new LinearLayout(getContextIfPresent());
+            thumbnail.setLayoutParams(new ViewGroup.MarginLayoutParams(320, 240));
 
-                eachVideo.setClickable(true);
+            thumbnail.setImageBitmap(video.getThumbnail());
 
-                eachVideo.setOnClickListener(new OnClickVideoListener(activity, video.getVideoID()));
+            LinearLayout textAndDesc = new LinearLayout(getParentActivity());
 
-                eachVideo.setPadding(0, 35, 0, 0);
+            textAndDesc.setOrientation(LinearLayout.VERTICAL);
 
-                eachVideo.setOrientation(LinearLayout.HORIZONTAL);
+            TextView videoName = new TextView(getParentActivity());
 
-                ImageView thumbnail = new ImageView(getContextIfPresent());
+            videoName.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40));
 
-                thumbnail.setLayoutParams(new ViewGroup.MarginLayoutParams(320, 240));
+            videoName.setText(video.getTitle());
 
-                thumbnail.setImageBitmap(this.thumbnails.get(video.getVideoID()));
+            videoName.setGravity(View.TEXT_ALIGNMENT_CENTER);
 
-                LinearLayout textAndDesc = new LinearLayout(getContextIfPresent());
+            TextView videoDesc = new TextView(getParentActivity());
 
-                textAndDesc.setOrientation(LinearLayout.VERTICAL);
+            videoDesc.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 200));
 
-                TextView videoName = new TextView(getContextIfPresent());
+            videoDesc.setText(video.getDescription());
 
-                videoName.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40));
+            textAndDesc.addView(videoName);
+            textAndDesc.addView(videoDesc);
 
-                videoName.setText(video.getTitle());
+            eachVideo.addView(thumbnail);
+            eachVideo.addView(textAndDesc);
 
-                videoName.setGravity(View.TEXT_ALIGNMENT_CENTER);
-
-                TextView videoDesc = new TextView(getContextIfPresent());
-
-                videoDesc.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 200));
-
-                videoDesc.setText(video.getDescription());
-
-                textAndDesc.addView(videoName);
-                textAndDesc.addView(videoDesc);
-
-                eachVideo.addView(thumbnail);
-                eachVideo.addView(textAndDesc);
-
-                videoLayout.addView(eachVideo);
-            }
-
-            refreshLayout.setRefreshing(false);
+            getParentView().addView(eachVideo);
         }
+
     }
 }

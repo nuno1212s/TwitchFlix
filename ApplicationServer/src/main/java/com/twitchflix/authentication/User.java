@@ -23,7 +23,7 @@ public abstract class User {
     //An unique universal identifier for each user
     private UUID userID;
 
-    private String firstName, lastName, email;
+    private String firstName, lastName, email, photoLink;
 
     private Set<UUID> uploadedVideos, likedVideos, watchedVideos;
 
@@ -32,18 +32,20 @@ public abstract class User {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.photoLink = "https://" + App.SERVER_IP + "/" + App.USER_PHOTOS + "/NO_PHOTO.png";
 
         this.uploadedVideos = Collections.synchronizedSet(new HashSet<>());
         this.likedVideos = Collections.synchronizedSet(new HashSet<>());
         this.watchedVideos = Collections.synchronizedSet(new HashSet<>());
     }
 
-    public User(UUID userID, String firstname, String lastName, String email,
+    public User(UUID userID, String firstname, String lastName, String email, String photoLink,
                 Set<UUID> uploadedVideos, Set<UUID> likedVideos, Set<UUID> watchedVideos) {
         this.userID = userID;
         this.firstName = firstname;
         this.lastName = lastName;
         this.email = email;
+        this.photoLink = photoLink;
 
         this.uploadedVideos = Collections.synchronizedSet(uploadedVideos);
         this.likedVideos = Collections.synchronizedSet(likedVideos);
@@ -64,6 +66,10 @@ public abstract class User {
 
     public String getEmail() {
         return email;
+    }
+
+    public String getPhotoLink() {
+        return this.photoLink;
     }
 
     public void addLike(UUID video) {
@@ -115,12 +121,19 @@ public abstract class User {
         App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
     }
 
+    public void setPhotoLink(String photoLink) {
+        this.photoLink = photoLink;
+
+        App.getAsync().submit(() -> App.getUserDatabase().updateAccount(this));
+    }
+
     public Document toMongoDB() {
 
         return new Document("userID", this.getUserID())
                 .append("FirstName", this.getFirstName())
                 .append("LastName", this.getLastName())
                 .append("email", this.getEmail())
+                .append("photolink", this.getPhotoLink())
                 .append("LikedVideos", this.likedVideos)
                 .append("WatchedVideos", this.watchedVideos)
                 .append("UploadedVideos", this.uploadedVideos);

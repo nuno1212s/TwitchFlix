@@ -14,7 +14,6 @@ import com.twitchflix.filesystem.FileManager;
 import com.twitchflix.loggers.Logger;
 import com.twitchflix.searchengine.NotSoTerribleSearchEngine;
 import com.twitchflix.searchengine.SearchEngine;
-import com.twitchflix.searchengine.TerribleSearchEngine;
 import com.twitchflix.videohandler.VideoRestHandler;
 import org.eclipse.jetty.http.HttpVersion;
 import org.eclipse.jetty.server.*;
@@ -25,6 +24,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJsonProvider;
+import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
 
@@ -32,12 +32,13 @@ import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 public class App {
 
-    public static String SERVER_IP;
+    public static String SERVER_IP, DATA_FOLDER, USER_PHOTOS;
 
     private static ExecutorService executors;
 
@@ -81,11 +82,13 @@ public class App {
         return fileManager;
     }
 
-
     public static void main(String[] args) throws Exception {
 
         //Initialize the logger
         SERVER_IP = "nuno1212s.ovh";
+        DATA_FOLDER = "/data/";
+
+        USER_PHOTOS = "userphotos";
 
         initFileManager();
         initLoggers();
@@ -148,17 +151,18 @@ public class App {
 
         HandlerList handlers = new HandlerList();
 
-        ServletHolder authentication = ctx.addServlet(ServletContainer.class, "/*");
-        authentication.setInitOrder(1);
+        ServletHolder servlet = ctx.addServlet(ServletContainer.class, "/*");
+        servlet.setInitOrder(1);
 
-        authentication.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES,
+        servlet.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES,
                 String.join(",", Arrays.asList(
                         AuthenticationRestHandler.class.getCanonicalName(),
                         VideoRestHandler.class.getCanonicalName(),
                         OAuth2RestHandler.class.getCanonicalName(),
                         UserDataHandler.class.getCanonicalName(),
                         DebugExceptionMapper.class.getCanonicalName(),
-                        JacksonJsonProvider.class.getCanonicalName()
+                        JacksonJsonProvider.class.getCanonicalName(),
+                        MultiPartFeature.class.getCanonicalName()
                 )));
 
         handlers.setHandlers(new Handler[]{ctx, new DefaultHandler()});

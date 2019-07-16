@@ -9,18 +9,23 @@ import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import com.twitchflix.applicationclient.ClientApp;
+import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
 import com.twitchflix.applicationclient.utils.NetworkUser;
+import com.twitchflix.applicationclient.utils.UserDataLoader;
+import com.twitchflix.applicationclient.utils.VideoDAO;
+import com.twitchflix.applicationclient.utils.VideoDataLoader;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class LandingPageViewModel extends AndroidViewModel {
 
     private MutableLiveData<List<VideoDAO>> videos;
 
     private MutableLiveData<List<VideoDAO>> searchVideos;
+
+    private MutableLiveData<Bitmap> userPhoto;
 
     private String queryString;
 
@@ -29,6 +34,7 @@ public class LandingPageViewModel extends AndroidViewModel {
 
         videos = new MutableLiveData<>();
         searchVideos = new MutableLiveData<>();
+        userPhoto = new MutableLiveData<>();
     }
 
     public void setQueryString(String query) {
@@ -41,6 +47,10 @@ public class LandingPageViewModel extends AndroidViewModel {
         runVideoLoad();
     }
 
+    public void requestLoadUserPhoto() {
+        runPhotoLoad();
+    }
+
     private void runVideoLoad() {
         new VideoLoader(this.getApplication().getApplicationContext(),
                 this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -51,12 +61,22 @@ public class LandingPageViewModel extends AndroidViewModel {
                 this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, this.queryString);
     }
 
+    private void runPhotoLoad() {
+        new PhotoLoader(this.getApplication().getApplicationContext(),
+                this).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+
+    }
+
     private void setLoadedVideos(List<VideoDAO> videos) {
         this.videos.setValue(videos);
     }
 
     private void setSearchVideos(List<VideoDAO> searchVideos) {
         this.searchVideos.setValue(searchVideos);
+    }
+
+    private void setUserPhoto(Bitmap bitmap) {
+        this.userPhoto.setValue(bitmap);
     }
 
     public LiveData<List<VideoDAO>> getSearchQueryVideos() {
@@ -67,8 +87,12 @@ public class LandingPageViewModel extends AndroidViewModel {
         return videos;
     }
 
+    public LiveData<Bitmap> getUserPhoto() {
+        return this.userPhoto;
+    }
+
     private static class VideoLoader extends NetworkUser<Void, Void, List<VideoDAO>>
-            implements VideoThumbnailLoader {
+            implements VideoDataLoader {
 
         private LandingPageViewModel storage;
 
@@ -102,8 +126,35 @@ public class LandingPageViewModel extends AndroidViewModel {
         }
     }
 
+    private static class PhotoLoader extends NetworkUser<UserData, Void, Bitmap>
+            implements UserDataLoader {
+
+        private LandingPageViewModel storage;
+
+        public PhotoLoader(Context context, LandingPageViewModel model) {
+            super(context);
+
+            this.storage = model;
+        }
+
+        @Override
+        protected Bitmap doInBackground(UserData... userDatas) {
+
+            UserData userData = userDatas[0];
+
+            return getUserPhoto(userData);
+        }
+
+        @Override
+        protected void onPostExecute(Bitmap bitmap) {
+            super.onPostExecute(bitmap);
+
+            storage.setUserPhoto(bitmap);
+        }
+    }
+
     private static class SearchQueryLoader extends NetworkUser<String, Void, List<VideoDAO>>
-            implements VideoThumbnailLoader {
+            implements VideoDataLoader {
 
         private LandingPageViewModel storage;
 
@@ -134,52 +185,6 @@ public class LandingPageViewModel extends AndroidViewModel {
             super.onPostExecute(videoDAOS);
 
             storage.setSearchVideos(videoDAOS);
-        }
-    }
-
-    public static class VideoDAO {
-
-        private UUID videoID, uploader;
-
-        private String title, description, uploaderName;
-
-        private Bitmap thumbnail;
-
-        private VideoDAO(UUID videoID, UUID uploader, String title, String description, String uploaderName, Bitmap thumbnail) {
-            this.videoID = videoID;
-            this.uploader = uploader;
-            this.title = title;
-            this.description = description;
-            this.uploaderName = uploaderName;
-            this.thumbnail = thumbnail;
-        }
-
-        public static VideoDAO fromData(UUID videoID, UUID uploader, String title, String description, String uploaderName, Bitmap thumbnail) {
-            return new VideoDAO(videoID, uploader, title, description, uploaderName, thumbnail);
-        }
-
-        public UUID getVideoID() {
-            return videoID;
-        }
-
-        public UUID getUploader() {
-            return uploader;
-        }
-
-        public String getTitle() {
-            return title;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public String getUploaderName() {
-            return uploaderName;
-        }
-
-        public Bitmap getThumbnail() {
-            return thumbnail;
         }
     }
 
