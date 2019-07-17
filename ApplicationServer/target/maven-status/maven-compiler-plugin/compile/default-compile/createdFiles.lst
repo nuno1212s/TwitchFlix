@@ -1,4 +1,3 @@
-com/twitchflix/rest/models/LogoutModel.class
 com/twitchflix/rest/models/VideoStream.class
 com/twitchflix/videohandler/VideoRestHandler.class
 com/twitchflix/databases/mongodb/OperationSubscriber.class
@@ -31,6 +30,7 @@ com/twitchflix/searchengine/NotSoTerribleSearchEngine.class
 com/twitchflix/loggers/Logger.class
 com/twitchflix/authentication/UserData.class
 com/twitchflix/filesystem/FileManager.class
+com/twitchflix/rest/models/EditVideoModel.class
 com/twitchflix/authentication/accounts/ActiveConnection.class
 com/twitchflix/rest/models/AcceptView.class
 com/twitchflix/databases/mongodb/MongoDB.class
@@ -38,5 +38,6 @@ com/twitchflix/authentication/accounts/OwnUser.class
 com/twitchflix/authentication/oauth2/OAuth2RestHandler.class
 com/twitchflix/rest/models/UpdateNameModel.class
 com/twitchflix/rest/models/LoginModel.class
+com/twitchflix/rest/models/DeleteVideoModel.class
 com/twitchflix/authentication/oauth2/OAuth2Handler.class
 com/twitchflix/rest/models/RegisterModel.class

@@ -94,6 +94,8 @@ public class LandingPage extends AppCompatActivity
             @Override
             public boolean onMenuItemActionExpand(MenuItem item) {
 
+                refreshLayout.setRefreshing(true);
+
                 pageViewModel.getSearchQueryVideos().observe(LandingPage.this, (videos) -> {
 
                     searchPageDrawer.draw(videos);
@@ -239,8 +241,6 @@ public class LandingPage extends AppCompatActivity
             refreshLayout.setRefreshing(false);
 
         });
-
-        this.pageViewModel.requestRefresh();
 
     }
 

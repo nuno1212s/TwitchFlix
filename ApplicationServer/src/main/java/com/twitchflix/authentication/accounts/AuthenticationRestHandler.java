@@ -4,10 +4,7 @@ import com.twitchflix.App;
 import com.twitchflix.authentication.User;
 import com.twitchflix.authentication.oauth2.OAuth2Handler;
 import com.twitchflix.authentication.oauth2.OAuthUser;
-import com.twitchflix.rest.models.EmailLoginModel;
-import com.twitchflix.rest.models.LogoutModel;
-import com.twitchflix.rest.models.RefreshConnectionModel;
-import com.twitchflix.rest.models.RegisterModel;
+import com.twitchflix.rest.models.*;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -69,7 +66,7 @@ public class AuthenticationRestHandler {
     @Path("logout")
     @Produces(MediaType.TEXT_PLAIN)
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response logOut(LogoutModel logout) {
+    public Response logOut(LoginModel logout) {
 
         if (App.getAuthenticationHandler().isValid(logout.getUserID(), logout.getAccessToken())) {
 

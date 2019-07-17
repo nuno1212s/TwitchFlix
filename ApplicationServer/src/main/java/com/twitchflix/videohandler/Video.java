@@ -87,6 +87,14 @@ public class Video {
         this.transcoding = transcoding;
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public boolean isTranscoding() {
         return this.transcoding;
     }

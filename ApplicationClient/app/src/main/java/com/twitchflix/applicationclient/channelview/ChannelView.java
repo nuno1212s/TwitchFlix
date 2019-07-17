@@ -3,12 +3,12 @@ package com.twitchflix.applicationclient.channelview;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.twitchflix.applicationclient.R;
@@ -18,7 +18,7 @@ import com.twitchflix.applicationclient.viewmodels.ChannelViewerModel;
 
 import java.util.UUID;
 
-public class ChannelView extends AppCompatActivity {
+public class ChannelView extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
 
     private static final String CHANNEL_OWNER = "CHANNEL_OWNER";
 
@@ -65,7 +65,7 @@ public class ChannelView extends AppCompatActivity {
     }
 
     private void initAndDraw() {
-        SwipeRefreshLayout refreshLayout = findViewById(R.id.channelView);
+        SwipeRefreshLayout refreshLayout = findViewById(R.id.channelMainView);
 
         LinearLayout channelLayout = refreshLayout.findViewById(R.id.channelNameLayout);
 
@@ -95,16 +95,38 @@ public class ChannelView extends AppCompatActivity {
                 channelViewer.requestRefresh()
         );
 
-        channelViewer.requestRefresh();
-
     }
 
     public void backButtonPressed(View view) {
-
-        Intent intent = new Intent(this, LandingPage.class);
-
-        startActivity(intent);
-
-        finish();
+        super.onBackPressed();
     }
+
+    public void showPopup(View view) {
+        PopupMenu popup = new PopupMenu(this, view);
+
+        popup.inflate(R.menu.own_video_actions);
+
+        popup.setOnMenuItemClickListener(this);
+
+        popup.show();
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem item) {
+
+        switch (item.getItemId()) {
+
+            case R.id.delete_video:
+
+                return true;
+
+            case R.id.edit_video:
+
+                return true;
+
+        }
+
+        return false;
+    }
+
 }

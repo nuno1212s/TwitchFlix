@@ -24,5 +24,9 @@ public interface VideoDatabase {
 
     void updateVideo(Video video);
 
+    void editVideo(Video video);
+
+    void deleteVideo(UUID videoID);
+
 
 }

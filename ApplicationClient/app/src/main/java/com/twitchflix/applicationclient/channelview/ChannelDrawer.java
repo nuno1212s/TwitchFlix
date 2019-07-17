@@ -1,11 +1,14 @@
 package com.twitchflix.applicationclient.channelview;
 
 import android.app.Activity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.twitchflix.applicationclient.ClientApp;
+import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
 import com.twitchflix.applicationclient.utils.Drawer;
 import com.twitchflix.applicationclient.utils.daos.VideoDAO;
@@ -27,56 +30,32 @@ public class ChannelDrawer extends Drawer {
 
         for (VideoDAO video : videos) {
 
-            LinearLayout eachVideo = new LinearLayout(getParentActivity());
+            View inflate = LayoutInflater.from(getParentActivity()).inflate(R.layout.channel_video_layout, null);
 
-            eachVideo.setClickable(true);
+            inflate.setOnClickListener(new OnClickVideoListener(getParentActivity(), video.getVideoID()));
 
-            eachVideo.setOnClickListener(new OnClickVideoListener(getParentActivity(), video.getVideoID()));
-
-            eachVideo.setPadding(0, 35, 0, 0);
-
-            eachVideo.setOrientation(LinearLayout.HORIZONTAL);
-
-            ImageView thumbnail = new ImageView(getParentActivity());
-
-            thumbnail.setLayoutParams(new ViewGroup.MarginLayoutParams(320, 240));
+            ImageView thumbnail = inflate.findViewById(R.id.video_thumbnail);
 
             thumbnail.setImageBitmap(video.getThumbnail());
 
-            LinearLayout textAndDesc = new LinearLayout(getParentActivity());
+            View title_desc = inflate.findViewById(R.id.title_desc);
 
-            textAndDesc.setOrientation(LinearLayout.VERTICAL);
+            TextView title = title_desc.findViewById(R.id.title),
+                    description = title_desc.findViewById(R.id.description);
 
-            TextView videoName = new TextView(getParentActivity());
+            View options_button = title_desc.findViewById(R.id.options_button);
 
-            videoName.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 40));
+            if (video.getUploader().getUserID().equals(ClientApp.getIns().getLoginHandler().getCurrentActiveConnection().getOwner())) {
+                options_button.setVisibility(View.VISIBLE);
+            }
 
-            videoName.setText(video.getTitle());
+            title.setText(video.getTitle());
 
-            videoName.setGravity(View.TEXT_ALIGNMENT_CENTER);
+            description.setText(video.getDescription());
 
-            TextView videoDesc = new TextView(getParentActivity());
-
-            videoDesc.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 200));
-
-            videoDesc.setText(video.getDescription());
-
-            textAndDesc.addView(videoName);
-            textAndDesc.addView(videoDesc);
-
-            eachVideo.addView(thumbnail);
-            eachVideo.addView(textAndDesc);
-
-            getParentView().addView(eachVideo);
+            getParentView().addView(inflate);
         }
 
     }
 
-    private void drawInto(ViewGroup group, VideoDAO video) {
-
-        LinearLayout eachVideo = new LinearLayout(getParentActivity());
-
-
-
-    }
 }

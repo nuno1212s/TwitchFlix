@@ -41,4 +41,8 @@
     <string name="new_last_name">New last name</string>
     <string name="update_account_settings">Update Account</string>
     <string name="action_search">Search</string>
+    <string name="video_thumbnail">Video thumbnail</string>
+    <string name="go_back">Return</string>
+    <string name="delete_video">Delete Video</string>
+    <string name="edit_video">Edit video</string>
 </resources>

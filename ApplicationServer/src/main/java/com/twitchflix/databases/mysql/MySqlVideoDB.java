@@ -68,19 +68,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
              PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(VIDEOID) AS VIDEOID, BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
                      "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VALID=TRUE AND TRANSCODING=FALSE")) {
 
-            ResultSet resultSet = s.executeQuery();
-
-            List<Video> totalVideos = new ArrayList<>();
-
-            while (resultSet.next()) {
-
-                totalVideos.add(new VideoBuilder()
-                        .setVideoID(UUID.fromString(resultSet.getString("VIDEOID")))
-                        .fromResultSet(resultSet).createVideo());
-
-            }
-
-            return totalVideos;
+            return readVideosFromQuery(s);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -157,6 +145,39 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
     }
 
+    @Override
+    public void editVideo(Video video) {
+
+        try (Connection c = getConnection();
+            PreparedStatement s = c.prepareStatement("UPDATE VIDEO SET TITLE=?, DESCRIPTION=? WHERE VIDEO_ID=UUID_TO_BIN(?)")) {
+
+            s.setString(1, video.getTitle());
+            s.setString(2, video.getDescription());
+            s.setString(3, video.getVideoID().toString());
+
+            s.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void deleteVideo(UUID videoID) {
+
+        try (Connection c = getConnection();
+            PreparedStatement s = c.prepareStatement("DELETE FROM VIDEOS WHERE VIDEO_ID=UUID_TO_BIN(?)")) {
+
+            s.setString(1, videoID.toString());
+
+            s.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
 
 
     @Override
@@ -167,25 +188,29 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
             s.setString(1, uploader.toString());
 
-            ResultSet resultSet = s.executeQuery();
-
-            List<Video> totalVideos = new ArrayList<>();
-
-            while (resultSet.next()) {
-
-                totalVideos.add(new VideoBuilder()
-                        .setVideoID(UUID.fromString(resultSet.getString("VIDEOID")))
-                        .fromResultSet(resultSet).createVideo());
-
-            }
-
-            return totalVideos;
+            return readVideosFromQuery(s);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return null;
+    }
+
+    private List<Video> readVideosFromQuery(PreparedStatement s) throws SQLException {
+        ResultSet resultSet = s.executeQuery();
+
+        List<Video> totalVideos = new ArrayList<>();
+
+        while (resultSet.next()) {
+
+            totalVideos.add(new VideoBuilder()
+                    .setVideoID(UUID.fromString(resultSet.getString("VIDEOID")))
+                    .fromResultSet(resultSet).createVideo());
+
+        }
+
+        return totalVideos;
     }
 
     private void createTable() {

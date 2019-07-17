@@ -37,6 +37,8 @@ public class LandingPageViewModel extends AndroidViewModel {
         videos = new MutableLiveData<>();
         searchVideos = new MutableLiveData<>();
         userPhoto = new MutableLiveData<>();
+
+        requestRefresh();
     }
 
     public void setQueryString(String query) {

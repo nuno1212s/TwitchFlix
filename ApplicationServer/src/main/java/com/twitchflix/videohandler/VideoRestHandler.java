@@ -2,13 +2,9 @@ package com.twitchflix.videohandler;
 
 import com.twitchflix.App;
 import com.twitchflix.authentication.User;
-import com.twitchflix.authentication.accounts.ActiveConnection;
 import com.twitchflix.rest.models.*;
 import com.twitchflix.searchengine.SearchEngine;
-import com.twitchflix.util.Pair;
-import jdk.nashorn.internal.objects.annotations.Getter;
 
-import javax.annotation.PostConstruct;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -123,8 +119,8 @@ public class VideoRestHandler {
                     .setUploadDate(System.currentTimeMillis())
                     .setLive(false)
                     .setLink("https://" + App.SERVER_IP + "/watch/hls/" + videoID.toString() + ".m3u8")
-                    .setThumbnailLink("https://"  + App.SERVER_IP + "/images/" + videoID.toString() + ".jpg")
-                    .setStreamLink("rtmp://"  + App.SERVER_IP + "/show/" + videoID.toString())
+                    .setThumbnailLink("https://" + App.SERVER_IP + "/images/" + videoID.toString() + ".jpg")
+                    .setStreamLink("rtmp://" + App.SERVER_IP + "/show/" + videoID.toString())
                     .createVideoStream();
 
             App.getAsync().submit(() -> App.getVideoDatabase().registerVideoStream(video));
@@ -214,6 +210,47 @@ public class VideoRestHandler {
         }
 
         return Response.ok().entity(byUploader).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("editVideo")
+    public Response editVideo(EditVideoModel editVideo) {
+
+        if (App.getAuthenticationHandler().isValid(editVideo.getUserID(), editVideo.getAccessToken())) {
+
+            Video videoByID = App.getVideoDatabase().getVideoByID(editVideo.getVideoID());
+
+            if (videoByID == null) {
+                return Response.status(Response.Status.NOT_FOUND).build();
+            }
+
+            videoByID.setTitle(editVideo.getTitle());
+
+            videoByID.setDescription(editVideo.getDescription());
+
+            App.getAsync().submit(() ->
+                    App.getVideoDatabase().editVideo(videoByID));
+
+            return Response.ok().build();
+        }
+
+        return Response.status(Response.Status.FORBIDDEN).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("deleteVideo")
+    public Response deleteVideo(DeleteVideoModel deleteVideo) {
+
+        if (App.getAuthenticationHandler().isValid(deleteVideo.getUserID(), deleteVideo.getAccessToken())) {
+
+            App.getVideoDatabase().deleteVideo(deleteVideo.getVideoID());
+
+            return Response.ok().build();
+        }
+
+        return Response.status(Response.Status.FORBIDDEN).build();
     }
 
     private List<UserVideo> instantiateVideos(List<Video> videos, User user) {

@@ -1,11 +1,16 @@
 package com.twitchflix.applicationclient.landingpage.drawers;
 
 import android.app.Activity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.twitchflix.applicationclient.R;
+import com.twitchflix.applicationclient.customview.RoundedView;
+import com.twitchflix.applicationclient.landingpage.OnClickChannelListener;
+import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
 import com.twitchflix.applicationclient.utils.Drawer;
 import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
@@ -32,59 +37,37 @@ public class SearchPageDrawer extends Drawer {
 
     public View draw(VideoDAO video) {
 
-        LinearLayout videoLayout = new LinearLayout(getParentActivity());
+        View inflate = LayoutInflater.from(getParentActivity()).inflate(R.layout.search_video_layout, null);
 
-        videoLayout.setOrientation(LinearLayout.HORIZONTAL);
+        ImageView thumbnail = inflate.findViewById(R.id.videoThumbnail);
 
-        videoLayout.setClickable(true);
+        thumbnail.setImageBitmap(video.getThumbnail());
 
-        ViewGroup.MarginLayoutParams margin = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 240);
+        OnClickVideoListener onClickVideo = new OnClickVideoListener(getParentActivity(), video.getVideoID());
 
-        margin.setMargins(0, 35, 0, 0);
+        thumbnail.setOnClickListener(onClickVideo);
 
-        videoLayout.setLayoutParams(margin);
+        View information = inflate.findViewById(R.id.videoInformation);
 
-        ImageView view = new ImageView(getParentActivity());
-
-        view.setLayoutParams(new ViewGroup.LayoutParams(320, 240));
-
-        view.setImageBitmap(video.getThumbnail());
-
-        LinearLayout verticalLayout = new LinearLayout(getParentActivity());
-
-        verticalLayout.setOrientation(LinearLayout.VERTICAL);
-
-        TextView title = new TextView(getParentActivity());
-
-        ViewGroup.MarginLayoutParams titleLayout = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 200);
-
-        titleLayout.setMargins(10, 0, 0, 5);
+        TextView title = information.findViewById(R.id.title);
 
         title.setText(video.getTitle());
 
-        title.setTextSize(32);
+        title.setOnClickListener(onClickVideo);
 
-        title.setLayoutParams(titleLayout);
+        View channelInformation = information.findViewById(R.id.channelInformation);
 
-        TextView channelTitle = new TextView(getParentActivity());
+        channelInformation.setOnClickListener(new OnClickChannelListener(getParentActivity(), video.getUploader().getUserID()));
 
-        ViewGroup.MarginLayoutParams channelNameLayout = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 20);
+        RoundedView channelThumbnail = channelInformation.findViewById(R.id.channelThumbnail);
 
-        channelNameLayout.setMargins(10, 5, 0, 0);
+        channelThumbnail.setImageBitmap(video.getChannelThumbnail());
 
-        channelTitle.setLayoutParams(channelNameLayout);
+        TextView channelName = channelInformation.findViewById(R.id.channelName);
 
-        channelTitle.setText(video.getUploaderName());
+        channelName.setText(video.getUploaderName());
 
-        channelTitle.setTextSize(12);
-
-        verticalLayout.addView(title);
-        verticalLayout.addView(channelTitle);
-
-        videoLayout.addView(view);
-        videoLayout.addView(verticalLayout);
-
-        return videoLayout;
+        return inflate;
     }
 
 }
