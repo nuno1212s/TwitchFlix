@@ -1,6 +1,7 @@
 package com.twitchflix.applicationclient.servercomunication;
 
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
+import com.twitchflix.applicationclient.rest.models.EditVideo;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
 import com.twitchflix.applicationclient.rest.models.Video;
 import com.twitchflix.applicationclient.rest.models.VideoStream;
@@ -19,6 +20,10 @@ public interface ServerRequests {
     Video getVideoByID(UUID videoID);
 
     void addView(UUID videoID, ActiveConnection connection);
+
+    void deleteVideo(UUID videoID, ActiveConnection connection);
+
+    void editVideo(EditVideo video);
 
     VideoStream requestVideoStream(String title, String description, ActiveConnection connection);
 

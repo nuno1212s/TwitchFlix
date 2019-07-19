@@ -149,7 +149,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public void editVideo(Video video) {
 
         try (Connection c = getConnection();
-            PreparedStatement s = c.prepareStatement("UPDATE VIDEO SET TITLE=?, DESCRIPTION=? WHERE VIDEO_ID=UUID_TO_BIN(?)")) {
+            PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET TITLE=?, DESCRIPTION=? WHERE VIDEOID=UUID_TO_BIN(?)")) {
 
             s.setString(1, video.getTitle());
             s.setString(2, video.getDescription());
@@ -167,7 +167,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public void deleteVideo(UUID videoID) {
 
         try (Connection c = getConnection();
-            PreparedStatement s = c.prepareStatement("DELETE FROM VIDEOS WHERE VIDEO_ID=UUID_TO_BIN(?)")) {
+            PreparedStatement s = c.prepareStatement("DELETE FROM VIDEOS WHERE VIDEOID=UUID_TO_BIN(?)")) {
 
             s.setString(1, videoID.toString());
 

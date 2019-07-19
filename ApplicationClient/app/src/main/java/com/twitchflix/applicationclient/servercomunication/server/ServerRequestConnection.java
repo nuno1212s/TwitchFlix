@@ -3,6 +3,7 @@ package com.twitchflix.applicationclient.servercomunication.server;
 import com.google.gson.reflect.TypeToken;
 import com.twitchflix.applicationclient.ServerConnection;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
+import com.twitchflix.applicationclient.rest.models.EditVideo;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
 import com.twitchflix.applicationclient.rest.models.Video;
 import com.twitchflix.applicationclient.rest.models.VideoStream;
@@ -90,6 +91,50 @@ public class ServerRequestConnection implements ServerRequests {
         Request request = new Request.Builder()
                 .url(ServerConnection.getServerIp() + "videos/view")
                 .post(RequestBody.create(JSON, jsonObject.toString()))
+                .build();
+
+        try {
+            ServerConnection.getIns().getClient().newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void deleteVideo(UUID videoID, ActiveConnection connection) {
+
+        JSONObject jsonObject = connection.toJSONObject();
+
+        try {
+
+            jsonObject.put("videoID", videoID);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Request request = new Request.Builder()
+                .url(ServerConnection.getServerIp() + "videos/deleteVideo")
+                .post(RequestBody.create(JSON, jsonObject.toString()))
+                .build();
+
+        try {
+            ServerConnection.getIns().getClient().newCall(request).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void editVideo(EditVideo video) {
+
+        String json = ServerConnection.getIns().getGson().toJson(video);
+
+        Request request = new Request.Builder()
+                .url(ServerConnection.getServerIp() + "videos/editVideo")
+                .post(RequestBody.create(JSON, json))
                 .build();
 
         try {

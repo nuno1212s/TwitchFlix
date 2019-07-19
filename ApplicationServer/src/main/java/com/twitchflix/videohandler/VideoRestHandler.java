@@ -8,6 +8,8 @@ import com.twitchflix.searchengine.SearchEngine;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -245,7 +247,28 @@ public class VideoRestHandler {
 
         if (App.getAuthenticationHandler().isValid(deleteVideo.getUserID(), deleteVideo.getAccessToken())) {
 
-            App.getVideoDatabase().deleteVideo(deleteVideo.getVideoID());
+            App.getAsync().submit(() -> {
+                App.getVideoDatabase().deleteVideo(deleteVideo.getVideoID());
+
+                String dataFolder = App.DATA_FOLDER + App.VIDEO_FOLDER + File.separator,
+                        videoThumbnailsPath = App.DATA_FOLDER + App.VIDEO_THUMBNAIL + File.separator;
+
+                File videoFolder = new File(dataFolder),
+                        videoThumbnails = new File(videoThumbnailsPath);
+
+                File[] files = videoFolder.listFiles((file, s) -> s.startsWith(deleteVideo.getVideoID().toString()));
+
+                for (File file : files) {
+                    file.delete();
+                }
+
+                files = videoThumbnails.listFiles((file, name) -> name.startsWith(deleteVideo.getVideoID().toString()));
+
+                for (File file : files) {
+                    file.delete();
+                }
+
+            });
 
             return Response.ok().build();
         }

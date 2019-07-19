@@ -21,10 +21,12 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
             tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".activities.Stream"
-                  android:screenOrientation="portrait">
+        <activity android:name=".activities.EditVideoActivity">
         </activity>
-        <activity android:name=".searchvideos.SearchActivity"/>
+        <activity
+                android:name=".activities.Stream"
+                android:screenOrientation="portrait">
+        </activity>
         <activity
                 android:name=".activities.AccountSettings"
                 android:label="@string/title_activity_account_settings"

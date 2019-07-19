@@ -45,4 +45,12 @@
     <string name="go_back">Return</string>
     <string name="delete_video">Delete Video</string>
     <string name="edit_video">Edit video</string>
+    <string name="delete_video_certain">Video Deletion</string>
+    <string name="delete_video_certain_body">Are you sure you want to delete this video?</string>
+    <string name="delete_video_yes">Delete video</string>
+    <string name="delete_video_no">Cancel</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="finish_video_editing">Edit Video</string>
 </resources>

@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
@@ -47,6 +46,7 @@ public class ChannelDrawer extends Drawer {
 
             if (video.getUploader().getUserID().equals(ClientApp.getIns().getLoginHandler().getCurrentActiveConnection().getOwner())) {
                 options_button.setVisibility(View.VISIBLE);
+                options_button.setTag(R.id.options_menu_target_video, video.getVideoID());
             }
 
             title.setText(video.getTitle());

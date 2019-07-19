@@ -3,6 +3,7 @@ package com.twitchflix.applicationclient.utils.loaders;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import com.twitchflix.applicationclient.rest.models.UserVideo;
+import com.twitchflix.applicationclient.rest.models.Video;
 import com.twitchflix.applicationclient.utils.daos.UserDAO;
 import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
@@ -17,7 +18,7 @@ public interface VideoDataLoader extends UserDataLoader {
 
     Map<UUID, Bitmap> videoThumnails = new HashMap<>();
 
-    default Bitmap getVideoThumbnail(UserVideo video) {
+    default Bitmap getVideoThumbnail(Video video) {
 
         if (videoThumnails.containsKey(video.getVideoID())) {
             return videoThumnails.get(video.getVideoID());
@@ -36,7 +37,7 @@ public interface VideoDataLoader extends UserDataLoader {
         return null;
     }
 
-    default VideoDAO createVideoDAO(UserVideo video) {
+    default VideoDAO createVideoDAO(Video video) {
 
         UserDAO userData = getUserData(video.getUploader());
 

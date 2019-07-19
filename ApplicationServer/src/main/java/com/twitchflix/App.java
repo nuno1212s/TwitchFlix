@@ -38,7 +38,7 @@ import java.util.logging.Level;
 
 public class App {
 
-    public static String SERVER_IP, DATA_FOLDER, USER_PHOTOS;
+    public static String SERVER_IP, DATA_FOLDER, USER_PHOTOS, VIDEO_FOLDER, VIDEO_THUMBNAIL;
 
     private static ExecutorService executors;
 
@@ -89,6 +89,8 @@ public class App {
         DATA_FOLDER = "/data/";
 
         USER_PHOTOS = "userphotos";
+        VIDEO_FOLDER = "recordings";
+        VIDEO_THUMBNAIL = "images";
 
         initFileManager();
         initLoggers();

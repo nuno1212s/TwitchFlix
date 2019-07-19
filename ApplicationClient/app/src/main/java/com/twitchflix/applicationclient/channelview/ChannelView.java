@@ -3,22 +3,23 @@ package com.twitchflix.applicationclient.channelview;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.*;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
-import com.twitchflix.applicationclient.landingpage.LandingPage;
+import com.twitchflix.applicationclient.activities.EditVideoActivity;
 import com.twitchflix.applicationclient.utils.Drawer;
+import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 import com.twitchflix.applicationclient.viewmodels.ChannelViewerModel;
 
+import java.util.List;
 import java.util.UUID;
 
-public class ChannelView extends AppCompatActivity implements PopupMenu.OnMenuItemClickListener {
+public class ChannelView extends AppCompatActivity {
 
     private static final String CHANNEL_OWNER = "CHANNEL_OWNER";
 
@@ -102,31 +103,43 @@ public class ChannelView extends AppCompatActivity implements PopupMenu.OnMenuIt
     }
 
     public void showPopup(View view) {
+
         PopupMenu popup = new PopupMenu(this, view);
 
         popup.inflate(R.menu.own_video_actions);
 
-        popup.setOnMenuItemClickListener(this);
+        UUID videoID = (UUID) view.getTag(R.id.options_menu_target_video);
+
+        popup.setOnMenuItemClickListener((item) -> {
+            switch (item.getItemId()) {
+
+                case R.id.delete_video:
+
+                    new AlertDialog.Builder(this)
+                            .setTitle(R.string.delete_video_certain)
+                            .setMessage(R.string.delete_video_certain_body)
+                            .setIcon(R.drawable.ic_dialog_alert)
+                            .setPositiveButton(R.string.delete_video_yes, (dialog, which) -> {
+                                channelViewer.deleteVideo(videoID);
+                            })
+                            .setNegativeButton(R.string.delete_video_no, null)
+                            .show();
+
+                    return true;
+
+                case R.id.edit_video:
+
+                    EditVideoActivity.startActivity(this, videoID);
+
+                    return true;
+
+            }
+
+            return false;
+
+        });
 
         popup.show();
-    }
-
-    @Override
-    public boolean onMenuItemClick(MenuItem item) {
-
-        switch (item.getItemId()) {
-
-            case R.id.delete_video:
-
-                return true;
-
-            case R.id.edit_video:
-
-                return true;
-
-        }
-
-        return false;
     }
 
 }
