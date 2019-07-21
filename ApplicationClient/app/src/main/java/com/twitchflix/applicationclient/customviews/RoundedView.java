@@ -1,4 +1,4 @@
-package com.twitchflix.applicationclient.customview;
+package com.twitchflix.applicationclient.customviews;
 
 import android.content.Context;
 import android.graphics.*;

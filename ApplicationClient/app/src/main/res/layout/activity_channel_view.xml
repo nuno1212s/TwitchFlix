@@ -29,12 +29,12 @@
                       android:gravity="center_horizontal" app:layout_constraintTop_toTopOf="parent"
                       app:layout_constraintStart_toStartOf="parent">
 
-            <com.twitchflix.applicationclient.customview.RoundedView android:id="@+id/channel_thumbnail"
-                                                                     android:layout_width="128dp"
-                                                                     android:layout_height="128dp"
-                                                                     android:scaleType="centerInside"
-                                                                     android:layout_marginTop="20dp"
-                                                                     android:src="@mipmap/ic_launcher_round"
+            <com.twitchflix.applicationclient.customviews.RoundedView android:id="@+id/channel_thumbnail"
+                                                                      android:layout_width="128dp"
+                                                                      android:layout_height="128dp"
+                                                                      android:scaleType="centerInside"
+                                                                      android:layout_marginTop="20dp"
+                                                                      android:src="@mipmap/ic_launcher_round"
             />
 
             <TextView android:id="@+id/channelName"

@@ -7,7 +7,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import com.twitchflix.applicationclient.customview.RoundedView;
+import com.twitchflix.applicationclient.customviews.RoundedView;
 import com.twitchflix.applicationclient.landingpage.OnClickChannelListener;
 import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
 import com.twitchflix.applicationclient.utils.Drawer;

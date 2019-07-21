@@ -12,12 +12,13 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public interface UserDataLoader {
 
-    Map<UUID, UserDAO> userData = new HashMap<>();
+    Map<UUID, UserDAO> userData = new ConcurrentHashMap<>();
 
-    Map<UUID, Bitmap> userPhotos = new HashMap<>();
+    Map<UUID, Bitmap> userPhotos = new ConcurrentHashMap<>();
 
     default UserDAO getUserData(UUID userID) {
         if (userData.containsKey(userID)) {
@@ -31,6 +32,27 @@ public interface UserDataLoader {
         UserDataLoader.userData.put(userID, userDAO);
 
         return userDAO;
+    }
+
+    default UserDAO getUserData(UserData user) {
+        if (userData.containsKey(user.getUuid())) {
+            return userData.get(user.getUuid());
+        }
+
+        UserDAO userDAO = UserDAO.fromData(user.getUuid(), user.getFirstName(), user.getLastName(), user.getEmail(), getUserPhoto(user));
+
+        UserDataLoader.userData.put(user.getUuid(), userDAO);
+
+        return userDAO;
+    }
+
+    default void updateUserData(UUID userId, Bitmap newData) {
+        userPhotos.put(userId, newData);
+
+        UserDAO userDAO = userData.get(userId);
+
+        if (userDAO != null)
+            userDAO.setChannelThumbnail(newData);
     }
 
     default String getUsername(UUID userID) {

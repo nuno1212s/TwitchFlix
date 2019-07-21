@@ -13,7 +13,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
+    <com.twitchflix.applicationclient.customviews.RoundedView
         android:id="@+id/userPhoto"
         android:layout_width="95dp"
         android:layout_height="95dp"

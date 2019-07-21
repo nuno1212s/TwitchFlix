@@ -20,6 +20,7 @@ import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.MainActivity;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.activities.AccountSettings;
+import com.twitchflix.applicationclient.activities.ChoosePictureActivity;
 import com.twitchflix.applicationclient.activities.Stream;
 import com.twitchflix.applicationclient.channelview.ChannelView;
 import com.twitchflix.applicationclient.utils.Drawer;
@@ -167,6 +168,12 @@ public class LandingPage extends AppCompatActivity
         } else if (id == R.id.start_stream) {
 
             Intent intent = new Intent(this, Stream.class);
+
+            startActivity(intent);
+
+        } else if (id == R.id.choosePhoto) {
+
+            Intent intent = new Intent(this, ChoosePictureActivity.class);
 
             startActivity(intent);
 

@@ -124,7 +124,7 @@ public class UserDataHandler {
     /**
      * Update the last name or the first name
      *
-     * @param model The necessary data to update the users name
+     * @param model     The necessary data to update the users name
      * @param firstName Whether it's the first name or the last
      * @return The response to the request
      */
@@ -171,9 +171,10 @@ public class UserDataHandler {
 
             int length;
 
-            while ((length = photoStream.read(buffer, 0, 1024)) != 0) {
+            while ((length = photoStream.read(buffer)) > 0) {
 
                 outputStream.write(buffer, 0, length);
+                outputStream.flush();
 
             }
 

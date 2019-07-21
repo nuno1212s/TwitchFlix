@@ -38,7 +38,7 @@
                                                            android:layout_height="60dp"
         >
 
-            <com.twitchflix.applicationclient.customview.RoundedView
+            <com.twitchflix.applicationclient.customviews.RoundedView
                     android:id="@+id/channelThumbnail"
                     android:layout_width="44dp"
                     android:layout_height="44dp"

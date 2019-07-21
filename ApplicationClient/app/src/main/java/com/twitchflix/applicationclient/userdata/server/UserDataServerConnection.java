@@ -1,22 +1,22 @@
 package com.twitchflix.applicationclient.userdata.server;
 
+import android.graphics.Bitmap;
 import com.twitchflix.applicationclient.ServerConnection;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.rest.models.UserData;
 import com.twitchflix.applicationclient.userdata.UserDataRequests;
-import okhttp3.MediaType;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import okhttp3.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.UUID;
 
 public class UserDataServerConnection implements UserDataRequests {
 
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8"),
+            PNG = MediaType.parse("image/png");
 
     @Override
     public UserData requestUserData(UUID userID) {
@@ -95,6 +95,34 @@ public class UserDataServerConnection implements UserDataRequests {
         Request request = new Request.Builder()
                 .url(ServerConnection.getServerIp() + "userdata/updateLastName")
                 .post(RequestBody.create(JSON, jsonObject.toString()))
+                .build();
+
+        try (Response r = ServerConnection.getIns().getClient().newCall(request).execute()) {
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void updateUserPhoto(ActiveConnection connection, Bitmap newUserPhoto) {
+
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+        newUserPhoto.compress(Bitmap.CompressFormat.PNG, 100, output);
+
+        RequestBody body = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+                .addPart(Headers.of("Content-Disposition", "form-data; name=\"image\""),
+                        RequestBody.create(PNG, output.toByteArray()))
+                .addPart(Headers.of("Content-Disposition", "form-data; name=\"user\""),
+                        RequestBody.create(JSON, connection.toJSONObject().toString()))
+                .build();
+
+        Request request = new Request.Builder()
+                .url(ServerConnection.getServerIp() + "userdata/uploadPhoto")
+                .post(body)
                 .build();
 
         try (Response r = ServerConnection.getIns().getClient().newCall(request).execute()) {

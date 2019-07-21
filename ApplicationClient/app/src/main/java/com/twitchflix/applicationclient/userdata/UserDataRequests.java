@@ -1,5 +1,6 @@
 package com.twitchflix.applicationclient.userdata;
 
+import android.graphics.Bitmap;
 import com.twitchflix.applicationclient.authentication.ActiveConnection;
 import com.twitchflix.applicationclient.rest.models.UserData;
 
@@ -16,5 +17,7 @@ public interface UserDataRequests {
     void updateFirstName(ActiveConnection connection, String firstName);
 
     void updateLastName(ActiveConnection connection, String lastName);
+
+    void updateUserPhoto(ActiveConnection connection, Bitmap newUserPhoto);
 
 }

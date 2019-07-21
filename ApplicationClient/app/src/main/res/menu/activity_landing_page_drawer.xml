@@ -17,6 +17,11 @@
     <item android:title="@string/title_nav_bar_2">
         <menu>
             <item
+                    android:id="@+id/choosePhoto"
+                    android:icon="@drawable/ic_menu_camera"
+                    android:title="@string/upload_new_photo"
+            />
+            <item
                 android:id="@+id/account_settings"
                 android:icon="@drawable/ic_menu_manage"
                 android:title="@string/account_settings"/>

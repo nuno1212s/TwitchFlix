@@ -42,6 +42,10 @@ public class UserDAO {
         return channelThumbnail;
     }
 
+    public void setChannelThumbnail(Bitmap bitmap) {
+        this.channelThumbnail = bitmap;
+    }
+
     public static UserDAO fromData(UUID userID, String firstName, String lastName, String email, Bitmap channelThumbnail) {
         return new UserDAO(userID, firstName, lastName, email, channelThumbnail);
     }
