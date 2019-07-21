@@ -5,7 +5,8 @@
               android:layout_height="130dp"
               android:clickable="true"
               android:focusable="true"
-              android:padding="5dp">
+              android:paddingTop="5dp"
+              android:paddingStart="5dp">
 
     <ImageView
             android:id="@+id/videoThumbnail"

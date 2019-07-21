@@ -5,21 +5,23 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginTop="7dp">
+>
 
     <LinearLayout
             android:id="@+id/channelInformation"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_marginTop="14dp"
+            android:layout_marginStart="14dp"
             android:paddingBottom="5dp"
             android:clickable="true"
             android:focusable="true">
 
         <com.twitchflix.applicationclient.customviews.RoundedView
                 android:contentDescription="@string/video_thumbnail"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
                 android:padding="5dp"
                 android:scaleType="centerInside"
                 tools:srcCompat="@color/colorPrimaryDark"
