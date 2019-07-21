@@ -2,8 +2,10 @@ package com.twitchflix.applicationclient.viewmodels;
 
 import android.app.Application;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Pair;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.AndroidViewModel;
@@ -21,7 +23,9 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
 import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.rest.models.Video;
+import com.twitchflix.applicationclient.utils.daos.UserDAO;
 import com.twitchflix.applicationclient.utils.loaders.NetworkUser;
+import com.twitchflix.applicationclient.utils.loaders.VideoDataLoader;
 
 import java.util.UUID;
 
@@ -37,12 +41,17 @@ public class WatchVideoViewModel extends AndroidViewModel {
 
     private MutableLiveData<Video> videoToPlay;
 
+    private MutableLiveData<Bitmap> channelThumbnail;
+
+    private MutableLiveData<String> channelName;
+
     public WatchVideoViewModel(@NonNull Application application) {
         super(application);
 
         exoPlayer = new MutableLiveData<>();
         videoToPlay = new MutableLiveData<>();
-
+        channelThumbnail = new MutableLiveData<>();
+        channelName = new MutableLiveData<>();
     }
 
     @Override
@@ -71,10 +80,14 @@ public class WatchVideoViewModel extends AndroidViewModel {
 
 
     private void setVideo(Video toPlay) {
-
         this.videoToPlay.setValue(toPlay);
 
         initializePlayer();
+    }
+
+    private void setVideoUploader(UserDAO uploader) {
+        this.channelThumbnail.setValue(uploader.getChannelThumbnail());
+        this.channelName.setValue(uploader.getFullName());
     }
 
     private void initializePlayer() {
@@ -198,28 +211,42 @@ public class WatchVideoViewModel extends AndroidViewModel {
         return this.exoPlayer;
     }
 
-    private static class LoadVideo extends NetworkUser<UUID, Void, Video> {
+    public LiveData<String> getChannelName() {
+        return this.channelName;
+    }
 
-        private WatchVideoViewModel video;
+    public LiveData<Bitmap> getChannelThumbnail() {
+        return this.channelThumbnail;
+    }
+
+    private static class LoadVideo extends NetworkUser<UUID, Void, Pair<Video, UserDAO>>
+            implements VideoDataLoader {
+
+        private WatchVideoViewModel videoModel;
 
         public LoadVideo(Context context, WatchVideoViewModel video) {
             super(context);
 
-            this.video = video;
+            this.videoModel = video;
         }
 
         @Override
-        protected Video doInBackground(UUID... uuids) {
+        protected Pair<Video, UserDAO> doInBackground(UUID... uuids) {
 
             ClientApp.getIns().getServerRequests().addView(uuids[0],
                     ClientApp.getIns().getLoginHandler().getCurrentActiveConnection());
 
-            return ClientApp.getIns().getServerRequests().getVideoByID(uuids[0]);
+            Video video = ClientApp.getIns().getServerRequests().getVideoByID(uuids[0]);
+
+            UserDAO userData = getUserData(video.getUploader());
+
+            return new Pair<>(video, userData);
         }
 
         @Override
-        protected void onPostExecute(Video video) {
-            this.video.setVideo(video);
+        protected void onPostExecute(Pair<Video, UserDAO> video) {
+            this.videoModel.setVideo(video.first);
+            this.videoModel.setVideoUploader(video.second);
         }
     }
 

@@ -3,6 +3,8 @@ package com.twitchflix.applicationclient.activities;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
@@ -27,7 +29,9 @@ public class WatchVideo extends AppCompatActivity {
 
     private PlayerView playerView;
 
-    private TextView videoTitle, videoDescription;
+    private TextView videoTitle, videoDescription, channelName;
+
+    private ImageView channelThumbnail;
 
     private WatchVideoViewModel viewModel;
 
@@ -42,6 +46,11 @@ public class WatchVideo extends AppCompatActivity {
         videoTitle = findViewById(R.id.video_title);
         videoDescription = findViewById(R.id.video_description);
 
+        View channelInformation = findViewById(R.id.channelInformation);
+
+        channelName = channelInformation.findViewById(R.id.channelTitle);
+        channelThumbnail = channelInformation.findViewById(R.id.channelThumbnail);
+
         viewModel = ViewModelProviders.of(this).get(WatchVideoViewModel.class);
 
         viewModel.getPlayer().observe(this, (player) -> {
@@ -51,6 +60,14 @@ public class WatchVideo extends AppCompatActivity {
         viewModel.getVideo().observe(this, (video) -> {
             videoTitle.setText(video.getTitle());
             videoDescription.setText(video.getDescription());
+        });
+
+        viewModel.getChannelName().observe(this, (channelName) -> {
+            this.channelName.setText(channelName);
+        });
+
+        viewModel.getChannelThumbnail().observe(this, (channelThumbnail) -> {
+            this.channelThumbnail.setImageBitmap(channelThumbnail);
         });
 
         if (extras != null) {

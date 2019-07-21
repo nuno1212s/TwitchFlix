@@ -92,6 +92,8 @@ public class LandingPageDrawer extends Drawer {
 
         videoTitle.setText(toDraw.getTitle());
 
+        videoLayout.setOnClickListener(new OnClickVideoListener(getParentActivity(), toDraw.getVideoID()));
+
         parent.addView(videoLayout);
     }
 }
