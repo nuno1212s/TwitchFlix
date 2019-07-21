@@ -43,7 +43,7 @@ public class LandingPage extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_landing_page);
+        setContentView(R.layout.landingpage_main_layout);
 
         this.pageViewModel = ViewModelProviders.of(this).get(LandingPageViewModel.class);
 

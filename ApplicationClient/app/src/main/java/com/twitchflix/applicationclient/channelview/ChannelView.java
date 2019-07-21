@@ -9,14 +9,11 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import com.twitchflix.applicationclient.ClientApp;
 import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.activities.EditVideoActivity;
 import com.twitchflix.applicationclient.utils.Drawer;
-import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 import com.twitchflix.applicationclient.viewmodels.ChannelViewerModel;
 
-import java.util.List;
 import java.util.UUID;
 
 public class ChannelView extends AppCompatActivity {
@@ -44,7 +41,7 @@ public class ChannelView extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_channel_view);
+        setContentView(R.layout.channelview_page_layout);
 
         channelViewer = ViewModelProviders.of(this).get(ChannelViewerModel.class);
 

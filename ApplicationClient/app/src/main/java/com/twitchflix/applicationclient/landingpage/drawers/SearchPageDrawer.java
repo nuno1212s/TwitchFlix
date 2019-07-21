@@ -36,7 +36,7 @@ public class SearchPageDrawer extends Drawer {
 
     public View draw(VideoDAO video) {
 
-        View inflate = LayoutInflater.from(getParentActivity()).inflate(R.layout.search_video_layout, null);
+        View inflate = LayoutInflater.from(getParentActivity()).inflate(R.layout.landingpage_search_video, null);
 
         ImageView thumbnail = inflate.findViewById(R.id.videoThumbnail);
 

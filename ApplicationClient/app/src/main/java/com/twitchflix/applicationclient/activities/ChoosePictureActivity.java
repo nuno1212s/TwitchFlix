@@ -2,6 +2,7 @@ package com.twitchflix.applicationclient.activities;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Parcelable;
@@ -9,6 +10,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -76,6 +78,22 @@ public class ChoosePictureActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
+
+            if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
+
+                Toast.makeText(this, R.string.permission_not_granted, Toast.LENGTH_LONG).show();
+
+            }
+
+        }
+
+    }
+
     public void choosePhoto(View view) {
         Intent choosePhoto = new Intent(Intent.ACTION_GET_CONTENT);
 
@@ -85,6 +103,13 @@ public class ChoosePictureActivity extends AppCompatActivity {
     }
 
     public void takePhoto(View view) {
+
+        if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+
+            requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CODE_ASK_PERMISSIONS);
+
+            return;
+        }
 
         Intent takePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 

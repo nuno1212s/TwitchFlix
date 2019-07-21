@@ -9,7 +9,7 @@
     tools:openDrawer="start">
 
     <include
-        layout="@layout/app_bar_landing_page"
+        layout="@layout/landingpage_app_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
@@ -19,7 +19,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/nav_header_landing_page"
+        app:headerLayout="@layout/landingpage_nav_header"
         app:menu="@menu/activity_landing_page_drawer" />
 
 

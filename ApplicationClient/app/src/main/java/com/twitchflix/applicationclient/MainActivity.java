@@ -24,7 +24,6 @@ public class MainActivity extends AppCompatActivity {
                     signedInAccount.getIdToken());
 
             return;
-
         }
 
         if (!ClientApp.getIns().getInformationStorage().isUserLoggedIn()) {

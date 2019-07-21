@@ -27,9 +27,11 @@ public class ChannelDrawer extends Drawer {
 
         getParentView().removeAllViews();
 
+        LayoutInflater inflater = LayoutInflater.from(getParentActivity());
+
         for (VideoDAO video : videos) {
 
-            View inflate = LayoutInflater.from(getParentActivity()).inflate(R.layout.channel_video_layout, null);
+            View inflate = inflater.inflate(R.layout.channelview_video_layout, null);
 
             inflate.setOnClickListener(new OnClickVideoListener(getParentActivity(), video.getVideoID()));
 

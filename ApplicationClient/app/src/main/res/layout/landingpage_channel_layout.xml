@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/channel"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="7dp">
+
+    <LinearLayout
+            android:id="@+id/channelInformation"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingBottom="5dp"
+            android:clickable="true"
+            android:focusable="true">
+
+        <com.twitchflix.applicationclient.customviews.RoundedView
+                android:contentDescription="@string/video_thumbnail"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:padding="5dp"
+                android:scaleType="centerInside"
+                tools:srcCompat="@color/colorPrimaryDark"
+                android:id="@+id/channelThumbnail"/>
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/channelTitle"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-black"
+                android:layout_weight="0"/>
+
+    </LinearLayout>
+
+    <HorizontalScrollView
+            android:id="@+id/channelVideosScroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+        <LinearLayout
+                android:id="@+id/channelVideos"
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+</LinearLayout>

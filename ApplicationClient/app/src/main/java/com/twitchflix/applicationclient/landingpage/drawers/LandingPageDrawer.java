@@ -2,23 +2,31 @@ package com.twitchflix.applicationclient.landingpage.drawers;
 
 import android.app.Activity;
 import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import com.twitchflix.applicationclient.R;
 import com.twitchflix.applicationclient.customviews.RoundedView;
 import com.twitchflix.applicationclient.landingpage.OnClickChannelListener;
 import com.twitchflix.applicationclient.landingpage.OnClickVideoListener;
 import com.twitchflix.applicationclient.utils.Drawer;
+import com.twitchflix.applicationclient.utils.daos.UserDAO;
 import com.twitchflix.applicationclient.utils.daos.VideoDAO;
 
 import java.util.*;
 
 public class LandingPageDrawer extends Drawer {
 
+    private LayoutInflater inflater;
+
     public LandingPageDrawer(Activity parent, ViewGroup parentView) {
         super(parent, parentView);
+
+        inflater = LayoutInflater.from(getParentActivity());
     }
 
     @Override
@@ -40,119 +48,50 @@ public class LandingPageDrawer extends Drawer {
             groupedVideos.put(video.getUploader().getUserID(), videoDAOS);
         }
 
+
         for (Map.Entry<UUID, List<VideoDAO>> channels : groupedVideos.entrySet()) {
 
-            LinearLayout channelNameLayout = new LinearLayout(getParentActivity());
+            View channelLayout = inflater.inflate(R.layout.landingpage_channel_layout, null);
 
-            channelNameLayout.setOrientation(LinearLayout.HORIZONTAL);
+            View channelInfo = channelLayout.findViewById(R.id.channelInformation);
 
-            ViewGroup.MarginLayoutParams channelNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 128);
+            channelInfo.setOnClickListener(new OnClickChannelListener(getParentActivity(), channels.getKey()));
 
-            channelNameParams.setMargins(25, 10, 0, 0);
+            List<VideoDAO> channelVideos = channels.getValue();
 
-            channelNameLayout.setLayoutParams(channelNameParams);
+            ImageView channelThumbnail = channelInfo.findViewById(R.id.channelThumbnail);
 
-            VideoDAO videoDAO = channels.getValue().get(0);
+            TextView textView = channelInfo.findViewById(R.id.channelTitle);
 
-            //Draw the channel thumbnail
-            RoundedView channelThumbnail = new RoundedView(getParentActivity());
+            UserDAO uploader = channelVideos.get(0).getUploader();
 
-            ViewGroup.LayoutParams channelParams = new ViewGroup.LayoutParams(128, 128);
+            channelThumbnail.setImageBitmap(uploader.getChannelThumbnail());
 
-            channelThumbnail.setPadding(15, 15, 15, 15);
+            textView.setText(uploader.getFullName());
 
-            channelThumbnail.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+            LinearLayout videoLayout = channelLayout.findViewById(R.id.channelVideosScroll).findViewById(R.id.channelVideos);
 
-            channelThumbnail.setLayoutParams(channelParams);
+            for (VideoDAO channelVideo : channelVideos) {
+                drawIntoView(videoLayout, channelVideo);
+            }
 
-            channelThumbnail.setImageBitmap(videoDAO.getChannelThumbnail());
-
-            //Channel name
-            String channel_name_text = videoDAO.getUploaderName();
-
-            ViewGroup.MarginLayoutParams channelTextNameParams = new ViewGroup.MarginLayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 128);
-
-            channelTextNameParams.setMargins(25, 0, 0, 0);
-
-            TextView channelName = new TextView(getParentActivity());
-
-            channelName.setGravity(Gravity.CENTER_HORIZONTAL | Gravity.CENTER_VERTICAL);
-
-            channelName.setLayoutParams(channelTextNameParams);
-
-            channelName.setText(channel_name_text);
-
-            //Add all to the layout
-            channelNameLayout.addView(channelThumbnail);
-
-            channelNameLayout.addView(channelName);
-
-            channelNameLayout.setOnClickListener(new OnClickChannelListener(getParentActivity(), channels.getKey()));
-
-            getParentView().addView(channelNameLayout);
-
-            drawIntoView(getParentView(), channels.getValue());
-
+            getParentView().addView(channelLayout);
         }
 
-    }
-
-    private void drawIntoView(ViewGroup parent, List<VideoDAO> toDraw) {
-
-        HorizontalScrollView scrollingVideo = new HorizontalScrollView(getParentActivity());
-
-        scrollingVideo.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        LinearLayout videos = new LinearLayout(getParentActivity());
-
-        videos.setOrientation(LinearLayout.HORIZONTAL);
-
-        videos.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-
-        scrollingVideo.addView(videos);
-
-        parent.addView(scrollingVideo);
-
-        for (VideoDAO videoDAO : toDraw) {
-            drawIntoView(videos, videoDAO);
-        }
     }
 
     private void drawIntoView(ViewGroup parent, VideoDAO toDraw) {
 
-        LinearLayout linearVideoLayout = new LinearLayout(getParentActivity());
+        View videoLayout = inflater.inflate(R.layout.landingpage_individual_video, null);
 
-        ViewGroup.MarginLayoutParams params = new ViewGroup.MarginLayoutParams(320, 300);
+        ImageView videoThumbnail = videoLayout.findViewById(R.id.videoThumbnail);
 
-        params.setMargins(15, 0, 0, 0);
+        TextView videoTitle = videoLayout.findViewById(R.id.videoTitle);
 
-        linearVideoLayout.setLayoutParams(params);
-
-        linearVideoLayout.setOrientation(LinearLayout.VERTICAL);
-
-        linearVideoLayout.setClickable(true);
-
-        ImageView thumbnail = new ImageView(getParentActivity());
-
-        thumbnail.setLayoutParams(new ViewGroup.LayoutParams(320, 240));
-
-        thumbnail.setAdjustViewBounds(true);
-
-        thumbnail.setScaleType(ImageView.ScaleType.FIT_CENTER);
-
-        thumbnail.setImageBitmap(toDraw.getThumbnail());
-
-        TextView videoTitle = new TextView(getParentActivity());
-
-        videoTitle.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        videoThumbnail.setImageBitmap(toDraw.getThumbnail());
 
         videoTitle.setText(toDraw.getTitle());
 
-        linearVideoLayout.addView(thumbnail);
-        linearVideoLayout.addView(videoTitle);
-
-        linearVideoLayout.setOnClickListener(new OnClickVideoListener(getParentActivity(), toDraw.getVideoID()));
-
-        parent.addView(linearVideoLayout);
+        parent.addView(videoLayout);
     }
 }
