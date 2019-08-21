@@ -10,7 +10,7 @@ public class UserData {
 
     private String firstName, lastName, email, salt, photoLink;
 
-    UserData(UUID uuid, String firstName, String lastName, String email, String photoLink, String salt) {
+    private UserData(UUID uuid, String firstName, String lastName, String email, String photoLink, String salt) {
         this.uuid = uuid;
         this.firstName = firstName;
         this.lastName = lastName;
