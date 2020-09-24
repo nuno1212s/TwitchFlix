@@ -1,18 +1,14 @@
 package com.twitchflix.applicationclient.rest.models;
 
-public class VideoStream extends Video {
+import com.twitchflix.applicationclient.utils.VideoLinkCreator;
 
-    private String streamLink;
+public class VideoStream extends Video {
 
     protected VideoStream() {
         super();
     }
 
-    public void setStreamLink(String streamLink) {
-        this.streamLink = streamLink;
-    }
-
     public String getStreamLink() {
-        return streamLink;
+        return VideoLinkCreator.createStreamURL(getVideoID().toString());
     }
 }

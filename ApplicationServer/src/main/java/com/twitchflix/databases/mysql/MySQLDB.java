@@ -37,7 +37,7 @@ public abstract class MySQLDB {
 
         HikariConfig config = new HikariConfig();
 
-        config.setJdbcUrl("jdbc:mysql://" + IP + "/" + database);
+        config.setJdbcUrl("jdbc:mysql://" + IP + "/" + database + "?serverTimezone=UTC");
 
         config.setUsername(userName);
         config.setPassword(password);

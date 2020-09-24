@@ -13,9 +13,6 @@ public class VideoBuilder {
     private String title;
     private String description;
     private boolean live;
-    private String link;
-    private String thumbnailLink;
-    private String streamLink;
     private UUID videoID;
     private long uploadDate;
     private int likes;
@@ -40,18 +37,6 @@ public class VideoBuilder {
         this.live = live;
         return this;
     }
-
-    public VideoBuilder setLink(String link) {
-        this.link = link;
-
-        return this;
-    }
-
-    public VideoBuilder setThumbnailLink(String thumbnailLink) {
-        this.thumbnailLink = thumbnailLink;
-        return this;
-    }
-
     public VideoBuilder setVideoID(UUID videoID) {
         this.videoID = videoID;
         return this;
@@ -72,11 +57,6 @@ public class VideoBuilder {
         return this;
     }
 
-    public VideoBuilder setStreamLink(String streamLink) {
-        this.streamLink = streamLink;
-        return this;
-    }
-
     public VideoBuilder fromResultSet(ResultSet set) throws SQLException {
 
         setUploader(UUID.fromString(set.getString("UPLOADER")));
@@ -84,8 +64,6 @@ public class VideoBuilder {
         setTitle(set.getString("TITLE"));
         setDescription(set.getString("DESCRIPTION"));
         setLive(set.getBoolean("LIVE"));
-        setLink(set.getString("LINK"));
-        setThumbnailLink(set.getString("THUMBNAILLINK"));
 //        setUploadDate(set.getDate("UPLOADDATE").toLocalDate().getLong(ChronoField.MILLI_OF_SECOND));
         setLikes(set.getInt("LIKES"));
         setViews(set.getInt("VIEWS"));
@@ -95,14 +73,10 @@ public class VideoBuilder {
 
     public Video createVideo() {
         return new Video(videoID, uploader, title, description, uploadDate,
-                likes, views, live, link, thumbnailLink);
+                likes, views, live);
     }
 
     public VideoStream createVideoStream() {
-        VideoStream videoStream = new VideoStream(videoID, uploader, title, description, uploadDate, likes, views, live, link, thumbnailLink);
-
-        videoStream.setStreamLink(this.streamLink);
-
-        return videoStream;
+        return new VideoStream(videoID, uploader, title, description, uploadDate, likes, views, live);
     }
 }

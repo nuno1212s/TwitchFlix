@@ -1,5 +1,7 @@
 package com.twitchflix.applicationclient.rest.models;
 
+import com.twitchflix.applicationclient.utils.VideoLinkCreator;
+
 import java.util.UUID;
 
 public class Video {
@@ -14,8 +16,6 @@ public class Video {
     private int likes, views;
 
     private boolean live;
-
-    private String link, thumbnailLink;
 
     protected Video() {}
 
@@ -52,11 +52,11 @@ public class Video {
     }
 
     public String getLink() {
-        return link;
+        return VideoLinkCreator.createVideoURL(getVideoID().toString(), isLive());
     }
 
     public String getThumbnailLink() {
-        return thumbnailLink;
+        return VideoLinkCreator.createThumbnailLink(getVideoID().toString());
     }
 
     public void setVideoID(UUID videoID) {
@@ -89,13 +89,5 @@ public class Video {
 
     public void setLive(boolean live) {
         this.live = live;
-    }
-
-    public void setLink(String link) {
-        this.link = link;
-    }
-
-    public void setThumbnailLink(String thumbnailLink) {
-        this.thumbnailLink = thumbnailLink;
     }
 }

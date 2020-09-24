@@ -22,7 +22,9 @@ public class ServerConnection {
 
     private Gson gson;
 
-    private static final String SERVER_IP = "https://nuno1212s.ovh:8443/";
+    private static final String SERVER_IP = "https://nunogneto.pt:8443/";
+
+    private static final String DOMAIN_NAME = "nunogneto.pt", STREAM_DOMAIN = "stream.nunogneto.pt";
 
     private ServerConnection(Context c) {
 
@@ -32,6 +34,14 @@ public class ServerConnection {
 
         this.gson = builder.create();
 
+    }
+
+    public static String getDomainName() {
+        return DOMAIN_NAME;
+    }
+
+    public static String getStreamDomain() {
+        return STREAM_DOMAIN;
     }
 
     public static String getServerIp() {

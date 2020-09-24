@@ -191,6 +191,8 @@ public class UserDataHandler {
     @Path("test")
     public Response test() {
 
+        System.out.println("TESTE");
+
         return Response.ok().entity("TESTE OK").build();
 
     }

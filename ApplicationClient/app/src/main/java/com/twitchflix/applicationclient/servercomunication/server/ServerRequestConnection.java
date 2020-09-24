@@ -162,9 +162,12 @@ public class ServerRequestConnection implements ServerRequests {
                 .post(RequestBody.create(JSON, jsonObject.toString()))
                 .build();
 
+        System.out.println("Executing...");
         try (Response r = ServerConnection.getIns().getClient().newCall(request).execute()) {
 
             if (r.code() == 200) {
+
+                System.out.println("responded...");
 
                 return ServerConnection.getIns().getGson().fromJson(r.body().string(), VideoStream.class);
 

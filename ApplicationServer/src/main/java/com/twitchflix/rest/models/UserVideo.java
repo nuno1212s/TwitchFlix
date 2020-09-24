@@ -12,8 +12,7 @@ public class UserVideo extends Video {
     public UserVideo(Video videoObject, User user) {
         super(videoObject.getVideoID(), videoObject.getUploader(), videoObject.getTitle(),
                 videoObject.getDescription(), videoObject.getUploadDate(), videoObject.getLikes(),
-                videoObject.getViews(), videoObject.isLive(),
-                videoObject.getLink(), videoObject.getThumbnailLink());
+                videoObject.getViews(), videoObject.isLive());
 
         UUID videoID = videoObject.getVideoID();
 

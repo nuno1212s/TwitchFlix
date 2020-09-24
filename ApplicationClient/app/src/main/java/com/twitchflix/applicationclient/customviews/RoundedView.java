@@ -33,14 +33,17 @@ public class RoundedView extends ImageView {
         if (getWidth() == 0 || getHeight() == 0) {
             return;
         }
+
         Bitmap b = ((BitmapDrawable) drawable).getBitmap();
-        Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
 
-        int w = getWidth(), h = getHeight();
+        if (b != null) {
+            Bitmap bitmap = b.copy(Bitmap.Config.ARGB_8888, true);
 
-        Bitmap roundBitmap = getCroppedBitmap(bitmap, w);
-        canvas.drawBitmap(roundBitmap, 0, 0, null);
+            int w = getWidth(), h = getHeight();
 
+            Bitmap roundBitmap = getCroppedBitmap(bitmap, w);
+            canvas.drawBitmap(roundBitmap, 0, 0, null);
+        }
     }
 
     public static Bitmap getCroppedBitmap(Bitmap bmp, int radius) {
@@ -49,7 +52,7 @@ public class RoundedView extends ImageView {
         if (bmp.getWidth() != radius || bmp.getHeight() != radius) {
             float smallest = Math.min(bmp.getWidth(), bmp.getHeight());
             float factor = smallest / radius;
-            sbmp = Bitmap.createScaledBitmap(bmp, (int)(bmp.getWidth() / factor), (int)(bmp.getHeight() / factor), false);
+            sbmp = Bitmap.createScaledBitmap(bmp, (int) (bmp.getWidth() / factor), (int) (bmp.getHeight() / factor), false);
         } else {
             sbmp = bmp;
         }

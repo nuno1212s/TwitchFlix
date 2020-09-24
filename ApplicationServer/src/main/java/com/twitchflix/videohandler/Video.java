@@ -19,20 +19,15 @@ public class Video {
 
     private boolean live;
 
-    private String link, thumbnailLink;
-
     private transient boolean transcoding = false;
 
-    Video(UUID uploader, String title, String description, boolean live,
-          String link, String thumbnailLink) {
+    Video(UUID uploader, String title, String description, boolean live) {
 
         this.videoID = UUID.randomUUID();
         this.uploader = uploader;
         this.title = title;
         this.description = description;
         this.live = live;
-        this.link = link;
-        this.thumbnailLink = thumbnailLink;
         this.likes = 0;
         this.views = 0;
         this.uploadDate = System.currentTimeMillis();
@@ -40,7 +35,7 @@ public class Video {
     }
 
     protected Video(UUID videoID, UUID uploader, String title, String description, long uploadDate,
-                    int likes, int views, boolean live, String link, String thumbnailLink) {
+                    int likes, int views, boolean live) {
 
         this.videoID = videoID;
         this.uploader = uploader;
@@ -50,8 +45,6 @@ public class Video {
         this.likes = likes;
         this.views = views;
         this.live = live;
-        this.link = link;
-        this.thumbnailLink = thumbnailLink;
 
     }
 
@@ -99,14 +92,6 @@ public class Video {
         return this.transcoding;
     }
 
-    public String getLink() {
-        return link;
-    }
-
-    public String getThumbnailLink() {
-        return thumbnailLink;
-    }
-
     public int getLikes() {
         return likes;
     }
@@ -120,9 +105,5 @@ public class Video {
 
         App.getAsync().submit(() ->
                 App.getVideoDatabase().incrementVideoViews(this.getVideoID()));
-    }
-
-    public void setLink(String link) {
-        this.link = link;
     }
 }

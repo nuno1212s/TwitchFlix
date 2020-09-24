@@ -16,6 +16,7 @@ import com.twitchflix.applicationclient.utils.loaders.UserDataLoader;
 import com.twitchflix.applicationclient.utils.loaders.VideoDataLoader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
@@ -118,6 +119,8 @@ public class LandingPageViewModel extends AndroidViewModel {
             List<UserVideo> landingPage =
                     ClientApp.getIns().getServerRequests()
                             .getLandingPage(ClientApp.getIns().getLoginHandler().getCurrentActiveConnection());
+
+            if (landingPage == null) return Collections.emptyList();
 
             List<VideoDAO> landingPageVideos = new ArrayList<>(landingPage.size());
 

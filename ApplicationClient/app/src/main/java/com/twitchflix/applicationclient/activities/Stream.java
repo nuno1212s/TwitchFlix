@@ -1,6 +1,8 @@
 package com.twitchflix.applicationclient.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -10,7 +12,10 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.pedro.encoder.input.video.CameraHelper;
 import com.pedro.rtplibrary.rtmp.RtmpCamera1;
@@ -28,6 +33,8 @@ public class Stream extends AppCompatActivity implements ConnectCheckerRtmp, Sur
     private static final String STREAM_TITLE = "title";
     private static final String STREAM_DESC = "description";
     private static final String FACING = "facing";
+
+    private static final int REQUEST_PERMS_CODE = 50;
 
     private EditText streamTitle;
 
@@ -48,6 +55,7 @@ public class Stream extends AppCompatActivity implements ConnectCheckerRtmp, Sur
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_stream);
 
         startStreamButton = findViewById(R.id.startStreamButton);
@@ -57,8 +65,6 @@ public class Stream extends AppCompatActivity implements ConnectCheckerRtmp, Sur
         this.cameraView = findViewById(R.id.camera_view);
 
         this.startStreamProgressBar = findViewById(R.id.startStreamProgress);
-
-        this.camera = new RtmpCamera1(this.cameraView, this);
 
         cameraView.getHolder().addCallback(this);
 
@@ -71,7 +77,35 @@ public class Stream extends AppCompatActivity implements ConnectCheckerRtmp, Sur
             this.streamTitleText = extras.getString(STREAM_TITLE);
             this.streamDescriptionText = extras.getString(STREAM_DESC);
             this.cameraFacing = CameraHelper.Facing.valueOf(extras.getString(FACING));
+        }
 
+        if (requestPerms()) {
+            initRTMP();
+        }
+    }
+
+    private void initRTMP() {
+        this.camera = new RtmpCamera1(this.cameraView, this);
+    }
+
+    private boolean requestPerms() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.RECORD_AUDIO},
+                    REQUEST_PERMS_CODE);
+
+            return false;
+        }
+
+        return true;
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_PERMS_CODE && resultCode == RESULT_OK) {
+            initRTMP();
         }
     }
 
@@ -103,6 +137,8 @@ public class Stream extends AppCompatActivity implements ConnectCheckerRtmp, Sur
                 }
 
                 if (streamURL == null) {
+                    System.out.println("Requesting stream link");
+
                     new RequestStreamLink(this)
                             .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, streamTitleText, streamDescriptionText);
                 } else {

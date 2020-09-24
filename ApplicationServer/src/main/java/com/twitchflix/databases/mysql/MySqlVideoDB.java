@@ -14,9 +14,10 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
             " UPLOADER BINARY(16) NOT NULL, TITLE varchar(255) NOT NULL, DESCRIPTION TEXT NOT NULL," +
             " UPLOADDATE TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, LIKES BIGINT NOT NULL DEFAULT 0," +
             " VIEWS BIGINT NOT NULL DEFAULT 0, LIVE BOOLEAN NOT NULL DEFAULT FALSE," +
-            " LINK varchar(2048), THUMBNAILLINK varchar(2048), VALID BOOLEAN NOT NULL DEFAULT FALSE," +
+            "VALID BOOLEAN NOT NULL DEFAULT FALSE," +
             "TRANSCODING BOOLEAN NOT NULL DEFAULT FALSE"+
-            ", UNIQUE(VIDEOID));";
+            ", UNIQUE(VIDEOID), " +
+            "INDEX UPLOADERINDEX (UPLOADER), INDEX TITLEINDEX (TITLE));";
 
     public MySqlVideoDB() {
         super();
@@ -30,7 +31,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
         try (Connection c = getConnection();
              PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
-                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VIDEOID = UUID_TO_BIN(?)")) {
+                     "UPLOADDATE, LIKES, VIEWS, LIVE FROM VIDEOS WHERE VIDEOID = UUID_TO_BIN(?)")) {
 
             s.setString(1, videoID.toString());
 
@@ -66,7 +67,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
 
         try (Connection c = getConnection();
              PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(VIDEOID) AS VIDEOID, BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
-                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VALID=TRUE AND TRANSCODING=FALSE")) {
+                     "UPLOADDATE, LIKES, VIEWS, LIVE FROM VIDEOS WHERE VALID=TRUE AND TRANSCODING=FALSE")) {
 
             return readVideosFromQuery(s);
 
@@ -106,15 +107,13 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public void registerVideoStream(Video video) {
 
         try (Connection c = getConnection();
-             PreparedStatement s = c.prepareStatement("INSERT INTO VIDEOS(VIDEOID, UPLOADER, TITLE, DESCRIPTION, LINK, THUMBNAILLINK) " +
-                     "values(UUID_TO_BIN(?), UUID_TO_BIN(?), ?, ?, ?, ?)")) {
+             PreparedStatement s = c.prepareStatement("INSERT INTO VIDEOS(VIDEOID, UPLOADER, TITLE, DESCRIPTION) " +
+                     "values(UUID_TO_BIN(?), UUID_TO_BIN(?), ?, ?)")) {
 
             s.setString(1, video.getVideoID().toString());
             s.setString(2, video.getUploader().toString());
             s.setString(3, video.getTitle());
             s.setString(4, video.getDescription());
-            s.setString(5, video.getLink());
-            s.setString(6, video.getThumbnailLink());
 
             s.executeUpdate();
 
@@ -128,11 +127,10 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public void updateVideo(Video video) {
 
         try (Connection c = getConnection();
-            PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET LIVE=?, LINK=?, TRANSCODING=?, VALID=TRUE" +
+            PreparedStatement s = c.prepareStatement("UPDATE VIDEOS SET LIVE=?, TRANSCODING=?, VALID=TRUE" +
                     " WHERE VIDEOID=UUID_TO_BIN(?)")) {
 
             s.setBoolean(1, video.isLive());
-            s.setString(2, video.getLink());
             s.setBoolean(3, video.isTranscoding());
 
             s.setString(4, video.getVideoID().toString());
@@ -184,7 +182,7 @@ public class MySqlVideoDB extends MySQLDB implements VideoDatabase {
     public List<Video> getVideosWithUploader(UUID uploader) {
         try (Connection c = getConnection();
              PreparedStatement s = c.prepareStatement("SELECT BIN_TO_UUID(VIDEOID) AS VIDEOID, BIN_TO_UUID(UPLOADER) AS UPLOADER, TITLE, DESCRIPTION, " +
-                     "UPLOADDATE, LIKES, VIEWS, LIVE, LINK, THUMBNAILLINK FROM VIDEOS WHERE VALID=TRUE AND TRANSCODING=FALSE AND UPLOADER=UUID_TO_BIN(?) ORDER BY UPLOADDATE")) {
+                     "UPLOADDATE, LIKES, VIEWS, LIVE FROM VIDEOS WHERE VALID=TRUE AND TRANSCODING=FALSE AND UPLOADER=UUID_TO_BIN(?) ORDER BY UPLOADDATE")) {
 
             s.setString(1, uploader.toString());
 

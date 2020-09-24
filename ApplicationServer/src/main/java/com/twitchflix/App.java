@@ -85,8 +85,8 @@ public class App {
     public static void main(String[] args) throws Exception {
 
         //Initialize the logger
-        SERVER_IP = "nuno1212s.ovh";
-        DATA_FOLDER = "/data/";
+        SERVER_IP = "nunogneto.pt";
+        DATA_FOLDER = "/mnt/databases/data/";
 
         USER_PHOTOS = "userphotos";
         VIDEO_FOLDER = "recordings";
@@ -146,7 +146,6 @@ public class App {
 
         server.start();
         server.join();
-
     }
 
     private static HandlerList registerServlets(ServletContextHandler ctx) {

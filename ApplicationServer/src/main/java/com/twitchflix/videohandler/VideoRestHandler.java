@@ -120,9 +120,6 @@ public class VideoRestHandler {
                     .setDescription(streamRequest.getDescription())
                     .setUploadDate(System.currentTimeMillis())
                     .setLive(false)
-                    .setLink("https://" + App.SERVER_IP + "/watch/hls/" + videoID.toString() + ".m3u8")
-                    .setThumbnailLink("https://" + App.SERVER_IP + "/images/" + videoID.toString() + ".jpg")
-                    .setStreamLink("rtmp://" + App.SERVER_IP + "/show/" + videoID.toString())
                     .createVideoStream();
 
             App.getAsync().submit(() -> App.getVideoDatabase().registerVideoStream(video));
@@ -169,8 +166,6 @@ public class VideoRestHandler {
         }
 
         videoByID.setTranscoding(false);
-
-        videoByID.setLink("https://" + App.SERVER_IP + "/recordings/" + streamId + ".mp4");
 
         App.getAsync().submit(() -> App.getVideoDatabase().updateVideo(videoByID));
 
