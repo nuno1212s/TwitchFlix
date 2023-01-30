@@ -2,7 +2,7 @@
 
 This is a streaming and VOD platform with full user account functionality like livestreams, videos per channel and even user photos. 
 
-Made with NGINX to handle the Streaming (RTMP), VOD distribution and in general file server (Like user photos and video thumbnails). NGINX is controlled by an HTTPS REST backend built in Java using Jetty and Jersey to handle all requests. This backend uses HikaryCP and MongoDB as the database for the project.
+Made with NGINX to handle the Streaming (RTMP), VOD distribution and in general file server (Like user photos and video thumbnails). NGINX is controlled by an HTTPS REST backend built in Java using Jetty and Jersey to handle all requests. This backend uses MariaDB (accessed utilizing HikariCP) and MongoDB as the database for the project.
 
 This server supports Google Sign In or normal login, stored in the database that uses hashing and salting to safely store and compare passwords along with auth keys to prevent sending passwords back and forward from the server.
 
